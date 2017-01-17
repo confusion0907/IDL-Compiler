@@ -1,0 +1,30 @@
+typedef long time;
+
+enum weather{sunny,rainy,cloudy,snowy};
+
+union goodMorning switch(long){
+	default:
+		octet unknownOp;
+	case 0:
+		octet case0;
+	case 1:
+		octet case1;
+};
+exception sayGoodbye{ 
+	string error; 
+};
+
+interface HelloService{
+	struct test{
+		short id;
+		string name;
+	};
+	typedef string id;
+	const short number = 5;
+	string sayHello(in string name,inout string number);
+	void shutdown(out short time);	
+};
+
+interface HelloWorld{
+	string sayGoodbye(in string name,inout string number);
+};

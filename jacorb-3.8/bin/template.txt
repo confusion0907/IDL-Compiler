@@ -1,0 +1,77 @@
+%newfile new<fileName>.idl
+%struct
+struct <structName>{
+%member
+	<memberType> <memberName>;
+%%
+};
+
+%%
+%interface
+%typedef
+static <typedefType> <typedefName>;
+%%
+
+%constants
+const <constantsType> <constantsName> = <constantsValue>;
+%%
+
+%operation
+const long <interfaceName>_<operationName>_Hash = HASH("<operationName>");
+
+struct <interfaceName>_<operationName>_In{
+%param:IN
+	<paramType> <paramName>;
+%%
+%param:INOUT
+	<paramType> <paramName>;
+%%
+};
+
+struct <interfaceName>_<operationName>_Out{
+%param:OUT
+	<paramType> <paramName>;
+%%
+%param:INOUT
+	<paramType> <paramName>;
+%%
+%return
+	<returnType> return_;
+%%
+};
+
+union <interfaceName>_<operationName>_Result switch(long){
+	default:
+		octet unknownEx;
+	case RETURNCODE_OK:
+		<interfaceName>_<operationName>_Out result;
+};
+
+%%
+union <interfaceName>_Call switch(long){
+	default:
+		octet unknownOp;
+%operation
+	case <operationName>:
+		<interfaceName>_<operationName>_In <operationName>;
+%%
+};
+
+struct <interfaceName>_Request{
+	<interfaceName>_Call data;
+};
+
+union <interfaceName>_Return switch(long){
+	default:
+		octet unknownOp;
+%operation
+	case <interfaceName>_<operationName>_Hash:
+		<interfaceName>_<operationName>_Result <operationName>;
+%%
+};
+
+struct <interfaceName>_Reply{
+	<interfaceName>_Return data;
+};
+
+%%

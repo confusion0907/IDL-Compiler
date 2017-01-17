@@ -1,0 +1,123 @@
+long time;
+
+struct weather{
+	const int sunny = 7;
+	const int rainy = 8;
+	const int cloudy = 9;
+	const int snowy = 10;
+};
+
+struct sayGoodbye{
+	string error;
+};
+
+union goodMorning switch(long){
+	case 0:
+		octet case0;
+		break;
+	case 1:
+		octet case1;
+		break;
+	default:
+		octet unknownOp;
+		break;
+};
+
+struct test{
+	short id;
+	string name;
+};
+
+string sayHello(string name,string number);
+void shutdown(short time);
+
+const long HelloService_sayHello_Hash = 752765c00722c7abfd3bdc842b6b46e3;
+
+struct HelloService_sayHello_In{
+	string name;
+	string number;
+};
+
+struct HelloService_sayHello_Out{
+	string number;
+	string return_;
+};
+
+struct HelloService_sayHello_Result{
+	HelloService_sayHello_Out result;
+};
+const long HelloService_shutdown_Hash = 5924f03a95ee6f7277e5bdd1e81b8fdc;
+
+struct HelloService_shutdown_In{
+};
+
+struct HelloService_shutdown_Out{
+	short time;
+};
+
+struct HelloService_shutdown_Result{
+	HelloService_shutdown_Out result;
+};
+
+struct HelloService_Call{
+	long switchUnion;
+	HelloService_sayHello_In sayHello;
+	HelloService_shutdown_In shutdown;
+	UnknownOperation unknowOp;
+};
+
+struct HelloService_Request{
+	RequestHeader header;
+	HelloService_Call data;
+};
+
+struct HelloService_Return{
+	long switchUnion;
+	HelloService_sayHello_Result sayHello;
+	HelloService_shutdown_Result shutdown;
+};
+
+struct HelloService_Reply{
+	ReplyHeader header;
+	HelloService_Return data;
+};
+
+string sayGoodbye(string name,string number);
+
+const long HelloWorld_sayGoodbye_Hash = 86dbecf8a866a667aa599a8e42d42219;
+
+struct HelloWorld_sayGoodbye_In{
+	string name;
+	string number;
+};
+
+struct HelloWorld_sayGoodbye_Out{
+	string number;
+	string return_;
+};
+
+struct HelloWorld_sayGoodbye_Result{
+	HelloWorld_sayGoodbye_Out result;
+};
+
+struct HelloWorld_Call{
+	long switchUnion;
+	HelloWorld_sayGoodbye_In sayGoodbye;
+	UnknownOperation unknowOp;
+};
+
+struct HelloWorld_Request{
+	RequestHeader header;
+	HelloWorld_Call data;
+};
+
+struct HelloWorld_Return{
+	long switchUnion;
+	HelloWorld_sayGoodbye_Result sayGoodbye;
+};
+
+struct HelloWorld_Reply{
+	ReplyHeader header;
+	HelloWorld_Return data;
+};
+
