@@ -1431,13 +1431,19 @@ public class Interface
             	}
             	else if(template.get(i).startsWith("%typedef"))
             	{
-            		i = i+1;
+            		int index = 1;
             		Vector<String> _template = new Vector<String>();
-            		while(!template.get(i).equals("%%"))
+            		_template.add(template.get(i));
+            		while(!(template.get(i).equals("%%") && index == 0))
             		{
+            			i = i + 1;
 						_template.add(template.get(i).replaceAll("<interfaceName>", name));
-						i = i+1;
+						if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+							index = index+1;
+						else if(template.get(i).equals("%%"))
+							index = index-1;
             		}
+            		_template.remove(_template.size()-1);
             		if (!is_pseudo)
                     {
                         if (!is_abstract)

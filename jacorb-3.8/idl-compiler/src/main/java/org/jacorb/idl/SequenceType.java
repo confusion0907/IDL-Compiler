@@ -118,8 +118,11 @@ public class SequenceType
     {
         return length;
     }
-
-
+    
+    public int getSequenceLength()
+    {
+        return length;
+    }
 
     void setRecursive()
     {

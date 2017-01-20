@@ -245,7 +245,7 @@ public class AliasTypeSpec
             // guard against recursive entries, which can happen due to
             // containments, e.g., an alias within an interface that refers
             // back to the interface
-            written = true;
+            //written = true;
 
             if (!(originalType instanceof FixedPointType) &&
 			    !(originalType.typeSpec() instanceof ArrayTypeSpec) &&
@@ -269,13 +269,71 @@ public class AliasTypeSpec
 
 			String className = className();
 			
-			for(int i = 0 ; i < template.size() ; i++)
+			if(template.get(0).contains(":local"))
 			{
-				String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
-				tmp = tmp.replaceAll("<typedefName>", className);
-				ps.println(tmp);
+				if (!(originalType instanceof FixedPointType) &&
+						!(originalType.typeSpec() instanceof ArrayTypeSpec) &&
+						!(originalType.typeSpec() instanceof StringType) &&
+						!(originalType.typeSpec() instanceof SequenceType) &&
+						! originalTypeWasScopedName &&
+						!(originalType instanceof ConstrTypeSpec &&
+								((ConstrTypeSpec)originalType).declaration() instanceof Interface )
+						)
+				{
+					for(int i = 1 ; i < template.size() ; i++)
+					{
+						String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+						tmp = tmp.replaceAll("<typedefName>", className);
+						ps.println(tmp);
+					}
+				}
 			}
-        }
+			else if(template.get(0).contains(":sequence"))
+			{
+				if(originalType instanceof SequenceType)
+				{
+					for(int i = 1 ; i < template.size() ; i++)
+					{
+						if(template.get(i).startsWith("%length"))
+						{
+							i = i+1;
+							while(!template.get(i).equals("%%"))
+							{
+								if(originalType.getSequenceLength() != 0)
+								{
+									String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+									tmp = tmp.replaceAll("<typedefName>", className);
+									tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
+									ps.println(tmp);
+								}
+								i = i+1;
+							}
+							i = i+1;
+						}
+						else
+						{
+							String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+							tmp = tmp.replaceAll("<typedefName>", className);
+							tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
+							ps.println(tmp);
+						}
+					}
+				}
+			}
+			else
+			{
+				for(int i = 1 ; i < template.size() ; i++)
+				{
+					String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+					tmp = tmp.replaceAll("<typedefName>", className);
+					if(originalType.typeSpec() instanceof SequenceType)
+						tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
+					else
+						tmp = tmp.replaceAll("<sequenceLength>", "");
+					ps.println(tmp);
+				}
+			}
+		}
     }
 
     public String printReadStatement(String varname, String streamname)

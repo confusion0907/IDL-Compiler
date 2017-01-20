@@ -140,13 +140,19 @@ public class Spec
 				}
 				else if(str.startsWith("%typedef"))
 				{
+					int index = 1;
 					Vector<String> template = new Vector<String>();
-					while(!str.equals("%%"))
+					template.add(str);
+					while(!(str.equals("%%") && index == 0))
 					{
 						str = raf.readLine();
 						ptr = raf.getFilePointer();
 						str = str.replaceAll("<fileName>", parser.file_Name);
 						template.add(str);
+						if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
+							index = index+1;
+						else if(str.equals("%%"))
+							index = index-1;
 					}
 					template.remove(template.size()-1);
 					

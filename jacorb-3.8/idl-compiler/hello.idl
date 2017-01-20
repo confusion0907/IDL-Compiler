@@ -1,4 +1,6 @@
-typedef long time;
+typedef sequence<long,80> time;
+typedef sequence<long> time_temp;
+typedef long number;
 
 enum weather{sunny,rainy,cloudy,snowy};
 
@@ -22,7 +24,7 @@ interface HelloService{
 	typedef string id;
 	const short number = 5;
 	string sayHello(in string name,inout string number);
-	void shutdown(out short time);	
+	void shutdown(out time data);	
 };
 
 interface HelloWorld{

@@ -1,6 +1,8 @@
 %newfile new<fileName>.idl
-%typedef
-<typedefType> <typedefName>;
+%typedef:sequence
+%length
+<typedefType><sequenceLength> <typedefName>;
+%%
 %%
 
 %enum

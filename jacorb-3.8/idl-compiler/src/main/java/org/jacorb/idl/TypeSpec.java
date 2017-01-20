@@ -233,6 +233,11 @@ public class TypeSpec
     {
         return type_spec.printWriteStatement( var_name, streamname );
     }
+    
+    public int getSequenceLength()
+    {
+    	return type_spec.getSequenceLength();
+    }
 
     public String printInsertExpression()
     {
