@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <copy file="D:\软件安装\Eclipse\workplace\jacorb-3.8\idl-compiler\target/jacorb-idl-compiler-3.8.jar" tofile="D:\软件安装\Eclipse\workplace\jacorb-3.8\idl-compiler/../lib/idl.jar" overwrite="true"/>
+</target>
+</project>

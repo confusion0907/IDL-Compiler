@@ -1,0 +1,128 @@
+%newfile new<fileName>.idl
+%typedef:sequence
+%length
+<typedefType> <typedefName> = new long[<sequenceLength>];
+%%
+%%
+%module
+%enum
+struct <enumName>{
+%label
+	const int <enumLabel> = IncNum(7);
+%%
+};
+%%
+
+%exception
+struct <exceptionName>{
+%member
+	<memberType> <memberName>;
+%%
+};
+%%
+
+%union
+union <unionName> switch(<switchType>){
+%case
+	case <caseValue>:
+		<memberType> <memberName>;
+		break;
+%%
+%default
+	default:
+		<memberType> <memberName>;
+		break;
+%%
+};
+%%
+
+%interface
+%exception
+struct <exceptionName>{
+%member
+	<memberType> <memberName>;
+%%
+};
+%%
+%union
+union <unionName> switch(<switchType>){
+%case
+	case <caseValue>:
+		<memberType> <memberName>;
+		break;
+%%
+%default
+	default:
+		<memberType> <memberName>;
+		break;
+%%
+};
+%%
+%struct
+struct <structName>{
+%member
+	<memberType> <memberName>;
+%%
+};
+
+%%
+%operation
+<returnType> <operationName>(<paramList>);
+%%
+
+%operation
+const long <interfaceName>_<operationName>_Hash = HASH("<operationName>");
+
+struct <interfaceName>_<operationName>_In{
+%param:IN
+	<paramType> <paramName>;
+%%
+%param:INOUT
+	<paramType> <paramName>;
+%%
+};
+
+struct <interfaceName>_<operationName>_Out{
+%param:OUT
+	<paramType> <paramName>;
+%%
+%param:INOUT
+	<paramType> <paramName>;
+%%
+%return
+	<returnType> return_;
+%%
+};
+
+struct <interfaceName>_<operationName>_Result{
+	<interfaceName>_<operationName>_Out result;
+};
+%%
+
+struct <interfaceName>_Call{
+	long switchUnion;
+%operation
+	<interfaceName>_<operationName>_In <operationName>;
+%%
+	UnknownOperation unknowOp;
+};
+
+struct <interfaceName>_Request{
+	RequestHeader header;
+	<interfaceName>_Call data;
+};
+
+struct <interfaceName>_Return{
+	long switchUnion;
+%operation
+	<interfaceName>_<operationName>_Result <operationName>;
+%%
+};
+
+struct <interfaceName>_Reply{
+	ReplyHeader header;
+	<interfaceName>_Return data;
+};
+
+%%
+%%
