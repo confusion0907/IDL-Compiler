@@ -21,6 +21,7 @@ package org.jacorb.idl;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
@@ -235,6 +236,7 @@ public class AliasTypeSpec
     {
     	//FIXME
         setPrintPhaseNames();
+        boolean judge = false;
 
         // no code generation for included definitions
         if (included && !generateIncluded())
@@ -282,9 +284,38 @@ public class AliasTypeSpec
 				{
 					for(int i = 1 ; i < template.size() ; i++)
 					{
-						String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
-						tmp = tmp.replaceAll("<typedefName>", className);
-						ps.println(tmp);
+						if(template.get(i).startsWith("%newfile"))
+			        	{
+			        		judge = true;
+			        		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+			        		PrintWriter _ps;
+			        		
+			        		try{
+								_ps = openOutput(tmp.substring(9));
+								if(_ps == null)
+									throw new Exception();
+							}catch(Exception e){
+								throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+							}
+			        		
+			        		if(ps != null)
+			        		{
+			        			ps.close();
+			        			ps = _ps;
+			        		}
+			        		else
+			        			ps = _ps;
+			        		
+			        		i = i+1;
+			        	}
+						else if(ps == null)
+							throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+						else
+						{
+							String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+							tmp = tmp.replaceAll("<typedefName>", className);
+							ps.println(tmp);
+						}
 					}
 				}
 			}
@@ -294,7 +325,33 @@ public class AliasTypeSpec
 				{
 					for(int i = 1 ; i < template.size() ; i++)
 					{
-						if(template.get(i).startsWith("%length"))
+						if(template.get(i).startsWith("%newfile"))
+			        	{
+			        		judge = true;
+			        		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+			        		PrintWriter _ps;
+			        		
+			        		try{
+								_ps = openOutput(tmp.substring(9));
+								if(_ps == null)
+									throw new Exception();
+							}catch(Exception e){
+								throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+							}
+			        		
+			        		if(ps != null)
+			        		{
+			        			ps.close();
+			        			ps = _ps;
+			        		}
+			        		else
+			        			ps = _ps;
+			        		
+			        		i = i+1;
+			        	}
+						else if(ps == null)
+							throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+						else if(template.get(i).startsWith("%length"))
 						{
 							i = i+1;
 							while(!template.get(i).equals("%%"))
@@ -324,16 +381,71 @@ public class AliasTypeSpec
 			{
 				for(int i = 1 ; i < template.size() ; i++)
 				{
-					String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
-					tmp = tmp.replaceAll("<typedefName>", className);
-					if(originalType.typeSpec() instanceof SequenceType)
-						tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
+					if(template.get(i).startsWith("%newfile"))
+		        	{
+		        		judge = true;
+		        		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+		        		PrintWriter _ps;
+		        		
+		        		try{
+							_ps = openOutput(tmp.substring(9));
+							if(_ps == null)
+								throw new Exception();
+						}catch(Exception e){
+							throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+						}
+		        		
+		        		if(ps != null)
+		        		{
+		        			ps.close();
+		        			ps = _ps;
+		        		}
+		        		else
+		        			ps = _ps;
+		        		
+		        		i = i+1;
+		        	}
+					else if(ps == null)
+						throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
 					else
-						tmp = tmp.replaceAll("<sequenceLength>", "");
-					ps.println(tmp);
+					{
+						String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+						tmp = tmp.replaceAll("<typedefName>", className);
+						if(originalType.typeSpec() instanceof SequenceType)
+							tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
+						else
+							tmp = tmp.replaceAll("<sequenceLength>", "");
+						ps.println(tmp);
+					}
 				}
 			}
 		}
+        
+        if(ps != null && judge)
+        	ps.close();
+    }
+    
+    protected PrintWriter openOutput(String typeName)
+    {
+        try
+        {
+            final File f = new File(parser.out_dir+"\\"+typeName);
+            if (GlobalInputStream.isMoreRecentThan(f))
+            {
+                PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
+                return ps;
+            }
+
+            // no need to open file for printing, existing file is more
+            // recent than IDL file.
+
+            return null;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException ("Could not open output file for "
+                                        + typeName + " (" + e + ")");
+        }
     }
 
     public String printReadStatement(String varname, String streamname)

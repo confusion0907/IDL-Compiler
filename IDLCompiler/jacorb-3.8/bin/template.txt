@@ -1,63 +1,4 @@
 %newfile new<fileName>.idl
-%typedef:sequence
-%length
-<typedefType> <typedefName> = new long[<sequenceLength>];
-%%
-%%
-%module
-%enum
-struct <enumName>{
-%label
-	const int <enumLabel> = IncNum(7);
-%%
-};
-%%
-
-%exception
-struct <exceptionName>{
-%member
-	<memberType> <memberName>;
-%%
-};
-%%
-
-%union
-union <unionName> switch(<switchType>){
-%case
-	case <caseValue>:
-		<memberType> <memberName>;
-		break;
-%%
-%default
-	default:
-		<memberType> <memberName>;
-		break;
-%%
-};
-%%
-
-%interface
-%exception
-struct <exceptionName>{
-%member
-	<memberType> <memberName>;
-%%
-};
-%%
-%union
-union <unionName> switch(<switchType>){
-%case
-	case <caseValue>:
-		<memberType> <memberName>;
-		break;
-%%
-%default
-	default:
-		<memberType> <memberName>;
-		break;
-%%
-};
-%%
 %struct
 struct <structName>{
 %member
@@ -66,8 +7,13 @@ struct <structName>{
 };
 
 %%
-%operation
-<returnType> <operationName>(<paramList>);
+%interface
+%typedef
+static <typedefType> <typedefName>;
+%%
+
+%constants
+const <constantsType> <constantsName> = <constantsValue>;
 %%
 
 %operation
@@ -94,35 +40,38 @@ struct <interfaceName>_<operationName>_Out{
 %%
 };
 
-struct <interfaceName>_<operationName>_Result{
-	<interfaceName>_<operationName>_Out result;
+union <interfaceName>_<operationName>_Result switch(long){
+	default:
+		octet unknownEx;
+	case RETURNCODE_OK:
+		<interfaceName>_<operationName>_Out result;
 };
-%%
 
-struct <interfaceName>_Call{
-	long switchUnion;
-%operation
-	<interfaceName>_<operationName>_In <operationName>;
 %%
-	UnknownOperation unknowOp;
+union <interfaceName>_Call switch(long){
+	default:
+		octet unknownOp;
+%operation
+	case <operationName>:
+		<interfaceName>_<operationName>_In <operationName>;
+%%
 };
 
 struct <interfaceName>_Request{
-	RequestHeader header;
 	<interfaceName>_Call data;
 };
 
-struct <interfaceName>_Return{
-	long switchUnion;
+union <interfaceName>_Return switch(long){
+	default:
+		octet unknownOp;
 %operation
-	<interfaceName>_<operationName>_Result <operationName>;
+	case <interfaceName>_<operationName>_Hash:
+		<interfaceName>_<operationName>_Result <operationName>;
 %%
 };
 
 struct <interfaceName>_Reply{
-	ReplyHeader header;
 	<interfaceName>_Return data;
 };
 
-%%
 %%

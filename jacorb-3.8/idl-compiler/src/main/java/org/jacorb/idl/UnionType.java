@@ -1275,6 +1275,8 @@ public class UnionType
 	            		
 	            		i = i+1;
 	            	}
+					else if(_ps == null)
+						throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
 					else if(template.get(i).startsWith("%case"))
 					{
 						i = i+1;

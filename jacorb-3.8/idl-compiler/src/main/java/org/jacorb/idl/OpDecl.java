@@ -20,6 +20,8 @@
 
 package org.jacorb.idl;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.util.Enumeration;
@@ -967,9 +969,12 @@ public class OpDecl
     /**
      * @param printModifiers whether "public abstract" should be added
      */
+    
     public void printSignature( PrintWriter ps, Vector<String> template, boolean printModifiers )
     {
-        int i = 0 ;
+    	//FIXME
+    	boolean judge = false;
+        int i = 1 ;
         
         while(i < template.size())
         {
@@ -998,6 +1003,70 @@ public class OpDecl
             	tmp = tmp.replace(hash, result);
             }
         	*/
+        	if(template.get(i).startsWith("%newfile"))
+        	{
+        		judge = true;
+        		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        		PrintWriter _ps;
+        		
+        		try{
+					_ps = openOutput(tmp.substring(9));
+					if(_ps == null)
+						throw new Exception();
+				}catch(Exception e){
+					throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+				}
+        		
+        		if(ps != null)
+        		{
+        			ps.close();
+        			ps = _ps;
+        		}
+        		else
+        			ps = _ps;
+        		
+        		i = i+1;
+        	}
+        	else if(ps == null)
+				throw new RuntimeException ("模板代码有误,文件已被关闭");
+        	else if(template.get(i).startsWith("%raises"))
+        	{
+        		i = i+1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!template.get(i).equals("%%"))
+        		{
+        			String tmp = template.get(i).replaceAll("<operationName>", name);
+            		tmp = tmp.replaceAll("<returnType>", opTypeSpec.typeName());
+            		tmp = tmp.replaceAll("<paramList>", paramList());
+            		tmp = tmp.replaceAll("<paramTypeList>", paramTypeList());
+            		tmp = tmp.replaceAll("<paramNameList>", paramNameList());
+            		tmp = tmp.replaceAll("<raisesList>", raisesExpr.getRaisesList());
+            		if(template.get(i).contains("HASH("))
+                	{
+                		int begin=-1,end=-1;
+                		for(int j = 0 ; j < tmp.length() ; j++)
+                		{
+                			if(tmp.charAt(j)=='H' && tmp.charAt(j+1)=='A' && tmp.charAt(j+2)=='S' && tmp.charAt(j+3)=='H' && tmp.charAt(j+4)=='(')
+                			{
+                				begin = j;
+                				break;
+                			}
+                		}
+                		String hash = tmp.substring(begin);
+                		end = hash.indexOf(')');
+                		hash = hash.substring(0, end+1);
+                		String arg = hash.substring(6,hash.length()-2);
+                		String result = toMD5(arg);
+                		if(result.equals(arg))
+                			throw new RuntimeException ("加密"+arg+"出错");
+                		tmp = tmp.replace(hash, result);
+                	}
+        			_template.add(tmp);
+        			i = i+1;
+        		}
+        		raisesExpr.print(ps,_template);
+        		i = i+1;
+        	}
         	if(template.get(i).startsWith("%param"))
         	{
         		if(template.get(i).contains(":INOUT"))
@@ -1017,6 +1086,7 @@ public class OpDecl
         						tmp = tmp.replaceAll("<paramList>", paramList());
         		        		tmp = tmp.replaceAll("<paramTypeList>", paramTypeList());
         		        		tmp = tmp.replaceAll("<paramNameList>", paramNameList());
+        		        		tmp = tmp.replaceAll("<raisesList>", raisesExpr.getRaisesList());
         						if(template.get(i).contains("HASH("))
         		            	{
         		            		int begin=-1,end=-1;
@@ -1034,10 +1104,7 @@ public class OpDecl
         		            		String arg = hash.substring(6,hash.length()-2);
         		            		String result = toMD5(arg);
         		            		if(result.equals(arg))
-        		            		{
-        		            			System.out.println("加密"+arg+"出错");
-        		            			System.exit(0);
-        		            		}
+        		            			throw new RuntimeException ("加密"+arg+"出错");
         		            		tmp = tmp.replace(hash, result);
         		            	}
         						ps.println(tmp);
@@ -1064,6 +1131,7 @@ public class OpDecl
         						tmp = tmp.replaceAll("<paramList>", paramList());
         		        		tmp = tmp.replaceAll("<paramTypeList>", paramTypeList());
         		        		tmp = tmp.replaceAll("<paramNameList>", paramNameList());
+        		        		tmp = tmp.replaceAll("<raisesList>", raisesExpr.getRaisesList());
         						if(template.get(i).contains("HASH("))
         		            	{
         		            		int begin=-1,end=-1;
@@ -1081,10 +1149,7 @@ public class OpDecl
         		            		String arg = hash.substring(6,hash.length()-2);
         		            		String result = toMD5(arg);
         		            		if(result.equals(arg))
-        		            		{
-        		            			System.out.println("加密"+arg+"出错");
-        		            			System.exit(0);
-        		            		}
+        		            			throw new RuntimeException ("加密"+arg+"出错");
         		            		tmp = tmp.replace(hash, result);
         		            	}
         						ps.println(tmp);
@@ -1111,6 +1176,7 @@ public class OpDecl
         						tmp = tmp.replaceAll("<paramList>", paramList());
         		        		tmp = tmp.replaceAll("<paramTypeList>", paramTypeList());
         		        		tmp = tmp.replaceAll("<paramNameList>", paramNameList());
+        		        		tmp = tmp.replaceAll("<raisesList>", raisesExpr.getRaisesList());
         						if(template.get(i).contains("HASH("))
         		            	{
         		            		int begin=-1,end=-1;
@@ -1128,14 +1194,53 @@ public class OpDecl
         		            		String arg = hash.substring(6,hash.length()-2);
         		            		String result = toMD5(arg);
         		            		if(result.equals(arg))
-        		            		{
-        		            			System.out.println("加密"+arg+"出错");
-        		            			System.exit(0);
-        		            		}
+        		            			throw new RuntimeException ("加密"+arg+"出错");
         		            		tmp = tmp.replace(hash, result);
         		            	}
         						ps.println(tmp);
         					}
+        				}
+        				i = i+1;
+        			}
+        			i = i+1;
+        		}
+        		else
+        		{
+        			i = i+1;
+        			while(!template.get(i).equals("%%"))
+        			{
+        				for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )
+        				{
+        					ParamDecl p = (ParamDecl)e.nextElement();
+        					String tmp = template.get(i).replaceAll("<operationName>", name);
+        					tmp = tmp.replaceAll("<paramType>", p.paramTypeSpec.typeName());
+        					tmp = tmp.replaceAll("<paramName>", p.simple_declarator.toString());
+        					tmp = tmp.replaceAll("<returnType>", opTypeSpec.typeName());
+        					tmp = tmp.replaceAll("<paramList>", paramList());
+        					tmp = tmp.replaceAll("<paramTypeList>", paramTypeList());
+        					tmp = tmp.replaceAll("<paramNameList>", paramNameList());
+        					tmp = tmp.replaceAll("<raisesList>", raisesExpr.getRaisesList());
+        					if(template.get(i).contains("HASH("))
+        					{
+        						int begin=-1,end=-1;
+        						for(int j = 0 ; j < tmp.length() ; j++)
+        						{
+        							if(tmp.charAt(j)=='H' && tmp.charAt(j+1)=='A' && tmp.charAt(j+2)=='S' && tmp.charAt(j+3)=='H' && tmp.charAt(j+4)=='(')
+        							{
+        								begin = j;
+        								break;
+        								}
+        						}
+        						String hash = tmp.substring(begin);
+        						end = hash.indexOf(')');
+        						hash = hash.substring(0, end+1);
+        						String arg = hash.substring(6,hash.length()-2);
+        						String result = toMD5(arg);
+        						if(result.equals(arg))
+        							throw new RuntimeException ("加密"+arg+"出错");
+        						tmp = tmp.replace(hash, result);
+        					}
+        					ps.println(tmp);
         				}
         				i = i+1;
         			}
@@ -1154,6 +1259,7 @@ public class OpDecl
         				tmp = tmp.replaceAll("<paramList>", paramList());
                 		tmp = tmp.replaceAll("<paramTypeList>", paramTypeList());
                 		tmp = tmp.replaceAll("<paramNameList>", paramNameList());
+                		tmp = tmp.replaceAll("<raisesList>", raisesExpr.getRaisesList());
         				if(template.get(i).contains("HASH("))
                     	{
                     		int begin=-1,end=-1;
@@ -1171,10 +1277,7 @@ public class OpDecl
                     		String arg = hash.substring(6,hash.length()-2);
                     		String result = toMD5(arg);
                     		if(result.equals(arg))
-                    		{
-                    			System.out.println("加密"+arg+"出错");
-                    			System.exit(0);
-                    		}
+                    			throw new RuntimeException ("加密"+arg+"出错");
                     		tmp = tmp.replace(hash, result);
                     	}
         				ps.println(tmp);
@@ -1197,6 +1300,7 @@ public class OpDecl
         		tmp = tmp.replaceAll("<paramList>", paramList());
         		tmp = tmp.replaceAll("<paramTypeList>", paramTypeList());
         		tmp = tmp.replaceAll("<paramNameList>", paramNameList());
+        		tmp = tmp.replaceAll("<raisesList>", raisesExpr.getRaisesList());
         		if(template.get(i).contains("HASH("))
             	{
             		int begin=-1,end=-1;
@@ -1214,16 +1318,15 @@ public class OpDecl
             		String arg = hash.substring(6,hash.length()-2);
             		String result = toMD5(arg);
             		if(result.equals(arg))
-            		{
-            			System.out.println("加密"+arg+"出错");
-            			System.exit(0);
-            		}
+            			throw new RuntimeException ("加密"+arg+"出错");
             		tmp = tmp.replace(hash, result);
             	}
         		ps.println(tmp);
         		i = i+1;
         	}
         }
+        if(ps != null && judge)
+        	ps.close();
     }
     
     private String paramList()
@@ -1363,6 +1466,29 @@ public class OpDecl
             count++;
         }
         return count;
+    }
+    
+    protected PrintWriter openOutput(String typeName)
+    {
+        try
+        {
+            final File f = new File(parser.out_dir+"\\"+typeName);
+            if (GlobalInputStream.isMoreRecentThan(f))
+            {
+                PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
+                return ps;
+            }
+
+            // no need to open file for printing, existing file is more
+            // recent than IDL file.
+
+            return null;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException ("Could not open output file for "
+                                        + typeName + " (" + e + ")");
+        }
     }
     
 	@Override

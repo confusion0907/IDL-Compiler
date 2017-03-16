@@ -205,7 +205,16 @@ public class InterfaceBody
             Definition d = e.nextElement();
             if( d.get_declaration() instanceof OpDecl )
             {
-                ( (OpDecl)d.get_declaration() ).printSignature( ps , template );
+            	if(template.get(0).equals("normal") && ((OpDecl)d.get_declaration()).opAttribute == 0)
+            		( (OpDecl)d.get_declaration() ).printSignature( ps , template );
+            	else if(template.get(0).equals("oneway") && ((OpDecl)d.get_declaration()).opAttribute == 1)
+            		( (OpDecl)d.get_declaration() ).printSignature( ps , template );
+            	else if(template.get(0).equals("raises") && ((OpDecl)d.get_declaration()).raisesExpr.nameList.size() > 0)
+            		( (OpDecl)d.get_declaration() ).printSignature( ps , template );
+            	else if(template.get(0).equals("noraises") && ((OpDecl)d.get_declaration()).raisesExpr.nameList.size() == 0)
+            		( (OpDecl)d.get_declaration() ).printSignature( ps , template );
+            	else if(template.get(0).equals("all"))
+            		( (OpDecl)d.get_declaration() ).printSignature( ps , template );
             }
             else if( d.get_declaration() instanceof AttrDecl )
             {

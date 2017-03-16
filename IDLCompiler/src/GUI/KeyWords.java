@@ -66,8 +66,17 @@ public class KeyWords {
 		labelwords.add("%case");
 		labelwords.add("%default");
 		labelwords.add("%interface");
+		labelwords.add("%interface:abstract");
+		labelwords.add("%interface:local");
+		labelwords.add("%interface:pseudo");
+		labelwords.add("%interface:normal");
 		labelwords.add("%struct");
 		labelwords.add("%operation");
+		labelwords.add("%operation:normal");
+		labelwords.add("%operation:oneway");
+		labelwords.add("%operation:noraises");
+		labelwords.add("%operation:raises");
+		labelwords.add("%param");
 		labelwords.add("%param:IN");
 		labelwords.add("%param:OUT");
 		labelwords.add("%param:INOUT");

@@ -115,6 +115,20 @@ public class Definitions
 			{
 				int index = 1;
 				Vector<String> _template = new Vector<String>();
+				String temp = "";
+				if(str.contains("abstract"))
+					temp = "abstract";
+				else if(str.contains("local"))
+					temp = "local";
+				else if(str.contains("pseudo"))
+					temp = "pseudo";
+				else if(str.contains("normal"))
+					temp = "normal";
+				else
+					temp = "all";
+				
+				template.add(temp);
+				
 				while(!(str.equals("%%") && index == 0))
 				{
 					i = i+1;
@@ -259,6 +273,8 @@ public class Definitions
         		while( e.hasMoreElements() )
 		            ( (IdlSymbol)e.nextElement() ).print( ps , _template , "module" );
         	}
+        	else if(ps == null)
+        		throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
 			else
 			{
 				ps.println(str);

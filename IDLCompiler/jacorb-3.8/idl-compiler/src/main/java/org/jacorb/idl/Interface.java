@@ -1372,199 +1372,251 @@ public class Interface
         ps.close();
     }
 
+    private void printBody(PrintWriter _ps , Vector<String> template)
+    {
+    	//FIXME printBody
+    	boolean judge = false;
+    	int i = 1;
+    	String scopeList = getScopeList();
+        while(i < template.size())
+        {
+        	if(template.get(i).startsWith("%newfile"))
+        	{
+        		judge = true;
+        		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        		PrintWriter ps;
+        		
+        		try{
+					ps = openOutput(tmp.substring(9));
+					if(ps == null)
+						throw new Exception();
+				}catch(Exception e){
+					throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+				}
+        		
+        		if(_ps != null)
+        		{
+        			_ps.close();
+        			_ps = ps;
+        		}
+        		else
+        			_ps = ps;
+        		
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%operation"))
+        	{
+        		String type = "";
+        		if(template.get(i).contains(":normal"))
+        			type = "normal";
+        		else if(template.get(i).contains(":oneway"))
+        			type = "oneway";
+        		else if(template.get(i).contains("noraises"))
+        			type = "noraises";
+        		else if(template.get(i).contains("raises"))
+        			type = "raises";
+        		else
+        			type = "all";
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		_template.add(type);
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        			tmp = tmp.replaceAll("<scopeList>", scopeList);
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		body.printOperationSignatures(_ps,_template);
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%typedef"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		_template.add(template.get(i));
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        			tmp = tmp.replaceAll("<scopeList>", scopeList);
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		body.print(_ps,_template,"typedef");
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%constants"))
+        	{
+        		i= i+1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!template.get(i).equals("%%"))
+        		{
+        			String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        			tmp = tmp.replaceAll("<scopeList>", scopeList);
+					_template.add(tmp);
+					i = i+1;
+        		}
+        		body.printConstants(_ps,_template);
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%struct"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        			tmp = tmp.replaceAll("<scopeList>", scopeList);
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		body.print(_ps,_template,"struct");
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%exception"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        			tmp = tmp.replaceAll("<scopeList>", scopeList);
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		body.print(_ps,_template,"exception");
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%union"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        			tmp = tmp.replaceAll("<scopeList>", scopeList);
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		body.print(_ps,_template,"union");
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%enum"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        			tmp = tmp.replaceAll("<scopeList>", scopeList);
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		body.print(_ps,_template,"enum");
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%inheritanceSpec"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+					_template.add(template.get(i).replaceAll("<interfaceName>", name));
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		if(_template.size() == 1 && !_template.get(0).contains("<scopeName>"))
+        			_ps.print(_template.get(0).replaceAll("<scopeList>", scopeList));
+        		else if(inheritanceSpec.v.size() > 0)
+        		{
+        			 for (Enumeration e = inheritanceSpec.v.elements(); e.hasMoreElements();)
+                     {
+        				 ScopedName sn = ((ScopedName) e.nextElement());
+                         String name = sn.resolvedName();
+                         
+                         for(int j = 0 ; j < _template.size() ; j++)
+                         {
+                        	String tmp = template.get(i).replaceAll("<scopeName>", name);
+                 			tmp = tmp.replaceAll("<scopeList>", scopeList);
+         					_template.add(tmp);
+                         }
+                     }
+        		}
+        		i = i+1;
+        	}
+        	else if(_ps == null)
+				throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+        	else
+        	{
+        		_ps.println(template.get(i).replaceAll("<interfaceName>", name));
+        		i = i+1;
+        	}
+        }
 
+        // print class files for interface local definitions
+        //body.print(null);
+        if(_ps != null && judge)
+        	_ps.close();
+    }
 
     public void print(PrintWriter _ps , Vector<String> template)
     {
-    	//FIXME
-    	boolean judge = false;
+    	//FIXME print
         if (included && !generateIncluded())
             return ;
 
         // divert output into individual .java files
         if (body != null)  // forward declaration
         {
-        	int i = 0;
-            while(i < template.size())
-            {
-            	if(template.get(i).startsWith("%newfile"))
-            	{
-            		judge = true;
-            		String tmp = template.get(i).replaceAll("<interfaceName>", name);
-            		PrintWriter ps;
-            		
-            		try{
-						ps = openOutput(tmp.substring(9));
-						if(ps == null)
-							throw new Exception();
-					}catch(Exception e){
-						throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
-					}
-            		
-            		if(_ps != null)
-            		{
-            			_ps.close();
-            			_ps = ps;
-            		}
-            		else
-            			_ps = ps;
-            		
-            		i = i+1;
-            	}
-            	else if(template.get(i).startsWith("%operation"))
-            	{
-            		int index = 1;
-            		Vector<String> _template = new Vector<String>();
-            		while(!(template.get(i).equals("%%") && index == 0))
-            		{
-            			i = i + 1;
-						_template.add(template.get(i).replaceAll("<interfaceName>", name));
-						if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
-							index = index+1;
-						else if(template.get(i).equals("%%"))
-							index = index-1;
-            		}
-            		_template.remove(_template.size()-1);
-            		if (!is_pseudo)
-                    {
-                        if (!is_abstract)
-                        	body.printOperationSignatures(_ps,_template);
-                    }
-            		i = i+1;
-            	}
-            	else if(template.get(i).startsWith("%typedef"))
-            	{
-            		int index = 1;
-            		Vector<String> _template = new Vector<String>();
-            		_template.add(template.get(i));
-            		while(!(template.get(i).equals("%%") && index == 0))
-            		{
-            			i = i + 1;
-						_template.add(template.get(i).replaceAll("<interfaceName>", name));
-						if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
-							index = index+1;
-						else if(template.get(i).equals("%%"))
-							index = index-1;
-            		}
-            		_template.remove(_template.size()-1);
-            		if (!is_pseudo)
-                    {
-                        if (!is_abstract)
-                        	body.print(_ps,_template,"typedef");
-                    }
-            		i = i+1;
-            	}
-            	else if(template.get(i).startsWith("%constants"))
-            	{
-            		i= i+1;
-            		Vector<String> _template = new Vector<String>();
-            		while(!template.get(i).equals("%%"))
-            		{
-						_template.add(template.get(i).replaceAll("<interfaceName>", name));
-						i = i+1;
-            		}
-            		if (!is_pseudo)
-                    {
-                        if (!is_abstract)
-                        	body.printConstants(_ps,_template);
-                    }
-            		i = i+1;
-            	}
-            	else if(template.get(i).startsWith("%struct"))
-            	{
-            		int index = 1;
-            		Vector<String> _template = new Vector<String>();
-            		while(!(template.get(i).equals("%%") && index == 0))
-            		{
-            			i = i + 1;
-						_template.add(template.get(i).replaceAll("<interfaceName>", name));
-						if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
-							index = index+1;
-						else if(template.get(i).equals("%%"))
-							index = index-1;
-            		}
-            		_template.remove(_template.size()-1);
-            		if (!is_pseudo)
-                    {
-                        if (!is_abstract)
-                        	body.print(_ps,_template,"struct");
-                    }
-            		i = i+1;
-            	}
-            	else if(template.get(i).startsWith("%exception"))
-            	{
-            		int index = 1;
-            		Vector<String> _template = new Vector<String>();
-            		while(!(template.get(i).equals("%%") && index == 0))
-            		{
-            			i = i + 1;
-						_template.add(template.get(i).replaceAll("<interfaceName>", name));
-						if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
-							index = index+1;
-						else if(template.get(i).equals("%%"))
-							index = index-1;
-            		}
-            		_template.remove(_template.size()-1);
-            		if (!is_pseudo)
-                    {
-                        if (!is_abstract)
-                        	body.print(_ps,_template,"exception");
-                    }
-            		i = i+1;
-            	}
-            	else if(template.get(i).startsWith("%union"))
-            	{
-            		int index = 1;
-            		Vector<String> _template = new Vector<String>();
-            		while(!(template.get(i).equals("%%") && index == 0))
-            		{
-            			i = i + 1;
-						_template.add(template.get(i).replaceAll("<interfaceName>", name));
-						if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
-							index = index+1;
-						else if(template.get(i).equals("%%"))
-							index = index-1;
-            		}
-            		_template.remove(_template.size()-1);
-            		if (!is_pseudo)
-                    {
-                        if (!is_abstract)
-                        	body.print(_ps,_template,"union");
-                    }
-            		i = i+1;
-            	}
-            	else if(template.get(i).startsWith("%enum"))
-            	{
-            		int index = 1;
-            		Vector<String> _template = new Vector<String>();
-            		while(!(template.get(i).equals("%%") && index == 0))
-            		{
-            			i = i + 1;
-						_template.add(template.get(i).replaceAll("<interfaceName>", name));
-						if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
-							index = index+1;
-						else if(template.get(i).equals("%%"))
-							index = index-1;
-            		}
-            		_template.remove(_template.size()-1);
-            		if (!is_pseudo)
-                    {
-                        if (!is_abstract)
-                        	body.print(_ps,_template,"enum");
-                    }
-            		i = i+1;
-            	}
-            	else
-            	{
-            		_ps.println(template.get(i).replaceAll("<interfaceName>", name));
-            		i = i+1;
-            	}
-            }
-
-            // print class files for interface local definitions
-            //body.print(null);
-            if(_ps != null && judge)
-            	_ps.close();
+        	String type = template.get(0);
+        	
+        	if(type.equals("all"))
+        		printBody(_ps, template);
+        	else if(type.equals("normal"))
+        	{
+        		if(!is_abstract && !is_local && !is_pseudo)
+        			printBody(_ps, template);
+        	}
+        	else if(type.equals("abstract") && is_abstract)
+        		printBody(_ps, template);
+        	else if(type.equals("local") && is_local)
+        		printBody(_ps, template);
+        	else if(type.equals("pseudo") && is_pseudo)
+        		printBody(_ps, template);
 
             //if (replyHandler != null)
                 //replyHandler.print (_ps);
@@ -1623,5 +1675,23 @@ public class Interface
         }
 
         return stub_name;
+    }
+    
+    private String getScopeList()
+    {
+    	String result = "";
+    	if (inheritanceSpec.v.size() > 0)
+    	{
+    		for (Enumeration e = inheritanceSpec.v.elements(); e.hasMoreElements();)
+    		{
+    			ScopedName sn = ((ScopedName) e.nextElement());
+                String name = sn.resolvedName();
+                
+                result = "," + result + name;
+    		}
+    	}
+    	if(!result.equals(""))
+    		result.substring(1);
+    	return result;
     }
 }

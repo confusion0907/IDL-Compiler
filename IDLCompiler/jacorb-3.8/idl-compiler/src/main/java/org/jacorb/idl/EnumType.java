@@ -21,6 +21,7 @@
 package org.jacorb.idl;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -383,6 +384,7 @@ public class EnumType
 
     public void print(PrintWriter ps,Vector<String> template)
     {
+    	//FIXME
         setPrintPhaseNames();
 
         // no code generation for included definitions
@@ -395,12 +397,39 @@ public class EnumType
 
         if (!written)
         {
+        	boolean judge = false;
         	String className = className();
         	
         	int i = 0;
         	while(i < template.size())
         	{
-        		if(template.get(i).startsWith("%label"))
+        		if(template.get(i).startsWith("%newfile"))
+            	{
+            		judge = true;
+            		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+            		PrintWriter _ps;
+            		
+            		try{
+    					_ps = openOutput(tmp.substring(9));
+    					if(_ps == null)
+    						throw new Exception();
+    				}catch(Exception e){
+    					throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+    				}
+            		
+            		if(ps != null)
+            		{
+            			ps.close();
+            			ps = _ps;
+            		}
+            		else
+            			ps = _ps;
+            		
+            		i = i+1;
+            	}
+            	else if(ps == null)
+    				throw new RuntimeException ("模板代码有误,文件已被关闭");
+            	else if(template.get(i).startsWith("%label"))
         		{
         			i = i+1;
         			Vector<String> _template = new Vector<String>();
@@ -453,8 +482,34 @@ public class EnumType
         			i = i+1;
         		}
         	}
+        	
+        	if(ps != null && judge)
+            	ps.close();
 
         	written = true;
+        }
+    }
+    
+    protected PrintWriter openOutput(String typeName)
+    {
+        try
+        {
+            final File f = new File(parser.out_dir+"\\"+typeName);
+            if (GlobalInputStream.isMoreRecentThan(f))
+            {
+                PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
+                return ps;
+            }
+
+            // no need to open file for printing, existing file is more
+            // recent than IDL file.
+
+            return null;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException ("Could not open output file for "
+                                        + typeName + " (" + e + ")");
         }
     }
 

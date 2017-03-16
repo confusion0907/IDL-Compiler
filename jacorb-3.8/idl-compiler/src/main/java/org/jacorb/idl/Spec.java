@@ -39,6 +39,7 @@ public class Spec
     extends IdlSymbol
 {
     public Vector definitions;
+    public static int line = 0;
 
     public Spec( int num )
     {
@@ -78,6 +79,7 @@ public class Spec
 			{
 				str = raf.readLine();
 				ptr = raf.getFilePointer();
+				line = line+1;
 				
 				str = str.replaceAll("<fileName>", parser.file_Name);
 				
@@ -101,10 +103,25 @@ public class Spec
 				{
 					int index = 1;
 					Vector<String> template = new Vector<String>();
+					String temp = "";
+					if(str.contains("abstract"))
+						temp = "abstract";
+					else if(str.contains("local"))
+						temp = "local";
+					else if(str.contains("pseudo"))
+						temp = "pseudo";
+					else if(str.contains("normal"))
+						temp = "normal";
+					else
+						temp = "all";
+					
+					template.add(temp);
+					
 					while(!(str.equals("%%") && index == 0))
 					{
 						str = raf.readLine();
 						ptr = raf.getFilePointer();
+						line = line+1;
 						str = str.replaceAll("<fileName>", parser.file_Name);
 						template.add(str);
 						if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
@@ -126,6 +143,7 @@ public class Spec
 					{
 						str = raf.readLine();
 						ptr = raf.getFilePointer();
+						line = line+1;
 						str = str.replaceAll("<fileName>", parser.file_Name);
 						template.add(str);
 						if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
@@ -148,6 +166,7 @@ public class Spec
 					{
 						str = raf.readLine();
 						ptr = raf.getFilePointer();
+						line = line+1;
 						str = str.replaceAll("<fileName>", parser.file_Name);
 						template.add(str);
 						if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
@@ -169,9 +188,10 @@ public class Spec
             		{
             			str = raf.readLine();
 						ptr = raf.getFilePointer();
+						line = line+1;
 						str = str.replaceAll("<fileName>", parser.file_Name);
 						template.add(str);
-						if(str.startsWith("%") && !str.equals("%%"))
+						if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 							index = index+1;
 						else if(str.equals("%%"))
 							index = index-1;
@@ -190,9 +210,10 @@ public class Spec
             		{
             			str = raf.readLine();
 						ptr = raf.getFilePointer();
+						line = line+1;
 						str = str.replaceAll("<fileName>", parser.file_Name);
 						template.add(str);
-						if(str.startsWith("%") && !str.equals("%%"))
+						if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 							index = index+1;
 						else if(str.equals("%%"))
 							index = index-1;
@@ -211,9 +232,10 @@ public class Spec
             		{
             			str = raf.readLine();
 						ptr = raf.getFilePointer();
+						line = line+1;
 						str = str.replaceAll("<fileName>", parser.file_Name);
 						template.add(str);
-						if(str.startsWith("%") && !str.equals("%%"))
+						if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 							index = index+1;
 						else if(str.equals("%%"))
 							index = index-1;
@@ -232,9 +254,10 @@ public class Spec
             		{
             			str = raf.readLine();
 						ptr = raf.getFilePointer();
+						line = line+1;
 						str = str.replaceAll("<fileName>", parser.file_Name);
 						template.add(str);
-						if(str.startsWith("%") && !str.equals("%%"))
+						if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 							index = index+1;
 						else if(str.equals("%%"))
 							index = index-1;
@@ -245,10 +268,10 @@ public class Spec
             		while( e.hasMoreElements() )
 			            ( (IdlSymbol)e.nextElement() ).print( _ps , template , "module" );
             	}
+            	else if(_ps == null)
+					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+line+")");
 				else
-				{
 					_ps.println(str);
-				}
 			}
 			if(_ps != null)
 				_ps.close();

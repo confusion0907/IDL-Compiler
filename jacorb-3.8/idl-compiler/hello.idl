@@ -1,34 +1,18 @@
-typedef sequence<long,80> time;
-typedef sequence<long> time_temp;
-typedef long number;
-
-module testModule{
-enum weather{sunny,rainy,cloudy,snowy};
-
-union goodMorning switch(long){
-	default:
-		octet unknownOp;
-	case 0:
-		octet case0;
-	case 1:
-		octet case1;
-};
-exception sayGoodbye{ 
-	string error; 
+exception error{
+	string name;
 };
 
-interface HelloService{
+interface HelloWorld{
+	oneway void sayGoodbye(in string name,inout string number);
+};
+
+interface HelloService :HelloWorld{
 	struct test{
 		short id;
 		string name;
 	};
 	typedef string id;
 	const short number = 5;
-	string sayHello(in string name,inout string number);
-	void shutdown(out time data);	
-};
-
-interface HelloWorld{
-	string sayGoodbye(in string name,inout string number);
-};
+	string sayHello(in string name,inout string number) raises (error);
+	void shutdown(out string data);	
 };

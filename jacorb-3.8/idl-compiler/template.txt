@@ -4,7 +4,6 @@
 <typedefType><sequenceLength> <typedefName>;
 %%
 %%
-%module
 %enum
 struct <enumName>{
 %label
@@ -66,7 +65,10 @@ struct <structName>{
 };
 
 %%
-%operation
+%operation:raises
+<returnType> <operationName>(<paramList>) throws <raisesList>;
+%%
+%operation:noraises
 <returnType> <operationName>(<paramList>);
 %%
 
@@ -114,7 +116,7 @@ struct <interfaceName>_Request{
 
 struct <interfaceName>_Return{
 	long switchUnion;
-%operation
+%operation:oneway
 	<interfaceName>_<operationName>_Result <operationName>;
 %%
 };
@@ -124,5 +126,4 @@ struct <interfaceName>_Reply{
 	<interfaceName>_Return data;
 };
 
-%%
 %%

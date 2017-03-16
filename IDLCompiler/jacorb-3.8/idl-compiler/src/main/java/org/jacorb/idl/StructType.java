@@ -855,6 +855,8 @@ public class StructType
             		
             		i = i+1;
             	}
+            	else if(ps == null)
+					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
             	else if(template.get(i).startsWith("%member"))
             	{
             		Vector<String> _template = new Vector<String>();

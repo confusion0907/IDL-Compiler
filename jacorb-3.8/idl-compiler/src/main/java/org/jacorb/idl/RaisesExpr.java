@@ -147,16 +147,43 @@ public class RaisesExpr
         }
     }
 
-    public void print( PrintWriter ps )
+    public void print( PrintWriter ps , Vector<String> template )
     {
-        Enumeration e = nameList.elements();
-        if( e.hasMoreElements() )
+    	//FIXME
+    	Enumeration e = nameList.elements();
+    	if( !e.hasMoreElements() )
         {
-            ps.print( " throws " + e.nextElement() );
+            return;
         }
+    	if(template.size() == 1 && !template.get(0).contains("<scopeName>"))
+    	{
+    		ps.println(template.get(0));
+    		return;
+    	}
         for( ; e.hasMoreElements(); )
         {
-            ps.print( "," + e.nextElement() );
+        	String name = ((ScopedName) e.nextElement()).name;
+            for(int i = 0 ; i < template.size() ; i++)
+            {
+            	ps.println(template.get(i).replaceAll("<scopeName>", name));
+            }
         }
+    }
+    
+    public String getRaisesList()
+    {
+    	String result = "";
+    	Enumeration e = nameList.elements();
+    	if( !e.hasMoreElements() )
+        {
+            return result;
+        }
+    	for( ; e.hasMoreElements(); )
+        {
+        	String name = ((ScopedName) e.nextElement()).name;
+            result = "," + result + name;
+        }
+    	result = result.substring(1);
+    	return result;
     }
 }
