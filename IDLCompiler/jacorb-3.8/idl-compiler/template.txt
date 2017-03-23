@@ -1,4 +1,50 @@
 %newfile new<fileName>.idl
+%valuetype:box
+<valuetypeType> <valuetypeName>;
+%%
+%valuetype:abstract
+%operation:noraises
+<returnType> <operationName>(<paramList>);
+%%
+%%
+%valuetype:normal
+string <valuetypeName>;
+%truncatable
+extends <truncatableList>
+%%
+%supports
+implements <supportsName>
+%%
+%factory
+class <factoryName> extends <raisesList>{
+%param
+	<paramType> <paramName>;
+%%
+};
+%%
+%statemember:public
+%member
+public <memberType> <memberName>;
+%%
+%%
+%statemember:private
+%member
+private <memberType> <memberName>;
+%%
+%%
+%operation:noraises
+<returnType> <operationName>(<paramList>);
+%%
+%typedef
+<typedefType> <typedefName>;
+%%
+%constants
+const <constantsType> <constantsName> = <constantsValue>;
+%%
+%attribute:normal
+<attributeType> <attributeName>();
+%%
+%%
 %typedef:sequence
 %length
 <typedefType><sequenceLength> <typedefName>;
@@ -11,7 +57,6 @@ struct <enumName>{
 %%
 };
 %%
-
 %exception
 struct <exceptionName>{
 %member
@@ -19,7 +64,6 @@ struct <exceptionName>{
 %%
 };
 %%
-
 %union
 union <unionName> switch(<switchType>){
 %case
@@ -34,8 +78,19 @@ union <unionName> switch(<switchType>){
 %%
 };
 %%
-
 %interface
+%constants
+const <constantsType> <constantsName> = <constantsValue>;
+%%
+%attribute:normal
+<attributeType> <attributeName>();
+%getraises
+<attributeType> <attributeName>() throws <scopeList>;
+%%
+%setraises
+void <attributeName>() throws <scopeList>;
+%%
+%%
 %exception
 struct <exceptionName>{
 %member
@@ -63,7 +118,6 @@ struct <structName>{
 	<memberType> <memberName>;
 %%
 };
-
 %%
 %operation:raises
 <returnType> <operationName>(<paramList>) throws <raisesList>;
@@ -71,7 +125,6 @@ struct <structName>{
 %operation:noraises
 <returnType> <operationName>(<paramList>);
 %%
-
 %operation
 const long <interfaceName>_<operationName>_Hash = HASH("<operationName>");
 
@@ -83,7 +136,6 @@ struct <interfaceName>_<operationName>_In{
 	<paramType> <paramName>;
 %%
 };
-
 struct <interfaceName>_<operationName>_Out{
 %param:OUT
 	<paramType> <paramName>;
@@ -100,7 +152,6 @@ struct <interfaceName>_<operationName>_Result{
 	<interfaceName>_<operationName>_Out result;
 };
 %%
-
 struct <interfaceName>_Call{
 	long switchUnion;
 %operation
@@ -108,22 +159,18 @@ struct <interfaceName>_Call{
 %%
 	UnknownOperation unknowOp;
 };
-
 struct <interfaceName>_Request{
 	RequestHeader header;
 	<interfaceName>_Call data;
 };
-
 struct <interfaceName>_Return{
 	long switchUnion;
 %operation:oneway
 	<interfaceName>_<operationName>_Result <operationName>;
 %%
 };
-
 struct <interfaceName>_Reply{
 	ReplyHeader header;
 	<interfaceName>_Return data;
 };
-
 %%

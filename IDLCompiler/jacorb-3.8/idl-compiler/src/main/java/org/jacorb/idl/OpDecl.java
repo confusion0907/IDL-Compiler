@@ -1006,7 +1006,8 @@ public class OpDecl
         	if(template.get(i).startsWith("%newfile"))
         	{
         		judge = true;
-        		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        		String tmp = template.get(i).replaceAll("<operationName>", name);
+        		tmp = tmp.replaceAll("<returnType>", opTypeSpec.typeName());
         		PrintWriter _ps;
         		
         		try{
@@ -1337,7 +1338,8 @@ public class OpDecl
     		ParamDecl p = (ParamDecl)e.nextElement();
     		result = result+","+p.paramTypeSpec.typeName()+" "+p.simple_declarator.toString();
     	}
-    	result = result.substring(1);
+    	if(!result.equals(""))
+    		result = result.substring(1);
     	return result;
     }
     
@@ -1349,7 +1351,8 @@ public class OpDecl
     		ParamDecl p = (ParamDecl)e.nextElement();
     		result = result+","+p.paramTypeSpec.typeName();
     	}
-    	result = result.substring(1);
+    	if(!result.equals(""))
+    		result = result.substring(1);
     	return result;
     }
     
@@ -1361,7 +1364,8 @@ public class OpDecl
     		ParamDecl p = (ParamDecl)e.nextElement();
     		result = result+","+p.simple_declarator.toString();
     	}
-    	result = result.substring(1);
+    	if(!result.equals(""))
+    		result = result.substring(1);
     	return result;
     }
     
@@ -1490,16 +1494,4 @@ public class OpDecl
                                         + typeName + " (" + e + ")");
         }
     }
-    
-	@Override
-	public void printSignature(PrintWriter ps, boolean printModifiers) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void printSignature(PrintWriter ps) {
-		// TODO Auto-generated method stub
-		
-	}
 }

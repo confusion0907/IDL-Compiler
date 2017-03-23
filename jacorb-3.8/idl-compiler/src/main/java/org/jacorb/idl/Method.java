@@ -27,6 +27,7 @@ package org.jacorb.idl;
  */
 
 import java.io.PrintWriter;
+import java.util.Vector;
 
 public class Method
     implements Operation
@@ -80,20 +81,17 @@ public class Method
         return sb.toString();
     }
 
-    public void printSignature( PrintWriter ps )
+    public void printSignature( PrintWriter ps , Vector<String> template )
     {
-        printSignature( ps, pseudo );
+        printSignature( ps, template , pseudo );
     }
 
     /**
      * @param printModifiers whether "public abstract" should be added
      */
-    public void printSignature( PrintWriter ps, boolean printModifiers )
+    public void printSignature( PrintWriter ps, Vector<String> template , boolean printModifiers )
     {
-        ps.print( "\t" );
-        if( printModifiers )
-            ps.print( "public abstract " );
-
+    	//FIXME
         if( isGetter() )
         {
             ps.print( resultType.toString() );
@@ -514,7 +512,4 @@ public class Method
     {
         visitor.visitMethod( this );
     }
-
-
-
 }

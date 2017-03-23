@@ -20,6 +20,8 @@
 
 package org.jacorb.idl;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -128,8 +130,86 @@ public class AttrDecl
         }
     }
 
-    public void print( PrintWriter ps )
+    public void print( PrintWriter ps , Vector<String> template )
     {
+    	//FIXME
+    	boolean judge = false;
+    	if(template.get(0).contains(":readonly") && !readOnly)
+    		return;
+    	else if(template.get(0).contains(":normal") && readOnly)
+    		return;
+    	
+    	for( Enumeration e = declarators.elements(); e.hasMoreElements(); )
+    	{
+    		Declarator d = (Declarator) e.nextElement();
+    		int i = 1 ;
+    		while(i < template.size())
+        	{
+    			if(template.get(i).startsWith("%newfile"))
+            	{
+            		judge = true;
+            		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+            		PrintWriter _ps;
+            		
+            		try{
+    					_ps = openOutput(tmp.substring(9));
+    					if(_ps == null)
+    						throw new Exception();
+    				}catch(Exception e1){
+    					throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+    				}
+            		
+            		if(ps != null)
+            		{
+            			ps.close();
+            			ps = _ps;
+            		}
+            		else
+            			ps = _ps;
+            		
+            		i = i+1;
+            	}
+    			if(ps == null)
+    				throw new RuntimeException ("模板代码有误,文件已被关闭");
+        		if(template.get(i).startsWith("%getraises"))
+        		{
+        			Vector<String> _template = new Vector<String>();
+        			i = i+1;
+        			while(!template.get(i).equals("%%"))
+        			{
+        				String tmp = template.get(i).replaceAll("<attributeType>", param_type_spec.typeName());
+            			tmp = tmp.replaceAll("<attributeName>", d.toString());
+            			_template.add(tmp);
+            			i = i+1;
+        			}
+        			getRaisesExpr.print(ps, _template);
+        			i = i+1;
+        		}
+        		else if(template.get(i).startsWith("%setraises"))
+        		{
+        			Vector<String> _template = new Vector<String>();
+        			i = i+1;
+        			while(!template.get(i).equals("%%"))
+        			{
+        				String tmp = template.get(i).replaceAll("<attributeType>", param_type_spec.typeName());
+            			tmp = tmp.replaceAll("<attributeName>", d.toString());
+            			_template.add(tmp);
+            			i = i+1;
+        			}
+        			setRaisesExpr.print(ps, _template);
+        			i = i+1;
+        		}
+        		else
+        		{
+        			String tmp = template.get(i).replaceAll("<attributeType>", param_type_spec.typeName());
+        			tmp = tmp.replaceAll("<attributeName>", d.toString());
+        			ps.println(tmp);
+        			i = i+1;
+        		}
+        	}
+    		if(ps != null && judge)
+            	ps.close();
+    	}
     }
 
     public Enumeration getOperations()
@@ -151,8 +231,29 @@ public class AttrDecl
                     ( fullName != null ? fullName :  param_type_spec.typeName() ) );
         }
     }
+    
+    protected PrintWriter openOutput(String typeName)
+    {
+        try
+        {
+            final File f = new File(parser.out_dir+"\\"+typeName);
+            if (GlobalInputStream.isMoreRecentThan(f))
+            {
+                PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
+                return ps;
+            }
 
+            // no need to open file for printing, existing file is more
+            // recent than IDL file.
 
+            return null;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException ("Could not open output file for "
+                                        + typeName + " (" + e + ")");
+        }
+    }
 }
 
 

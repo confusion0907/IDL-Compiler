@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Level;
 
 /**
@@ -454,8 +455,16 @@ public class ValueDecl
             "(short)" + access + ")";
     }
 
-    public void print(PrintWriter ps)
+    public void print(PrintWriter ps , Vector<String> template)
     {
+    	//FIXME
+    	if(!template.get(0).equals("normal") && !template.get(0).equals("custom") && !template.get(0).equals("nocustom") && !template.get(0).equals("all"))
+    		return;
+    	else if(template.get(0).equals("custom") && !isCustomMarshalled)
+    		return;
+    	else if(template.get(0).equals("nocustom") && isCustomMarshalled)
+    		return;
+    	
         // no code generation for included definitions
         if (included && !generateIncluded())
         {
@@ -467,37 +476,558 @@ public class ValueDecl
         {
             return;
         }
+        
+        boolean judge = false;
+    	int i = 1;
+    	while(i < template.size())
+        {
+        	if(template.get(i).startsWith("%newfile"))
+        	{
+        		judge = true;
+        		String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        		PrintWriter _ps = openOutput(tmp.substring(9));
+        		
+        		if(_ps == null)
+        		{
+        			System.out.println("文件"+tmp.substring(9)+"已存在，代码生成失败");
+        			return;
+        		}
+        		else if(ps != null)
+        		{
+        			ps.close();
+        			ps = _ps;
+        		}
+        		else
+        			ps = _ps;
+        		
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%operation"))
+        	{
+        		String type = "";
+        		if(template.get(i).contains(":normal"))
+        			type = "normal";
+        		else if(template.get(i).contains(":oneway"))
+        			type = "oneway";
+        		else if(template.get(i).contains("noraises"))
+        			type = "noraises";
+        		else if(template.get(i).contains("raises"))
+        			type = "raises";
+        		else
+        			type = "all";
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		_template.add(type);
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		for (Iterator m = operations.iterator(); m.hasNext();)
+        		{
+        			Operation o = ((Operation)m.next());
+        			if(o instanceof OpDecl)
+        				o.printSignature(ps,_template);
+        		}
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%typedef"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		_template.add(template.get(i));
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		for (Iterator m = exports.iterator(); m.hasNext();)
+        		{
+        			IdlSymbol s = (IdlSymbol)m.next();
+        			if(s instanceof TypeDeclaration)
+        				s.print(ps,_template,"typedef");
+        		}
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%constants"))
+        	{
+        		i= i+1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!template.get(i).equals("%%"))
+        		{
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					i = i+1;
+        		}
+        		for (Iterator m = exports.iterator(); m.hasNext();)
+        		{
+        			IdlSymbol s = (IdlSymbol)m.next();
+        			if(s instanceof ConstDecl)
+        				s.print(ps,_template);
+        		}
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%struct"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		for (Iterator m = exports.iterator(); m.hasNext();)
+        		{
+        			IdlSymbol s = (IdlSymbol)m.next();
+        			if(s instanceof TypeDeclaration)
+        				s.print(ps,_template,"struct");
+        		}
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%exception"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		for (Iterator m = exports.iterator(); m.hasNext();)
+        		{
+        			IdlSymbol s = (IdlSymbol)m.next();
+        			if(s instanceof TypeDeclaration)
+        				s.print(ps,_template,"exception");
+        		}
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%union"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		for (Iterator m = exports.iterator(); m.hasNext();)
+        		{
+        			IdlSymbol s = (IdlSymbol)m.next();
+        			if(s instanceof TypeDeclaration)
+        				s.print(ps,_template,"union");
+        		}
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%enum"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		for (Iterator m = exports.iterator(); m.hasNext();)
+        		{
+        			IdlSymbol s = (IdlSymbol)m.next();
+        			if(s instanceof TypeDeclaration)
+        				s.print(ps,_template,"enum");
+        		}
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%attribute"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		_template.add(template.get(i));
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		for (Iterator m = exports.iterator(); m.hasNext();)
+        		{
+        			IdlSymbol s = (IdlSymbol)m.next();
+        			if(s instanceof AttrDecl)
+        				s.print(ps,_template);
+        		}
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%statemember"))
+        	{
+        		boolean _public = false;
+        		if(template.get(i).contains(":public"))
+        			_public = true;
+        		else if(template.get(i).contains(":private"))
+        			_public = false;
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		for(Iterator t = stateMembers.v.iterator(); t.hasNext();)
+	            {
+	                ((StateMember)t.next()).print(ps,_template,_public);
+	            }
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%factory"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		printFactory(ps,_template);
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%truncatable"))
+        	{
+        		Vector<String> _template = new Vector<String>();
+        		_template.add(template.get(i));
+        		int index = 1;
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		Enumeration e = inheritanceSpec.getValueTypes();
+            	if (!e.hasMoreElements() && inheritanceSpec.truncatable == null)
+            	{
+            		i = i + 1;
+            		continue;
+            	}
+        		if(_template.size() == 2 && !(_template.get(1).contains("<truncatableName>") || (_template.get(1).contains("<supportsName>"))))
+        			ps.println(_template.get(1));
+        		else
+        			inheritanceSpec.print(ps,_template);
+        		i = i + 1;
+        	}
+        	else if(template.get(i).startsWith("%supports"))
+        	{
+        		Vector<String> _template = new Vector<String>();
+        		_template.add(template.get(i));
+        		int index = 1;
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+        			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+        			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+        			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+        			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		Enumeration enumeration = inheritanceSpec.getSupportedInterfaces();
+        		if (!enumeration.hasMoreElements())
+            	{
+            		i = i + 1;
+            		continue;
+            	}
+        		if(_template.size() == 2 && !(_template.get(1).contains("<truncatableName>") || (_template.get(1).contains("<supportsName>"))))
+        			ps.println(_template.get(1));
+        		else
+        			inheritanceSpec.print(ps,_template);
+        		i = i + 1;
+        	}
+        	else if(ps == null)
+				throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+        	else
+        	{
+        		String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+        		tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+    			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+    			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+    			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+    			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+    			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+        		ps.println(tmp);
+        		i = i+1;
+        	}
+        }
+    	
+    	if(ps != null && judge)
+        	ps.close();
+    }
+    
+    private void printFactory(PrintWriter ps, Vector<String> template) 
+    {
+    	if (factories.size() == 0)
+        {
+            return;
+        }
+    	
+    	if (hasBody)
+        {
+    		for(Iterator t = factories.iterator(); t.hasNext();)
+            {
+    			((InitDecl)t.next()).print(ps,template);
+            }
+        }
+	}
 
+	protected PrintWriter openOutput(String typeName)
+    {
         try
         {
-            String path = parser.out_dir
-                + fileSeparator
-                + pack_name.replace('.', fileSeparator);
-
-            File dir = new File(path);
-
-            if (!dir.exists())
+            final File f = new File(typeName);
+            if (GlobalInputStream.isMoreRecentThan(f))
             {
-                if (!dir.mkdirs())
-                    org.jacorb.idl.parser.fatal_error
-                        ("Unable to create " + path, null);
+                PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
+                return ps;
             }
 
-            printClass(dir);
-            printFactory(dir);
-            printHelper(dir);
-            printHolder(dir);
+            // no need to open file for printing, existing file is more
+            // recent than IDL file.
 
-            // print class files for exports definitions
-            for (Iterator i = exports.iterator(); i.hasNext();) {
-                ((IdlSymbol)i.next()).print(null);
-            }
+            return null;
         }
         catch (IOException e)
         {
-            org.jacorb.idl.parser.fatal_error
-                ("I/O error writing " + javaName() + ": " + e, null);
+            throw new RuntimeException ("Could not open output file for "
+                                        + typeName + " (" + e + ")");
         }
+    }
+	
+	public String getTruncatableList()
+    {
+    	String result = "";
+    	Enumeration e = inheritanceSpec.getValueTypes();
+    	if (e.hasMoreElements() || inheritanceSpec.truncatable != null)
+        {
+            for(; e.hasMoreElements();)
+            {
+                ScopedName scopedName = (ScopedName)e.nextElement();
+                ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                result = result + "," + ts.toString();
+            }
+            if (inheritanceSpec.truncatable != null)
+            	result = result + "," + inheritanceSpec.truncatable.scopedName;
+            if(!result.equals(""))
+            	result = result.substring(1);
+        }
+    	return result;
+    }
+	
+	public String getAbstractTruncatableList()
+    {
+    	String result = "";
+    	Enumeration e = inheritanceSpec.getValueTypes();
+    	if (e.hasMoreElements() || inheritanceSpec.truncatable != null)
+        {
+            for(; e.hasMoreElements();)
+            {
+                ScopedName scopedName = (ScopedName)e.nextElement();
+                ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                if (ts.c_type_spec instanceof ValueAbsDecl)
+                	result = result + "," + ts.toString();
+            }
+            if(!result.equals(""))
+            	result = result.substring(1);
+        }
+    	return result;
+    }
+	
+	public String getStatefulTruncatableList()
+    {
+    	String result = "";
+    	Enumeration e = inheritanceSpec.getValueTypes();
+    	if (e.hasMoreElements() || inheritanceSpec.truncatable != null)
+        {
+            for(; e.hasMoreElements();)
+            {
+                ScopedName scopedName = (ScopedName)e.nextElement();
+                ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                if (!(ts.c_type_spec instanceof ValueAbsDecl))
+                	result = result + "," + ts.toString();
+            }
+            if (inheritanceSpec.truncatable != null)
+            	result = result + "," + inheritanceSpec.truncatable.scopedName;
+            if(!result.equals(""))
+            	result = result.substring(1);
+        }
+    	return result;
+    }
+	
+	public String getSupportsList()
+    {
+    	String result = "";
+    	Enumeration enumeration = inheritanceSpec.getSupportedInterfaces();
+        for(; enumeration.hasMoreElements();)
+        {
+        	ScopedName sne = (ScopedName)enumeration.nextElement();
+        	result = result + ", " + sne;
+        }
+        if(!result.equals(""))
+        	result = result.substring(1);
+    	return result;
+    }
+	
+	public String getStatefulSupportsList()
+    {
+    	String result = "";
+    	Enumeration enumeration = inheritanceSpec.getSupportedInterfaces();
+        for(; enumeration.hasMoreElements();)
+        {
+        	ScopedName sne = (ScopedName)enumeration.nextElement();
+        	if (Interface.abstractInterfaces == null || !Interface.abstractInterfaces.contains (sne.toString()))
+        		result = result + ", " + sne;
+        }
+        if(!result.equals(""))
+        	result = result.substring(1);
+    	return result;
+    }
+	
+	public String getAbstractSupportsList()
+    {
+    	String result = "";
+    	Enumeration enumeration = inheritanceSpec.getSupportedInterfaces();
+        for(; enumeration.hasMoreElements();)
+        {
+        	ScopedName sne = (ScopedName)enumeration.nextElement();
+        	if (!(Interface.abstractInterfaces == null) && Interface.abstractInterfaces.contains (sne.toString()))
+        		result = result + ", " + sne;
+        }
+        if(!result.equals(""))
+        	result = result.substring(1);
+    	return result;
     }
 
     public String printWriteStatement(String var_name, String streamname)
@@ -519,432 +1049,6 @@ public class ValueDecl
     public String printReadStatement(String var_name, String streamname)
     {
         return var_name + " = " + printReadExpression(streamname);
-    }
-
-    /**
-     * Prints the abstract Java class to which this valuetype is mapped.
-     */
-
-    private void printClass(File dir)
-        throws IOException
-    {
-        File outfile = new File(dir, name + ".java");
-
-        // If we have a body (i.e. we've defined any pending_interface) and the 'more
-        // recent check' is ok then write the file.
-        if (hasBody && GlobalInputStream.isMoreRecentThan(outfile))
-        {
-            PrintWriter out = new PrintWriter(new FileWriter(outfile));
-
-            if (pack_name.length() > 0)
-            {
-                out.println("package " + pack_name + ";" + Environment.NL);
-            }
-
-            printClassComment("valuetype", name, out);
-            out.println("public abstract class " + name);
-
-            // set up extends and implements clauses
-
-            StringBuffer extendsBuffer = new StringBuffer("extends ");
-            StringBuffer implementsBuffer = new StringBuffer("implements ");
-
-            if (this.isCustomMarshalled())
-                implementsBuffer.append("org.omg.CORBA.portable.CustomValue");
-            else
-                implementsBuffer.append("org.omg.CORBA.portable.StreamableValue");
-
-            if (inheritanceSpec != null)
-            {
-                boolean first = true;
-
-                // go through ancestor value types
-                Enumeration e = inheritanceSpec.getValueTypes();
-                if (e.hasMoreElements() || inheritanceSpec.truncatable != null)
-                {
-                    if (e.hasMoreElements())
-                    {
-                        ScopedName scopedName = (ScopedName)e.nextElement();
-                        ConstrTypeSpec ts = unwindTypedefs(scopedName);
-                            //(ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
-
-                        // abstract base valuetypes are mapped to interfaces, so
-                        // we "implement"
-                        if (ts.c_type_spec instanceof ValueAbsDecl)
-                        {
-                            implementsBuffer.append(", " + ts.toString());
-                        }
-                        else
-                        {
-                            // stateful base valuetypes are mapped to classes, so
-                            // we  "extend"
-                            first = false;
-                            extendsBuffer.append(ts.toString());
-                        }
-                    }
-
-                    for(; e.hasMoreElements();)
-                    {
-                        ScopedName scopedName = (ScopedName)e.nextElement();
-                        ConstrTypeSpec ts =
-                            (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
-
-                        // abstract base valuetypes are mapped to interfaces, so
-                        // we "implement"
-                        if (ts.c_type_spec instanceof ValueAbsDecl)
-                        {
-                            implementsBuffer.append(", " + scopedName.toString());
-                        }
-                        else
-                        {
-                            // stateful base valuetypes are mapped to classes, so
-                            // we "extend"
-                            //
-                            // applied patch by Thomas Leineweber for bug #492
-                            //
-                            if (first)
-                            {
-                                extendsBuffer.append(scopedName.toString());
-                                first = false;
-                            }
-                            else
-                            {
-                                extendsBuffer.append(", " + scopedName.toString());
-                            }
-                        }
-                    }
-
-                    // also check for the presence of a stateful base value type
-                    // that we can be truncated to
-                    if (inheritanceSpec.truncatable != null)
-                    {
-                        extendsBuffer.append
-                            (
-                             (first ? "" : ", ") +
-                             inheritanceSpec.truncatable.scopedName
-                             );
-                    }
-                }
-
-                // go through supported interfaces
-                Enumeration enumeration = inheritanceSpec.getSupportedInterfaces();
-                if (enumeration.hasMoreElements())
-                {
-                    for(; enumeration.hasMoreElements();)
-                    {
-                        ScopedName sne = (ScopedName)enumeration.nextElement();
-                        implementsBuffer.append (", " + sne);
-                        if (Interface.abstractInterfaces == null ||
-                            !Interface.abstractInterfaces.contains (sne.toString()))
-                        {
-                            implementsBuffer.append ("Operations");
-                        }
-                    }
-                }
-
-            }
-
-            if (extendsBuffer.length() > 8)
-            {
-                hasStatefulBases = true;
-                out.println("\t" + extendsBuffer.toString());
-            }
-
-            out.println("\t" + implementsBuffer.toString());
-
-            out.println("{");
-
-            printSerialVersionUID(out);
-
-            // collect and print repository ids that this value type can
-            // truncated to.
-
-            out.print("\tprivate String[] _truncatable_ids = {\"" + id() + "\"");
-            StringBuffer sb = new StringBuffer();
-
-            if (inheritanceSpec != null)
-            {
-                Truncatable trunc = inheritanceSpec.truncatable;
-
-                if (trunc != null)
-                {
-                    sb.append(", \"" + trunc.getId() + "\"");
-                    ScopedName scopedName = trunc.scopedName;
-                    while(scopedName != null)
-                    {
-                        ValueDecl v  =
-                            (ValueDecl)((ConstrTypeSpec)scopedName.resolvedTypeSpec()).c_type_spec;
-
-                        if (v.inheritanceSpec == null)
-                        {
-                            break;
-                        }
-                        Truncatable t = v.inheritanceSpec.truncatable;
-                        if (t != null)
-                        {
-                            sb.append(", \"" + t.getId() + "\"");
-                            scopedName = t.scopedName;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-            out.println(sb.toString() +  "};");
-
-            for(Iterator i = stateMembers.v.iterator(); i.hasNext();)
-            {
-                ((StateMember)i.next()).print(out);
-                out.println();
-            }
-
-            for(Iterator i = operations.iterator(); i.hasNext();)
-            {
-                ((Operation)i.next()).printSignature(out, true);
-                out.println();
-            }
-
-            if (!this.isCustomMarshalled())
-            {
-                printWriteMethod(out);
-                printReadMethod(out);
-            }
-
-            out.println("\tpublic String[] _truncatable_ids()");
-            out.println("\t{");
-            out.println("\t\treturn _truncatable_ids;");  // FIXME
-            out.println("\t}");
-
-            out.println("\tpublic org.omg.CORBA.TypeCode _type()");
-            out.println("\t{");
-            out.println("\t\treturn " + javaName() + "Helper.type();");
-            out.println("\t}");
-
-            out.println("}");
-            out.close();
-        }
-    }
-
-    /**
-     * Prints the Factory interface for this valuetype if any
-     * factories were defined.
-     */
-
-    private void printFactory(File dir)
-        throws IOException
-    {
-        if (factories.size() == 0)
-        {
-            return;
-        }
-
-        File outfile = new File(dir, name + "ValueFactory.java");
-
-        // If we have a body (i.e. we've defined any pending_interface) and the 'more
-        // recent check' is ok then write the file.
-        if (hasBody && GlobalInputStream.isMoreRecentThan(outfile))
-        {
-            PrintWriter out = new PrintWriter(new FileWriter(outfile));
-
-            if (pack_name.length() > 0)
-            {
-                out.println("package " + pack_name + ";" + Environment.NL);
-            }
-
-            printClassComment("valuetype", name, out);
-
-            out.println("public interface  " + name + "ValueFactory");
-            out.println("\textends org.omg.CORBA.portable.ValueFactory");
-            out.println("{");
-
-            for(Iterator i = factories.iterator(); i.hasNext();)
-            {
-                ((InitDecl)i.next()).print(out, name);
-            }
-
-            out.println("}");
-            out.close();
-        }
-    }
-
-
-    /**
-     * Prints the _write() method required by
-     * org.omg.CORBA.portable.StreamableValue.
-     */
-    private void printWriteMethod(PrintWriter out)
-    {
-        out.println("\tpublic void _write " +
-                    "(org.omg.CORBA.portable.OutputStream os)");
-        out.println("\t{");
-
-        if (hasStatefulBases)
-        {
-            out.println("\t\tsuper._write(os);");
-        }
-
-        for(Iterator i = stateMembers.v.iterator(); i.hasNext();)
-        {
-            out.println("\t\t" + ((StateMember)i.next()).writeStatement("os"));
-        }
-        out.println("\t}" + Environment.NL);
-    }
-
-    /**
-     * Prints the _read() method required by
-     * org.omg.CORBA.portable.StreamableValue.
-     */
-
-    private void printReadMethod(PrintWriter out)
-    {
-        out.println("\tpublic void _read " +
-                    "(final org.omg.CORBA.portable.InputStream os)");
-        out.println("\t{");
-
-        if (hasStatefulBases)
-        {
-            out.println("\t\tsuper._read(os);");
-        }
-
-        for(Iterator i = stateMembers.v.iterator(); i.hasNext();)
-        {
-            out.println("\t\t" + ((StateMember)i.next()).readStatement("os"));
-        }
-        out.println("\t}" + Environment.NL);
-    }
-
-    private void printHelper(File dir)
-        throws IOException
-    {
-        File outfile = new File(dir, name + "Helper.java");
-
-        // If we have a body (i.e. we've defined any pending_interface) and the 'more
-        // recent check' is ok then write the file.
-        if (hasBody && GlobalInputStream.isMoreRecentThan(outfile))
-        {
-            PrintWriter out = new PrintWriter(new FileWriter(outfile));
-
-            if (pack_name.length() > 0)
-            {
-                out.println("package " + pack_name + ";" + Environment.NL);
-            }
-
-            printClassComment("valuetype", name, out);
-
-            out.println("public abstract class " + name + "Helper");
-            out.println("{");
-
-            out.println("\tprivate volatile static org.omg.CORBA.TypeCode _type = null;");
-
-            // insert() / extract()
-
-            out.println("\tpublic static void insert " +
-                        "(org.omg.CORBA.Any a, " + javaName() + " v)");
-            out.println("\t{");
-            out.println("\t\ta.insert_Value (v, v._type());");
-            out.println("\t}");
-            out.println("\tpublic static " + javaName() + " extract " +
-                        "(org.omg.CORBA.Any a)");
-            out.println("\t{");
-            out.println("\t\treturn (" + javaName() + ")a.extract_Value();");
-            out.println("\t}");
-
-            // type() / id()
-            out.println("\tpublic static org.omg.CORBA.TypeCode type()");
-            out.println("\t{");
-            out.println("\t\tif (_type == null)");
-            out.println("\t\t{");
-            out.println("\t\t\tsynchronized(" + name + "Helper.class)");
-            out.println("\t\t\t{");
-            out.println("\t\t\t\tif (_type == null)");
-            out.println("\t\t\t\t{");
-            out.println("\t\t\t\t\t_type = " + getTypeCodeExpression() + ";");
-            out.println("\t\t\t\t}");
-            out.println("\t\t\t}");
-            out.println("\t\t}");
-            out.println("\t\treturn _type;");
-            out.println("\t}" + Environment.NL);
-
-            out.println("\tpublic static String id()");
-            out.println("\t{");
-            out.println("\t\treturn \"" + id() + "\";");
-            out.println("\t}");
-
-            // read() / write()
-
-            out.println("\tpublic static " + javaName() + " read " +
-                        "(org.omg.CORBA.portable.InputStream is)");
-            out.println("\t{");
-            out.println("\t\treturn (" + javaName() + ")((org.omg.CORBA_2_3.portable.InputStream)is).read_value (\"" + id() + "\");");
-            out.println("\t}");
-
-            out.println("\tpublic static void write " +
-                        "(org.omg.CORBA.portable.OutputStream os, " +
-                        javaName() + " val)");
-            out.println("\t{");
-            out.println("\t\t((org.omg.CORBA_2_3.portable.OutputStream)os)" +
-                        ".write_value (val, \"" + id() + "\");");
-            out.println("\t}");
-
-            // factory methods
-
-            for (Iterator i = factories.iterator(); i.hasNext();)
-            {
-                InitDecl d = (InitDecl)i.next();
-                d.printHelperMethod (out, name);
-            }
-
-            out.println("}");
-            out.close();
-        }
-    }
-
-    private void printHolder(File dir) throws IOException
-    {
-        File outfile = new File(dir, name + "Holder.java");
-
-        // If we have a body (i.e. we've defined any pending_interface) and the 'more
-        // recent check' is ok then write the file.
-        if (hasBody && GlobalInputStream.isMoreRecentThan(outfile))
-        {
-            PrintWriter out = new PrintWriter(new FileWriter(outfile));
-
-            if (pack_name.length() > 0)
-            {
-                out.println("package " + pack_name + ";" + Environment.NL);
-            }
-
-            printClassComment("valuetype", name, out);
-
-            out.println("public" + parser.getFinalString() + " class " + name + "Holder");
-            out.println("\timplements org.omg.CORBA.portable.Streamable");
-            out.println("{");
-            out.println("\tpublic " + javaName() + " value;");
-            out.println("\tpublic " + name + "Holder () {}");
-            out.println("\tpublic " + name + "Holder (final "
-                        + javaName() + " initial)");
-            out.println("\t{");
-            out.println("\t\tvalue = initial;");
-            out.println("\t}");
-            out.println("\tpublic void _read " +
-                        "(final org.omg.CORBA.portable.InputStream is)");
-            out.println("\t{");
-            out.println("\t\tvalue = " + javaName() + "Helper.read (is);");
-            out.println("\t}");
-            out.println("\tpublic void _write " +
-                        "(final org.omg.CORBA.portable.OutputStream os)");
-            out.println("\t{");
-            out.println("\t\t" + javaName() + "Helper.write (os, value);");
-            out.println("\t}");
-            out.println("\tpublic org.omg.CORBA.TypeCode _type ()");
-            out.println("\t{");
-            out.println("\t\treturn value._type ();");
-            out.println("\t}");
-            out.println("}");
-            out.close();
-        }
     }
 
     public void printInsertIntoAny(PrintWriter ps,

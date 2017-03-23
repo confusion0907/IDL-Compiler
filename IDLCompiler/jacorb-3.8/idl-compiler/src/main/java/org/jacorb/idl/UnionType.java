@@ -1257,7 +1257,8 @@ public class UnionType
 					if(template.get(i).startsWith("%newfile"))
 	            	{
 	            		judge = true;
-	            		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+	            		String tmp = template.get(i).replaceAll("<enumName>", className);
+	            		tmp = tmp.replaceAll("<switchType>", ts.toString());
 	            		PrintWriter ps = openOutput(tmp.substring(9));
 	            		
 	            		if(ps == null)

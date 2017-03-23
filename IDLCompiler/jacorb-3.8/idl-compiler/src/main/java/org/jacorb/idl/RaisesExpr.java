@@ -157,7 +157,7 @@ public class RaisesExpr
         }
     	if(template.size() == 1 && !template.get(0).contains("<scopeName>"))
     	{
-    		ps.println(template.get(0));
+    		ps.println(template.get(0).replaceAll("<scopeList>", getRaisesList()));
     		return;
     	}
         for( ; e.hasMoreElements(); )
@@ -165,7 +165,9 @@ public class RaisesExpr
         	String name = ((ScopedName) e.nextElement()).name;
             for(int i = 0 ; i < template.size() ; i++)
             {
-            	ps.println(template.get(i).replaceAll("<scopeName>", name));
+            	String tmp = template.get(i).replaceAll("<scopeName>", name);
+            	tmp = tmp.replaceAll("<scopeList>", getRaisesList());
+            	ps.println(tmp);
             }
         }
     }

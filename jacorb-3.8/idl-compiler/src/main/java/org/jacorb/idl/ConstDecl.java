@@ -158,67 +158,27 @@ public class ConstDecl extends Declaration
      *  into a separate interface
      */
 
-    public void print(PrintWriter ps)
+    public void print(PrintWriter ps , Vector<String> template)
     {
-        if (contained() || (included && !generateIncluded()))
-            return;
-
-        try
+    	String fullName = ScopedName.unPseudoName(full_name());
+        String className;
+        if (fullName.indexOf('.') > 0)
         {
-            String fullName = ScopedName.unPseudoName(full_name());
-            String className;
-            if (fullName.indexOf('.') > 0)
-            {
-                pack_name = fullName.substring(0, fullName.lastIndexOf('.'));
-                className = fullName.substring(fullName.lastIndexOf('.') + 1);
-            }
-            else
-            {
-                pack_name = "";
-                className = fullName;
-            }
-
-            String path = parser.out_dir + fileSeparator +
-                pack_name.replace('.', fileSeparator);
-            File dir = new File(path);
-            if (!dir.exists())
-            {
-                if (!dir.mkdirs())
-                {
-                    org.jacorb.idl.parser.fatal_error("Unable to create " + path, null);
-                }
-            }
-
-            String fname = className + ".java";
-            File f = new File(dir, fname);
-
-            if (GlobalInputStream.isMoreRecentThan(f))
-            {
-                PrintWriter pw = new PrintWriter(new java.io.FileWriter(f));
-
-                if (parser.logger.isLoggable(Level.ALL))
-                    parser.logger.log(Level.ALL, "ConstDecl.print " + fname);
-
-                if (!pack_name.equals(""))
-                    pw.println("package " + pack_name + ";");
-
-                printClassComment("const", className, pw);
-
-                pw.println("public interface " + className);
-                pw.println("{");
-
-                pw.print("\t" + const_type.toString() + " value = ");
-
-                pw.print(getValue());
-                pw.println(";");
-
-                pw.println("}");
-                pw.close();
-            }
+            pack_name = fullName.substring(0, fullName.lastIndexOf('.'));
+            className = fullName.substring(fullName.lastIndexOf('.') + 1);
         }
-        catch (java.io.IOException i)
+        else
         {
-            throw new RuntimeException("File IO error" + i);
+            pack_name = "";
+            className = fullName;
+        }
+        
+        for(int i = 0 ; i < template.size() ; i++)
+        {
+        	String tmp = template.get(i).replaceAll("<constantsType>", const_type.toString());
+        	tmp = tmp.replaceAll("<constantsName>", className);
+        	tmp = tmp.replaceAll("<constantsValue>", getValue());
+        	ps.println(tmp);
         }
     }
 

@@ -21,6 +21,7 @@
 package org.jacorb.idl;
 
 import java.io.PrintWriter;
+import java.util.Vector;
 
 public class StateMember 
     extends Member
@@ -44,12 +45,34 @@ public class StateMember
         return result;
     }
 
-    public void print( PrintWriter ps )
+    public void print( PrintWriter ps , Vector<String> template , boolean _public )
     {
-        if( this.isPublic )
-            member_print( ps, null );
-        else
-            member_print( ps, null );
+        int i = 0;
+        while(i < template.size())
+        {
+        	if(template.get(i).startsWith("%member"))
+        	{
+        		Vector<String> _template = new Vector<String>();
+        		while(!template.get(i).equals("%%"))
+        		{
+        			_template.add(template.get(i));
+        			i = i + 1;
+        		}
+        		if( this.isPublic && _public )
+                    member_print( ps, _template );
+                else if( !this.isPublic && !_public )
+                    member_print( ps, _template );
+        		i = i + 1;
+        	}
+        	else
+        	{
+        		if( this.isPublic && _public )
+                    ps.println(template.get(i));
+                else if( !this.isPublic && !_public )
+                	ps.println(template.get(i));
+        		i = i + 1;
+        	}
+        }
     }
 
     public String writeStatement( String outStreamName )

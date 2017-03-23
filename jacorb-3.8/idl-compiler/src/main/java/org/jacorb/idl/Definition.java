@@ -97,6 +97,8 @@ public class Definition
     		declaration.print(ps , template , "enum");
     	else if(type.equals("module") && declaration instanceof Declaration && !(declaration instanceof TypeDeclaration))
     		declaration.print(ps , template);
+    	else if(type.equals("valuetype") && declaration instanceof Value)
+    		declaration.print(ps , template);
     }
 
     public void parse()

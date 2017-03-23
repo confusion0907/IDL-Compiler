@@ -22,9 +22,11 @@ package org.jacorb.idl;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Level;
 
 /**
@@ -358,8 +360,12 @@ public class ValueBoxDecl
 
     /** generate required classes */
 
-    public void print(PrintWriter ps)
+    public void print(PrintWriter ps,Vector<String> template)
     {
+    	//FIXME
+    	if(!template.get(0).equals("box"))
+    		return;
+    	
         setPrintPhaseNames();
 
         // no code generation for included definitions
@@ -370,69 +376,70 @@ public class ValueBoxDecl
 
         if (!written)
         {
-            try
+        	String className = boxTypeName();
+        	int i = 1;
+            boolean judge = false;
+            while(i < template.size())
             {
-                String className = boxTypeName();
-                if (className.indexOf('.') > 0)
-                    className = className.substring(className.lastIndexOf('.') + 1);
-
-                String path = parser.out_dir + fileSeparator +
-                    pack_name.replace('.', fileSeparator);
-
-                File dir = new File(path);
-                if (!dir.exists())
-                {
-                    if (!dir.mkdirs())
-                    {
-                        org.jacorb.idl.parser.fatal_error("Unable to create " + path, null);
-                    }
-                }
-
-                // print the mapped java class
-                PrintWriter decl_ps;
-                String fname = className + ".java";
-                File f = new File(dir, fname);
-
-                if (typeSpec.typeSpec() instanceof BaseType)
-                {
-                    if (GlobalInputStream.isMoreRecentThan(f))
-                    {
-                        decl_ps = new PrintWriter(new java.io.FileWriter(f));
-                        printValueClass(className, decl_ps);
-                        decl_ps.close();
-                    }
-                }
-
-                // print the holder class */
-
-                fname = className + "Holder.java";
-                f = new File(dir, fname);
-
-                if (GlobalInputStream.isMoreRecentThan(f))
-                {
-                    decl_ps = new PrintWriter(new java.io.FileWriter(f));
-                    printHolderClass(className, decl_ps);
-                    decl_ps.close();
-                }
-
-                // print the helper class
-
-                fname = className + "Helper.java";
-                f = new File(dir, fname);
-
-                if (GlobalInputStream.isMoreRecentThan(f))
-                {
-                    decl_ps = new PrintWriter(new java.io.FileWriter(f));
-                    printHelperClass(className, decl_ps);
-                    decl_ps.close();
-                }
-
-                written = true;
+            	if(template.get(i).startsWith("%newfile"))
+            	{
+            		judge = true;
+            		String tmp = template.get(i).replaceAll("<valuetypeName>", className);
+            		tmp = tmp.replaceAll("<valuetypeType>", typeSpec.toString());
+            		PrintWriter _ps = openOutput(tmp.substring(9));
+            		
+            		if(_ps == null)
+            		{
+            			System.out.println("文件"+tmp.substring(9)+"已存在，代码生成失败");
+            			return;
+            		}
+            		else if(ps != null)
+            		{
+            			ps.close();
+            			ps = _ps;
+            		}
+            		else
+            			ps = _ps;
+            		
+            		i = i+1;
+            	}
+            	else if(ps == null)
+					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+            	else
+            	{
+            		String tmp = template.get(i).replaceAll("<valuetypeName>", className);
+            		tmp = tmp.replaceAll("<valuetypeType>", typeSpec.toString());
+            		ps.println(tmp);
+            		i = i+1;
+            	}
             }
-            catch (java.io.IOException i)
+        	written = true;
+        	
+        	if(ps != null && judge)
+            	ps.close();
+        }
+    }
+    
+    protected PrintWriter openOutput(String typeName)
+    {
+        try
+        {
+            final File f = new File(typeName);
+            if (GlobalInputStream.isMoreRecentThan(f))
             {
-                throw new RuntimeException("File IO error" + i);
+                PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
+                return ps;
             }
+
+            // no need to open file for printing, existing file is more
+            // recent than IDL file.
+
+            return null;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException ("Could not open output file for "
+                                        + typeName + " (" + e + ")");
         }
     }
 

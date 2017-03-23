@@ -185,9 +185,10 @@ public class InterfaceBody
                 d.print( ps );
         }
     }
-    
+
     public void print( PrintWriter ps , Vector<String> template , String type )
     {
+    	//FIXME
          for( Enumeration<Definition> e = v.elements(); e.hasMoreElements(); )
          {
              Declaration d = e.nextElement().get_declaration();
@@ -198,12 +199,13 @@ public class InterfaceBody
 
     /** print signatures to the operations file */
 
-    public void printOperationSignatures( PrintWriter ps , Vector<String> template )
+    public void printOperationSignatures( PrintWriter ps , Vector<String> template , String type )
     {
+    	//FIXME
         for( Enumeration<Definition> e = v.elements(); e.hasMoreElements(); )
         {
             Definition d = e.nextElement();
-            if( d.get_declaration() instanceof OpDecl )
+            if( d.get_declaration() instanceof OpDecl && type.equals("operation") )
             {
             	if(template.get(0).equals("normal") && ((OpDecl)d.get_declaration()).opAttribute == 0)
             		( (OpDecl)d.get_declaration() ).printSignature( ps , template );
@@ -216,13 +218,9 @@ public class InterfaceBody
             	else if(template.get(0).equals("all"))
             		( (OpDecl)d.get_declaration() ).printSignature( ps , template );
             }
-            else if( d.get_declaration() instanceof AttrDecl )
+            else if( d.get_declaration() instanceof AttrDecl && type.equals("attribute") )
             {
-                for( Enumeration m = ( (AttrDecl)d.get_declaration() ).getOperations();
-                     m.hasMoreElements(); )
-                {
-                    ( (Operation)m.nextElement() ).printSignature( ps );
-                }
+                ( (AttrDecl)d.get_declaration() ).print(ps, template);
             }
         }
     }

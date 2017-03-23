@@ -104,13 +104,13 @@ public class Spec
 					int index = 1;
 					Vector<String> template = new Vector<String>();
 					String temp = "";
-					if(str.contains("abstract"))
+					if(str.contains(":abstract"))
 						temp = "abstract";
-					else if(str.contains("local"))
+					else if(str.contains(":local"))
 						temp = "local";
-					else if(str.contains("pseudo"))
+					else if(str.contains(":pseudo"))
 						temp = "pseudo";
-					else if(str.contains("normal"))
+					else if(str.contains(":normal"))
 						temp = "normal";
 					else
 						temp = "all";
@@ -267,6 +267,43 @@ public class Spec
             		Enumeration e = definitions.elements();
             		while( e.hasMoreElements() )
 			            ( (IdlSymbol)e.nextElement() ).print( _ps , template , "module" );
+            	}
+            	else if(str.startsWith("%valuetype"))
+            	{
+            		String type = "";
+            		if(str.contains(":box"))
+            			type = "box";
+            		else if(str.contains(":abstract"))
+            			type = "abstract";
+            		else if(str.contains(":normal"))
+            			type = "normal";
+            		else if(str.contains(":nocustom"))
+            			type = "nocustom";
+            		else if(str.contains(":custom"))
+            			type = "custom";
+            		else
+            			type = "all";
+            		
+            		Vector<String> template = new Vector<String>();
+            		template.add(type);
+            		int index = 1;
+            		while(!(str.equals("%%") && index == 0))
+            		{
+            			str = raf.readLine();
+						ptr = raf.getFilePointer();
+						line = line+1;
+						str = str.replaceAll("<fileName>", parser.file_Name);
+						template.add(str);
+						if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
+							index = index+1;
+						else if(str.equals("%%"))
+							index = index-1;
+            		}
+            		template.remove(template.size()-1);
+            		
+            		Enumeration e = definitions.elements();
+            		while( e.hasMoreElements() )
+			            ( (IdlSymbol)e.nextElement() ).print( _ps , template , "valuetype" );
             	}
             	else if(_ps == null)
 					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+line+")");

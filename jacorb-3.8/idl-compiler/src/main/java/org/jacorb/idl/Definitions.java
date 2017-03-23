@@ -90,7 +90,7 @@ public class Definitions
     		if(template.get(i).startsWith("%newfile"))
         	{
         		judge = true;
-        		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+        		String tmp = template.get(i).replaceAll("<moduleName>", name);
         		PrintWriter _ps = openOutput(tmp.substring(9));
         		
         		try{
@@ -133,7 +133,7 @@ public class Definitions
 				{
 					i = i+1;
 					str = template.get(i);
-					str = str.replaceAll("<fileName>", parser.file_Name);
+					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
 					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
@@ -154,7 +154,7 @@ public class Definitions
 				{
 					i = i+1;
 					str = template.get(i);
-					str = str.replaceAll("<fileName>", parser.file_Name);
+					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
 					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
@@ -176,7 +176,7 @@ public class Definitions
 				{
 					i = i+1;
 					str = template.get(i);
-					str = str.replaceAll("<fileName>", parser.file_Name);
+					str = str.replaceAll("<moduleName>", name);
 					template.add(str);
 					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
@@ -197,7 +197,7 @@ public class Definitions
         		{
         			i = i+1;
 					str = template.get(i);
-					str = str.replaceAll("<fileName>", parser.file_Name);
+					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
 					if(str.startsWith("%") && !str.equals("%%"))
 						index = index+1;
@@ -218,7 +218,7 @@ public class Definitions
         		{
         			i = i+1;
 					str = template.get(i);
-					str = str.replaceAll("<fileName>", parser.file_Name);
+					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
 					if(str.startsWith("%") && !str.equals("%%"))
 						index = index+1;
@@ -239,7 +239,7 @@ public class Definitions
         		{
         			i = i+1;
 					str = template.get(i);
-					str = str.replaceAll("<fileName>", parser.file_Name);
+					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
 					if(str.startsWith("%") && !str.equals("%%"))
 						index = index+1;
@@ -260,7 +260,7 @@ public class Definitions
         		{
         			i = i+1;
 					str = template.get(i);
-					str = str.replaceAll("<fileName>", parser.file_Name);
+					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
 					if(str.startsWith("%") && !str.equals("%%"))
 						index = index+1;
@@ -272,6 +272,42 @@ public class Definitions
         		Enumeration e = getElements();
         		while( e.hasMoreElements() )
 		            ( (IdlSymbol)e.nextElement() ).print( ps , _template , "module" );
+        	}
+        	else if(str.startsWith("%valuetype"))
+        	{
+        		String type = "";
+        		if(str.contains(":box"))
+        			type = "box";
+        		else if(str.contains(":abstract"))
+        			type = "abstract";
+        		else if(str.contains(":normal"))
+        			type = "normal";
+        		else if(str.contains(":nocustom"))
+        			type = "nocustom";
+        		else if(str.contains(":custom"))
+        			type = "custom";
+        		else
+        			type = "all";
+        		
+        		Vector<String> _template = new Vector<String>();
+        		_template.add(type);
+        		int index = 1;
+        		while(!(str.equals("%%") && index == 0))
+        		{
+        			i = i+1;
+        			str = template.get(i);
+        			str = str.replaceAll("<moduleName>", name);
+					_template.add(str);
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
+						index = index+1;
+					else if(str.equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		
+        		Enumeration e = getElements();
+        		while( e.hasMoreElements() )
+		            ( (IdlSymbol)e.nextElement() ).print( ps , _template , "valuetype" );
         	}
         	else if(ps == null)
         		throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");

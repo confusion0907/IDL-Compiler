@@ -1432,7 +1432,7 @@ public class Interface
 						index = index-1;
         		}
         		_template.remove(_template.size()-1);
-        		body.printOperationSignatures(_ps,_template);
+        		body.printOperationSignatures(_ps,_template,"operation");
         		i = i+1;
         	}
         	else if(template.get(i).startsWith("%typedef"))
@@ -1576,6 +1576,25 @@ public class Interface
                          }
                      }
         		}
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%attribute"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		_template.add(template.get(i));
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<interfaceName>", name);
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		body.printOperationSignatures(_ps,_template,"attribute");
         		i = i+1;
         	}
         	else if(_ps == null)

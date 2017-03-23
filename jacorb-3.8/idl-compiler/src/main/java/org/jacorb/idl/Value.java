@@ -25,6 +25,7 @@ package org.jacorb.idl;
  */
 
 import java.io.PrintWriter;
+import java.util.Vector;
 import java.util.logging.Level;
 
 public class Value
@@ -96,9 +97,9 @@ public class Value
         return value.holderName();
     }
 
-    public void print( PrintWriter ps )
+    public void print( PrintWriter ps , Vector<String> template )
     {
-        value.print( ps );
+        value.print( ps , template );
     }
 
     public String toString()

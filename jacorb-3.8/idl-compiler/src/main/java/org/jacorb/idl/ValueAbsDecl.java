@@ -21,10 +21,12 @@ package org.jacorb.idl;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Level;
 
 /**
@@ -289,84 +291,234 @@ public class ValueAbsDecl
      * operations and attributes
      */
 
-    public void print(PrintWriter unused)
+    public void print(PrintWriter ps , Vector<String> template)
     {
+    	//FIXME
+    	if(!template.get(0).equals("abstract"))
+    		return;
+    	
         if (included && !generateIncluded())
         {
             return;
         }
+        
+        int i = 1;
+        boolean judge = false;
 
         // divert output into class files
         if (body != null) // forward declaration
         {
-            try
+            while(i < template.size())
             {
-                // Java Interface file
-
-                String path =
-                    parser.out_dir + fileSeparator + pack_name.replace('.', fileSeparator);
-                File dir = new File(path);
-                if (!dir.exists())
-                {
-                    if (!dir.mkdirs())
-                    {
-                        org.jacorb.idl.parser.fatal_error("Unable to create " + path, null);
-                    }
-                }
-
-                File f = new File(dir, name + ".java");
-
-                if (GlobalInputStream.isMoreRecentThan(f))
-                {
-                    PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
-
-                    if (!pack_name.equals(""))
-                        ps.println("package " + pack_name + ";" + Environment.NL);
-
-                    printClassComment("abstract value type", name, ps);
-
-                    // do we inherit from a class in the unnamed package?
-                    // if so, we have to import this class explicitly
-
-                    if (inheritanceSpec != null && inheritanceSpec.v.size() > 0)
-                    {
-                        Enumeration e = inheritanceSpec.v.elements();
-                        for (; e.hasMoreElements();)
-                        {
-                            ScopedName sn = (ScopedName)e.nextElement();
-                            if (sn.resolvedName().indexOf('.') < 0)
-                            {
-                                ps.println("import " + sn + "Operations;");
-                            }
-                        }
-                    }
-                    printImport(ps);
-
-                    ps.println("public interface " + name);
-                    ps.print("\textends org.omg.CORBA.portable.ValueBase ");
-
-                    if (inheritanceSpec != null && inheritanceSpec.v.size() > 0)
-                    {
-                        for (Enumeration e = inheritanceSpec.v.elements(); e.hasMoreElements();)
-                        {
-                            ps.print(", " + e.nextElement());
-                        }
-                    }
-
-                    ps.println(Environment.NL + "{");
-                    if (body != null)
-                    {
-                        // forward declaration
-                        body.printOperationSignatures(ps,null);
-                    }
-                    ps.println("}");
-                    ps.close();
-                }
+            	if(template.get(i).startsWith("%newfile"))
+            	{
+            		judge = true;
+            		String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            		PrintWriter _ps = openOutput(tmp.substring(9));
+            		
+            		if(_ps == null)
+            		{
+            			System.out.println("文件"+tmp.substring(9)+"已存在，代码生成失败");
+            			return;
+            		}
+            		else if(ps != null)
+            		{
+            			ps.close();
+            			ps = _ps;
+            		}
+            		else
+            			ps = _ps;
+            		
+            		i = i+1;
+            	}
+            	else if(template.get(i).startsWith("%operation"))
+            	{
+            		String type = "";
+            		if(template.get(i).contains(":normal"))
+            			type = "normal";
+            		else if(template.get(i).contains(":oneway"))
+            			type = "oneway";
+            		else if(template.get(i).contains("noraises"))
+            			type = "noraises";
+            		else if(template.get(i).contains("raises"))
+            			type = "raises";
+            		else
+            			type = "all";
+            		int index = 1;
+            		Vector<String> _template = new Vector<String>();
+            		_template.add(type);
+            		while(!(template.get(i).equals("%%") && index == 0))
+            		{
+            			i = i + 1;
+            			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+    					_template.add(tmp);
+    					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+    						index = index+1;
+    					else if(template.get(i).equals("%%"))
+    						index = index-1;
+            		}
+            		_template.remove(_template.size()-1);
+            		body.printOperationSignatures(ps,_template,"operation");
+            		i = i+1;
+            	}
+            	else if(template.get(i).startsWith("%typedef"))
+            	{
+            		int index = 1;
+            		Vector<String> _template = new Vector<String>();
+            		_template.add(template.get(i));
+            		while(!(template.get(i).equals("%%") && index == 0))
+            		{
+            			i = i + 1;
+            			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+    					_template.add(tmp);
+    					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+    						index = index+1;
+    					else if(template.get(i).equals("%%"))
+    						index = index-1;
+            		}
+            		_template.remove(_template.size()-1);
+            		body.print(ps,_template,"typedef");
+            		i = i+1;
+            	}
+            	else if(template.get(i).startsWith("%constants"))
+            	{
+            		i= i+1;
+            		Vector<String> _template = new Vector<String>();
+            		while(!template.get(i).equals("%%"))
+            		{
+            			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+    					_template.add(tmp);
+    					i = i+1;
+            		}
+            		body.printConstants(ps,_template);
+            		i = i+1;
+            	}
+            	else if(template.get(i).startsWith("%struct"))
+            	{
+            		int index = 1;
+            		Vector<String> _template = new Vector<String>();
+            		while(!(template.get(i).equals("%%") && index == 0))
+            		{
+            			i = i + 1;
+            			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+    					_template.add(tmp);
+    					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+    						index = index+1;
+    					else if(template.get(i).equals("%%"))
+    						index = index-1;
+            		}
+            		_template.remove(_template.size()-1);
+            		body.print(ps,_template,"struct");
+            		i = i+1;
+            	}
+            	else if(template.get(i).startsWith("%exception"))
+            	{
+            		int index = 1;
+            		Vector<String> _template = new Vector<String>();
+            		while(!(template.get(i).equals("%%") && index == 0))
+            		{
+            			i = i + 1;
+            			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+    					_template.add(tmp);
+    					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+    						index = index+1;
+    					else if(template.get(i).equals("%%"))
+    						index = index-1;
+            		}
+            		_template.remove(_template.size()-1);
+            		body.print(ps,_template,"exception");
+            		i = i+1;
+            	}
+            	else if(template.get(i).startsWith("%union"))
+            	{
+            		int index = 1;
+            		Vector<String> _template = new Vector<String>();
+            		while(!(template.get(i).equals("%%") && index == 0))
+            		{
+            			i = i + 1;
+            			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+    					_template.add(tmp);
+    					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+    						index = index+1;
+    					else if(template.get(i).equals("%%"))
+    						index = index-1;
+            		}
+            		_template.remove(_template.size()-1);
+            		body.print(ps,_template,"union");
+            		i = i+1;
+            	}
+            	else if(template.get(i).startsWith("%enum"))
+            	{
+            		int index = 1;
+            		Vector<String> _template = new Vector<String>();
+            		while(!(template.get(i).equals("%%") && index == 0))
+            		{
+            			i = i + 1;
+            			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+    					_template.add(tmp);
+    					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+    						index = index+1;
+    					else if(template.get(i).equals("%%"))
+    						index = index-1;
+            		}
+            		_template.remove(_template.size()-1);
+            		body.print(ps,_template,"enum");
+            		i = i+1;
+            	}
+            	else if(template.get(i).startsWith("%attribute"))
+            	{
+            		int index = 1;
+            		Vector<String> _template = new Vector<String>();
+            		_template.add(template.get(i));
+            		while(!(template.get(i).equals("%%") && index == 0))
+            		{
+            			i = i + 1;
+            			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+    					_template.add(tmp);
+    					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+    						index = index+1;
+    					else if(template.get(i).equals("%%"))
+    						index = index-1;
+            		}
+            		_template.remove(_template.size()-1);
+            		body.printOperationSignatures(ps,_template,"attribute");
+            		i = i+1;
+            	}
+            	else if(ps == null)
+					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+            	else
+            	{
+            		String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            		ps.println(tmp);
+            		i = i+1;
+            	}
             }
-            catch (java.io.IOException i)
+        }
+        
+        if(ps != null && judge)
+        	ps.close();
+    }
+    
+    protected PrintWriter openOutput(String typeName)
+    {
+        try
+        {
+            final File f = new File(typeName);
+            if (GlobalInputStream.isMoreRecentThan(f))
             {
-                throw new RuntimeException("File IO error" + i);
+                PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
+                return ps;
             }
+
+            // no need to open file for printing, existing file is more
+            // recent than IDL file.
+
+            return null;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException ("Could not open output file for "
+                                        + typeName + " (" + e + ")");
         }
     }
 

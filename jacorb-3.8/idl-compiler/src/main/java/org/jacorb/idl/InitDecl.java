@@ -21,6 +21,7 @@
 package org.jacorb.idl;
 
 import java.io.PrintWriter;
+import java.security.MessageDigest;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -106,23 +107,122 @@ public class InitDecl
      * Prints the method's signature, for inclusion in the
      * factory interface.
      */
-    public void print( PrintWriter ps, String type_name )
+    public void print( PrintWriter ps, Vector<String> template )
     {
-        ps.print( "\t" + type_name + " " + name + "( " );
-
-        Enumeration e = paramDecls.elements();
-
-        if( e.hasMoreElements() )
-            ( (ParamDecl)e.nextElement() ).print( ps );
-
-        for( ; e.hasMoreElements(); )
-        {
-            ps.print( ", " );
-            ( (ParamDecl)e.nextElement() ).print( ps );
-        }
-        ps.print( ")" );
-        raisesExpr.print( ps );
-        ps.println( ";" );
+    	//FIXME
+        int i = 0 ;
+    	while(i < template.size())
+    	{
+    		if(template.get(i).startsWith("%raises"))
+        	{
+        		i = i+1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!template.get(i).equals("%%"))
+        		{
+        			String tmp = template.get(i).replaceAll("<factoryName>", name);
+            		tmp = tmp.replaceAll("<paramList>", paramList());
+            		tmp = tmp.replaceAll("<paramTypeList>", paramTypeList());
+            		tmp = tmp.replaceAll("<paramNameList>", paramNameList());
+            		tmp = tmp.replaceAll("<raisesList>", raisesExpr.getRaisesList());
+            		if(template.get(i).contains("HASH("))
+                	{
+                		int begin=-1,end=-1;
+                		for(int j = 0 ; j < tmp.length() ; j++)
+                		{
+                			if(tmp.charAt(j)=='H' && tmp.charAt(j+1)=='A' && tmp.charAt(j+2)=='S' && tmp.charAt(j+3)=='H' && tmp.charAt(j+4)=='(')
+                			{
+                				begin = j;
+                				break;
+                			}
+                		}
+                		String hash = tmp.substring(begin);
+                		end = hash.indexOf(')');
+                		hash = hash.substring(0, end+1);
+                		String arg = hash.substring(6,hash.length()-2);
+                		String result = toMD5(arg);
+                		if(result.equals(arg))
+                			throw new RuntimeException ("加密"+arg+"出错");
+                		tmp = tmp.replace(hash, result);
+                	}
+        			_template.add(tmp);
+        			i = i+1;
+        		}
+        		raisesExpr.print(ps,_template);
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%param"))
+        	{
+        		i = i+1;
+    			while(!template.get(i).equals("%%"))
+    			{
+    				for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )
+    				{
+    					ParamDecl p = (ParamDecl)e.nextElement();
+    					String tmp = template.get(i).replaceAll("<factoryName>", name);
+    					tmp = tmp.replaceAll("<paramType>", p.paramTypeSpec.typeName());
+    					tmp = tmp.replaceAll("<paramName>", p.simple_declarator.toString());
+    					tmp = tmp.replaceAll("<paramList>", paramList());
+    					tmp = tmp.replaceAll("<paramTypeList>", paramTypeList());
+    					tmp = tmp.replaceAll("<paramNameList>", paramNameList());
+    					tmp = tmp.replaceAll("<raisesList>", raisesExpr.getRaisesList());
+    					if(template.get(i).contains("HASH("))
+    					{
+    						int begin=-1,end=-1;
+    						for(int j = 0 ; j < tmp.length() ; j++)
+    						{
+    							if(tmp.charAt(j)=='H' && tmp.charAt(j+1)=='A' && tmp.charAt(j+2)=='S' && tmp.charAt(j+3)=='H' && tmp.charAt(j+4)=='(')
+    							{
+    								begin = j;
+    								break;
+    								}
+    						}
+    						String hash = tmp.substring(begin);
+    						end = hash.indexOf(')');
+    						hash = hash.substring(0, end+1);
+    						String arg = hash.substring(6,hash.length()-2);
+    						String result = toMD5(arg);
+    						if(result.equals(arg))
+    							throw new RuntimeException ("加密"+arg+"出错");
+    						tmp = tmp.replace(hash, result);
+    					}
+    					ps.println(tmp);
+    				}
+    				i = i+1;
+    			}
+    			i = i+1;
+        	}
+        	else
+        	{
+        		String tmp = template.get(i).replaceAll("<factoryName>", name);
+        		tmp = tmp.replaceAll("<paramList>", paramList());
+        		tmp = tmp.replaceAll("<paramTypeList>", paramTypeList());
+        		tmp = tmp.replaceAll("<paramNameList>", paramNameList());
+        		tmp = tmp.replaceAll("<raisesList>", raisesExpr.getRaisesList());
+        		if(template.get(i).contains("HASH("))
+            	{
+            		int begin=-1,end=-1;
+            		for(int j = 0 ; j < tmp.length() ; j++)
+            		{
+            			if(tmp.charAt(j)=='H' && tmp.charAt(j+1)=='A' && tmp.charAt(j+2)=='S' && tmp.charAt(j+3)=='H' && tmp.charAt(j+4)=='(')
+            			{
+            				begin = j;
+            				break;
+            			}
+            		}
+            		String hash = tmp.substring(begin);
+            		end = hash.indexOf(')');
+            		hash = hash.substring(0, end+1);
+            		String arg = hash.substring(6,hash.length()-2);
+            		String result = toMD5(arg);
+            		if(result.equals(arg))
+            			throw new RuntimeException ("加密"+arg+"出错");
+            		tmp = tmp.replace(hash, result);
+            	}
+        		ps.println(tmp);
+        		i = i+1;
+        	}
+    	}
+        //raisesExpr.print( ps );
     }
 
     /**
@@ -170,5 +270,70 @@ public class InitDecl
     public String opName()
     {
         return name();
+    }
+    
+    private String paramList()
+    {
+    	String result = "";
+    	for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )
+    	{
+    		ParamDecl p = (ParamDecl)e.nextElement();
+    		result = result+","+p.paramTypeSpec.typeName()+" "+p.simple_declarator.toString();
+    	}
+    	if(!result.equals(""))
+    		result = result.substring(1);
+    	return result;
+    }
+    
+    private String paramTypeList()
+    {
+    	String result = "";
+    	for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )
+    	{
+    		ParamDecl p = (ParamDecl)e.nextElement();
+    		result = result+","+p.paramTypeSpec.typeName();
+    	}
+    	if(!result.equals(""))
+    		result = result.substring(1);
+    	return result;
+    }
+    
+    private String paramNameList()
+    {
+    	String result = "";
+    	for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )
+    	{
+    		ParamDecl p = (ParamDecl)e.nextElement();
+    		result = result+","+p.simple_declarator.toString();
+    	}
+    	if(!result.equals(""))
+    		result = result.substring(1);
+    	return result;
+    }
+    
+    public String toMD5(String plainText)
+    {
+    	try 
+    	{
+    		MessageDigest md = MessageDigest.getInstance("MD5"); 
+    		md.update(plainText.getBytes());
+    		byte b[] = md.digest();
+    		int i;
+    		StringBuffer buf = new StringBuffer("");
+    		for (int offset = 0; offset < b.length; offset++) 
+    		{
+    			i = b[offset];
+    			if (i < 0)
+    				i += 256;
+    			if (i < 16)
+    				buf.append("0");
+    			buf.append(Integer.toHexString(i));
+    		}
+    		return buf.toString();
+    	} 
+    	catch (Exception e) {
+    		e.printStackTrace();
+    	}
+		return plainText;
     }
 }

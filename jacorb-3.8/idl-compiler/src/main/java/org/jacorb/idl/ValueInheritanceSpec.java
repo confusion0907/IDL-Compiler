@@ -111,9 +111,150 @@ public class ValueInheritanceSpec
 
     }
 
-    public void print( PrintWriter ps )
+    public void print( PrintWriter ps , Vector<String> template )
     {
-        ps.print( toString() );
+    	int i = 1;
+    	if(template.get(0).startsWith("%truncatable"))
+    	{
+    		while(i < template.size())
+    		{
+    			if(template.get(i).startsWith("%abstract"))
+    			{
+    				Vector<String> _template = new Vector<String>();
+            		while(!template.get(i).equals("%%"))
+            		{
+    					_template.add(template.get(i));
+    					i = i+1;
+            		}
+            		Enumeration e = v.elements();
+            		for( ; e.hasMoreElements(); )
+                    {
+            			ScopedName scopedName = (ScopedName)e.nextElement();
+                    	ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                        for(int j = 0 ; j < _template.size() ; j++)
+                        {
+                        	if(ts.c_type_spec instanceof ValueAbsDecl)
+                        		ps.println(_template.get(j).replaceAll("<truncatableName>", ts.toString()));
+                        }
+                    }
+            		i = i + 1;
+    			}
+    			else if(template.get(i).startsWith("%stateful"))
+    			{
+    				Vector<String> _template = new Vector<String>();
+            		while(!template.get(i).equals("%%"))
+            		{
+    					_template.add(template.get(i));
+    					i = i+1;
+            		}
+            		for( Enumeration e = v.elements() ; e.hasMoreElements(); )
+                    {
+            			ScopedName scopedName = (ScopedName)e.nextElement();
+                    	ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                        for(int j = 0 ; j < _template.size() ; j++)
+                        {
+                        	if(!(ts.c_type_spec instanceof ValueAbsDecl))
+                        		ps.println(_template.get(j).replaceAll("<truncatableName>", ts.toString()));
+                        }
+                    }
+            		i = i + 1;
+            		if(truncatable == null)
+            			continue;
+            		for(int j = 0 ; j < _template.size() ; j++)
+                    {
+                    	ScopedName scopedName = (ScopedName)truncatable.scopedName;
+                    	ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                    	ps.println(_template.get(j).replaceAll("<truncatableName>", ts.toString()));
+                    }
+    			}
+    			else
+    			{
+    				Vector<String> _template = new Vector<String>();
+            		while(i < template.size() && !template.get(i).equals("%%"))
+            		{
+    					_template.add(template.get(i));
+    					i = i+1;
+            		}
+            		for( Enumeration e = v.elements() ; e.hasMoreElements(); )
+                    {
+            			ScopedName scopedName = (ScopedName)e.nextElement();
+                    	ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                        for(int j = 0 ; j < _template.size() ; j++)
+                        	ps.println(_template.get(j).replaceAll("<truncatableName>", ts.toString()));
+                    }
+            		i = i + 1;
+            		if(truncatable == null)
+            			continue;
+            		for(int j = 0 ; i < _template.size() ; j++)
+                    {
+                    	ScopedName scopedName = (ScopedName)truncatable.scopedName;
+                    	ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                    	ps.println(_template.get(j).replaceAll("<truncatableName>", ts.toString()));
+                    }
+    			}
+    		}
+    	}
+    	else if(template.get(0).startsWith("%supports"))
+    	{
+    		while(i < template.size())
+    		{
+    			if(template.get(i).startsWith("%abstract"))
+    			{
+    				Vector<String> _template = new Vector<String>();
+            		while(!template.get(i).equals("%%"))
+            		{
+    					_template.add(template.get(i));
+    					i = i+1;
+            		}
+            		for( Enumeration e = getSupportedInterfaces() ; e.hasMoreElements(); )
+                    {
+            			ScopedName sne = (ScopedName)e.nextElement();
+                        for(int j = 0 ; j < _template.size() ; j++)
+                        {
+                        	if (!(Interface.abstractInterfaces == null) && Interface.abstractInterfaces.contains (sne.toString()))
+                        		ps.println(_template.get(j).replaceAll("<supportsName>", sne.toString()));
+                        }
+                    }
+            		i = i + 1;
+    			}
+    			else if(template.get(i).startsWith("%stateful"))
+    			{
+    				Vector<String> _template = new Vector<String>();
+    				i = i + 1;
+            		while(!template.get(i).equals("%%"))
+            		{
+    					_template.add(template.get(i));
+    					i = i+1;
+            		}
+            		for( Enumeration e = getSupportedInterfaces() ; e.hasMoreElements();)
+                    {
+            			ScopedName sne = (ScopedName)e.nextElement();
+                        for(int j = 0 ; j < _template.size() ; j++)
+                        {
+                        	if (Interface.abstractInterfaces == null || !Interface.abstractInterfaces.contains (sne.toString()))
+                        		ps.println(_template.get(j).replaceAll("<supportsName>", sne.toString()));
+                        }
+                    }
+            		i = i + 1;
+    			}
+    			else
+    			{
+    				Vector<String> _template = new Vector<String>();
+            		while(i < template.size() && !(template.get(i).equals("%%")))
+            		{
+    					_template.add(template.get(i));
+    					i = i+1;
+            		}
+            		for( Enumeration e = getSupportedInterfaces() ; e.hasMoreElements();)
+                    {
+            			ScopedName sne = (ScopedName)e.nextElement();
+                        for(int j = 0 ; j < _template.size() ; j++)
+                        	ps.println(_template.get(j).replaceAll("<supportsName>", sne.toString()));
+                    }
+            		i = i + 1;
+    			}
+    		}
+    	}
     }
 
     public String toString()

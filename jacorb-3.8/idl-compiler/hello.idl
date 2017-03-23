@@ -2,7 +2,19 @@ exception error{
 	string name;
 };
 
+valuetype sundown{
+	factory register() raises(error);
+	private short a;
+	public string b;
+	string countdown(out boolean already);
+	typedef short time;
+	const short sunrise = 5;
+	attribute short reset;
+};
+
 interface HelloWorld{
+	const boolean judge = TRUE | FALSE;
+	attribute short time getraises(error) setraises(error);
 	oneway void sayGoodbye(in string name,inout string number);
 };
 
@@ -11,8 +23,11 @@ interface HelloService :HelloWorld{
 		short id;
 		string name;
 	};
-	typedef string id;
+	typedef string id,type;
 	const short number = 5;
 	string sayHello(in string name,inout string number) raises (error);
 	void shutdown(out string data);	
+};
+
+valuetype test : truncatable sundown supports HelloWorld , HelloService{
 };

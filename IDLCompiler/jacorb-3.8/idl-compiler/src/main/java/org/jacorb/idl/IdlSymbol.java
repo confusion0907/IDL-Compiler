@@ -286,7 +286,7 @@ public class IdlSymbol
     {
         throw new java.lang.RuntimeException( "--abstract--!" );
     }
-    
+
     public void print( PrintWriter ps )
     {
         throw new java.lang.RuntimeException( "--abstract--!" );

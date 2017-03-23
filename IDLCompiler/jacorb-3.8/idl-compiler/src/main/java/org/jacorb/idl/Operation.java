@@ -25,6 +25,7 @@ package org.jacorb.idl;
  */
 
 import java.io.PrintWriter;
+import java.util.Vector;
 
 public interface Operation
 {
@@ -62,9 +63,9 @@ public interface Operation
     /**
      * @param printModifiers whether "public abstract" should be added
      */
-    void printSignature( PrintWriter ps, boolean printModifiers );
+    void printSignature( PrintWriter ps, Vector<String> template , boolean printModifiers );
 
-    void printSignature( PrintWriter ps );
+    void printSignature( PrintWriter ps , Vector<String> template );
 
     /**
      * Method code for skeletons
