@@ -99,6 +99,8 @@ public class Definition
     		declaration.print(ps , template);
     	else if(type.equals("valuetype") && declaration instanceof Value)
     		declaration.print(ps , template);
+    	else if(type.equals("typeprefix") && declaration instanceof TypePrefixDecl)
+    		declaration.print(ps , template);
     }
 
     public void parse()

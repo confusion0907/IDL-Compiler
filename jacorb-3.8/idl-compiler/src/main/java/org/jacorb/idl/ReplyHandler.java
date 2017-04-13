@@ -56,7 +56,8 @@ public class ReplyHandler extends Interface
      *  Creates an inheritance spec for this ReplyHandler, based
      *  on the inheritance spec of the parent interface.
      */
-    private void createInheritanceSpec (SymbolList source)
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createInheritanceSpec (SymbolList source)
     {
         inheritanceSpec = new SymbolList (new_num());
         if (source.v.isEmpty())
@@ -105,7 +106,8 @@ public class ReplyHandler extends Interface
      * Creates the ReplyHandler operations for the given operation of the
      * parent interface, and puts them into the body of this ReplyHandler.
      */
-    private void createOperationsFor (OpDecl d)
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private void createOperationsFor (OpDecl d)
     {
         // Create the parameter list for the NO_EXCEPTION reply operation
         List paramDecls = new ArrayList();
@@ -134,7 +136,8 @@ public class ReplyHandler extends Interface
      * Creates the ReplyHandler operations for the given attribute declaration
      * of the parent interface, and puts them into the body of this ReplyHandler.
      */
-    private void createOperationsFor (AttrDecl d)
+    @SuppressWarnings("rawtypes")
+	private void createOperationsFor (AttrDecl d)
     {
         for (Iterator i = d.declarators.v.iterator(); i.hasNext();)
         {
@@ -160,14 +163,16 @@ public class ReplyHandler extends Interface
      * Returns a parameter list with a single "in" argument that has
      * the given type and name.
      */
-    private List parameterList(TypeSpec type, String name)
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private List parameterList(TypeSpec type, String name)
     {
         List result = new ArrayList();
         result.add (new ParamDecl (ParamDecl.MODE_IN, type, name));
         return result;
     }
 
-    private List excepParameterList()
+    @SuppressWarnings("rawtypes")
+	private List excepParameterList()
     {
         return parameterList (new ExceptionHolderTypeSpec (new_num()),
                               "excep_holder");

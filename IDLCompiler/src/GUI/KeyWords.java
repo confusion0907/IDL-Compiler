@@ -4,11 +4,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class KeyWords {
-	private Set<String> keywords;
-	private Set<String> labelwords;
-	private Set<String> functionwords;
+	private static KeyWords keyWords = null;
+	private static Set<String> keywords;
+	private static Set<String> labelwords;
+	private static Set<String> functionwords;
 	
-	public KeyWords()
+	public static KeyWords getInstance()
+	{
+		if(keyWords == null)
+			keyWords = new KeyWords();
+		return keyWords;
+	}
+	
+	private KeyWords()
 	{
 		initKeywords();
 		initLabelwords();
@@ -43,19 +51,42 @@ public class KeyWords {
 		keywords.add("<constantsType>");
 		keywords.add("<constantsValue>");
 		keywords.add("<sequenceLength>");
+		keywords.add("<digitsNumber>");
+		keywords.add("<scaleNumber>");
 		keywords.add("<enumName>");
 		keywords.add("<enumLabel>");
 		keywords.add("<exceptionName>");
 		keywords.add("<unionName>");
+		keywords.add("<moduleName>");
 		keywords.add("<switchType>");
 		keywords.add("<caseValue>");
+		keywords.add("<valuetypeType>");
+		keywords.add("<valuetypeName>");
+		keywords.add("<sequenceLength>");
+		keywords.add("<truncatableList>");
+		keywords.add("<abstractTruncatableList>");
+		keywords.add("<statefulTruncatableList>");
+		keywords.add("<supportsList>");
+		keywords.add("<abstractSupportsList>");
+		keywords.add("<statefulSupportsList>");
+		keywords.add("<factoryName>");
+		keywords.add("<raisesList>");
+		keywords.add("<scopeList>");
+		keywords.add("<scopeName>");
+		keywords.add("<prefixString>");
+		keywords.add("<attributeName>");
+		keywords.add("<attributeType>");
+		keywords.add("<nativeName>");
 	}
 
 	private void initKeywords()
 	{
 		labelwords = new HashSet<String>();
 		labelwords.add("%newfile");
+		labelwords.add("%typedef");
+		labelwords.add("%typedef:local");
 		labelwords.add("%typedef:sequence");
+		labelwords.add("%typedef:fixed");
 		labelwords.add("%length");
 		labelwords.add("%module");
 		labelwords.add("%enum");
@@ -81,6 +112,25 @@ public class KeyWords {
 		labelwords.add("%param:OUT");
 		labelwords.add("%param:INOUT");
 		labelwords.add("%return");
+		labelwords.add("%constants");
+		labelwords.add("%attribute");
+		labelwords.add("%attribute:readonly");
+		labelwords.add("%attribute:normal");
+		labelwords.add("%getraises");
+		labelwords.add("%setraises");
+		labelwords.add("%raises");
+		labelwords.add("%valuetype:box");
+		labelwords.add("%valuetype:abstract");
+		labelwords.add("%valuetype:normal");
+		labelwords.add("%truncatable");
+		labelwords.add("%supports");
+		labelwords.add("%factory");
+		labelwords.add("%statemember:public");
+		labelwords.add("%statemember:private");
+		labelwords.add("%supports");
+		labelwords.add("%inheritance");
+		labelwords.add("%native");
+		labelwords.add("%typeprefix");
 		labelwords.add("%%");
 	}
 
@@ -89,7 +139,7 @@ public class KeyWords {
 	}
 
 	public void setKeywords(Set<String> keywords) {
-		this.keywords = keywords;
+		KeyWords.keywords = keywords;
 	}
 
 	public Set<String> getLabelwords() {
@@ -97,7 +147,7 @@ public class KeyWords {
 	}
 
 	public void setLabelwords(Set<String> labelwords) {
-		this.labelwords = labelwords;
+		KeyWords.labelwords = labelwords;
 	}
 
 	public Set<String> getFunctionwords() {
@@ -105,6 +155,6 @@ public class KeyWords {
 	}
 
 	public void setFunctionwords(Set<String> functionwords) {
-		this.functionwords = functionwords;
+		KeyWords.functionwords = functionwords;
 	}
 }

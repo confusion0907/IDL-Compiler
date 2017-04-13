@@ -24,7 +24,6 @@ package org.jacorb.idl;
  * @author Gerald Brose
  */
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -32,8 +31,10 @@ import java.util.logging.Level;
 
 public class ConstDecl extends Declaration
 {
-    private static Hashtable values = new Hashtable();
-    private static Hashtable declarations = new Hashtable();
+    @SuppressWarnings("rawtypes")
+	private static Hashtable values = new Hashtable();
+    @SuppressWarnings("rawtypes")
+	private static Hashtable declarations = new Hashtable();
 
     private ScopedName t = new ScopedName(new_num());
     private int pos_int_const = 0;
@@ -73,7 +74,8 @@ public class ConstDecl extends Declaration
         t.setPackage(s);
     }
 
-    public void parse()
+    @SuppressWarnings("unchecked")
+	public void parse()
     {
         const_expr.setDeclaration(this);
         try
@@ -160,6 +162,7 @@ public class ConstDecl extends Declaration
 
     public void print(PrintWriter ps , Vector<String> template)
     {
+    	//FIXME
     	String fullName = ScopedName.unPseudoName(full_name());
         String className;
         if (fullName.indexOf('.') > 0)

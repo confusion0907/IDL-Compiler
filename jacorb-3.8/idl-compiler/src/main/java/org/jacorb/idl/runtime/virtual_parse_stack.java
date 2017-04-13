@@ -25,7 +25,8 @@ public class virtual_parse_stack {
   /*-----------------------------------------------------------*/
 
   /** Constructor to build a virtual stack out of a real stack. */
-  public virtual_parse_stack(Stack shadowing_stack) throws java.lang.Exception
+  @SuppressWarnings("rawtypes")
+public virtual_parse_stack(Stack shadowing_stack) throws java.lang.Exception
     {
       /* sanity check */
       if (shadowing_stack == null)
@@ -49,7 +50,8 @@ public class virtual_parse_stack {
    *  the bottom of the virtual portion of the stack, but is always left
    *  unmodified.
    */
-  protected Stack real_stack;
+  @SuppressWarnings("rawtypes")
+protected Stack real_stack;
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -67,7 +69,8 @@ public class virtual_parse_stack {
    *  on the virtual stack).  When this portion of the stack becomes empty we 
    *  transfer elements from the underlying stack onto this stack. 
    */
-  protected Stack vstack;
+  @SuppressWarnings("rawtypes")
+protected Stack vstack;
 
   /*-----------------------------------------------------------*/
   /*--- General Methods ---------------------------------------*/
@@ -76,7 +79,8 @@ public class virtual_parse_stack {
   /** Transfer an element from the real to the virtual stack.  This assumes 
    *  that the virtual stack is currently empty.  
    */
-  protected void get_from_real()
+  @SuppressWarnings("unchecked")
+protected void get_from_real()
     {
       symbol stack_sym;
 
@@ -135,7 +139,8 @@ public class virtual_parse_stack {
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** Push a state number onto the stack. */
-  public void push(int state_num)
+  @SuppressWarnings("unchecked")
+public void push(int state_num)
     {
       vstack.push(new Integer(state_num));
     }

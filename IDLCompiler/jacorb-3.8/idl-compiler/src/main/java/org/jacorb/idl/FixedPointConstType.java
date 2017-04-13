@@ -27,7 +27,13 @@ package org.jacorb.idl;
 public class FixedPointConstType
         extends BaseType
 {
-    public FixedPointConstType( int num )
+	static private String typeName = "BigDecimal";
+	
+    public static void setTypeName(String typeName) {
+		FixedPointConstType.typeName = typeName;
+	}
+
+	public FixedPointConstType( int num )
     {
         super( num );
     }
@@ -39,7 +45,7 @@ public class FixedPointConstType
 
     public String typeName()
     {
-        return "java.math.BigDecimal";
+        return typeName;
     }
 
     public TypeSpec typeSpec()

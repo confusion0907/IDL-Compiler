@@ -648,7 +648,8 @@ public class ScopedName
         return resolvedTypeSpec().getTypeCodeExpression();
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression(Set knownTypes)
     {
         return resolvedTypeSpec().getTypeCodeExpression(knownTypes);
     }

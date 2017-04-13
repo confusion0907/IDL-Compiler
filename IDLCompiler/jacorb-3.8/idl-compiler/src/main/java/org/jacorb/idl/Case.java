@@ -46,7 +46,8 @@ public class Case
         super( num );
     }
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
         if( pack_name.length() > 0 )
@@ -119,7 +120,8 @@ public class Case
     }
 
 
-    public void parse()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void parse()
     {
         element_spec.parse();
 

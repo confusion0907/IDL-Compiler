@@ -35,13 +35,15 @@ public class Definitions
     extends SymbolList
 {
 
-    public Definitions( int num )
+    @SuppressWarnings("rawtypes")
+	public Definitions( int num )
     {
         super( num );
         v = new Vector();
     }
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
         Enumeration e = getElements();
@@ -52,7 +54,8 @@ public class Definitions
         }
     }
 
-    public void setEnclosingSymbol( IdlSymbol s )
+    @SuppressWarnings("rawtypes")
+	public void setEnclosingSymbol( IdlSymbol s )
     {
         if( enclosing_symbol != null && enclosing_symbol != s )
         {
@@ -66,7 +69,8 @@ public class Definitions
             ( (IdlSymbol)e.nextElement() ).setEnclosingSymbol( s );
     }
 
-    public void set_included( boolean i )
+    @SuppressWarnings("rawtypes")
+	public void set_included( boolean i )
     {
         included = i;
         Enumeration e = getElements();
@@ -74,11 +78,13 @@ public class Definitions
             ( (IdlSymbol)e.nextElement() ).set_included( i );
     }
 
-    public Enumeration getElements()
+    @SuppressWarnings("rawtypes")
+	public Enumeration getElements()
     {
         return v.elements();
     }
 
+	@SuppressWarnings("rawtypes")
 	public void print( PrintWriter ps , Vector<String> template )
     {
     	int i = 0;

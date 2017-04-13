@@ -177,7 +177,8 @@ public class TypeSpec
         return null;
     }
 
-    public String getTypeCodeExpression( Set knownTypes )
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression( Set knownTypes )
     {
         System.out.println("Add TypeSpec.GetTypeCodeExpression for " + this.getClass());
         return type_spec.getTypeCodeExpression( knownTypes );
@@ -238,6 +239,16 @@ public class TypeSpec
     {
     	return type_spec.getSequenceLength();
     }
+    
+    public int getDigits() 
+    {
+		return type_spec.getDigits();
+	}
+
+	public int getScale() 
+	{
+		return type_spec.getScale();
+	}
 
     public String printInsertExpression()
     {

@@ -2,7 +2,6 @@ org\jacorb\idl\SymbolList.class
 org\jacorb\idl\IDLTreeVisitor.class
 org\jacorb\idl\AliasTypeSpec.class
 org\jacorb\idl\AttrDecl.class
-org\jacorb\idl\UnionType$3.class
 org\jacorb\idl\EnumType.class
 org\jacorb\idl\SimpleDeclarator.class
 org\jacorb\idl\RaisesExpr.class
@@ -17,7 +16,6 @@ org\jacorb\idl\runtime\token.class
 org\jacorb\idl\ParseException.class
 org\jacorb\idl\Operation.class
 org\jacorb\idl\TypeDef.class
-org\jacorb\idl\UnionType$UnionIterator.class
 org\jacorb\idl\str_token.class
 org\jacorb\idl\SimpleTypeSpec.class
 org\jacorb\idl\TypeDeclarator.class
@@ -36,11 +34,9 @@ org\jacorb\idl\SwitchBody.class
 org\jacorb\idl\TemplateTypeSpec.class
 org\jacorb\idl\ScopedName.class
 org\jacorb\idl\InterfaceBody$ParseThread.class
-org\jacorb\idl\UnionType$2.class
 org\jacorb\idl\runtime\symbol.class
 org\jacorb\idl\Value.class
 org\jacorb\idl\Definitions.class
-org\jacorb\idl\UnionType$1.class
 org\jacorb\idl\Scope.class
 org\jacorb\idl\Method.class
 org\jacorb\idl\PositionInfo.class

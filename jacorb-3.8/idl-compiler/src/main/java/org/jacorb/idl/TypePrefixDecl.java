@@ -20,7 +20,10 @@
 
 package org.jacorb.idl;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Vector;
 
 /**
  * Declaration of typeprefix
@@ -38,10 +41,69 @@ public class TypePrefixDecl extends Declaration
         super(num);
     }
 
-    public void print( PrintWriter ps )
+    public void print( PrintWriter ps , Vector<String> template )
     {
-        //do nothing
+    	boolean judge = false;
+    	for(int i = 0 ; i < template.size() ; i++)
+    	{
+    		if(template.get(i).startsWith("%newfile"))
+        	{
+        		judge = true;
+        		String tmp = template.get(i).replaceAll("<scopeName>", scopedname.name);
+        		tmp = tmp.replaceAll("<prefixString>", prefix);
+        		PrintWriter _ps = openOutput(tmp.substring(9));
+        		
+        		try{
+					_ps = openOutput(tmp.substring(9));
+					if(_ps == null)
+						throw new Exception();
+				}catch(Exception e){
+					throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+				}
+        		
+        		if(ps != null)
+        		{
+        			ps.close();
+        			ps = _ps;
+        		}
+        		else
+        			ps = _ps;
+        		
+        		i = i+1;
+        	}
+    		else
+    		{
+    			String tmp = template.get(i).replaceAll("<scopeName>", scopedname.name);
+        		tmp = tmp.replaceAll("<prefixString>", prefix);
+        		ps.println(tmp);
+    		}
+    	}
+    	
+    	if(ps != null && judge)
+        	ps.close();
     }
+    
+    private PrintWriter openOutput(String tmp) {
+    	try
+        {
+            final File f = new File(parser.out_dir+"\\"+tmp);
+            if (GlobalInputStream.isMoreRecentThan(f))
+            {
+                PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
+                return ps;
+            }
+
+            // no need to open file for printing, existing file is more
+            // recent than IDL file.
+
+            return null;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException ("Could not open output file for "
+                                        + tmp + " (" + e + ")");
+        }
+	}
 
     public void parse() throws ParseException
     {

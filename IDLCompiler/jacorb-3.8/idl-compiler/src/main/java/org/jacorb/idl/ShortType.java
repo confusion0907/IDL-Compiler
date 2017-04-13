@@ -30,6 +30,15 @@ public class ShortType
     extends IntType
 {
 	static private String typeName = "short";
+	static private String typeName_unsigned = "short";
+
+	public static String getTypeName_unsigned() {
+		return typeName_unsigned;
+	}
+
+	public static void setTypeName_unsigned(String typeName_unsigned) {
+		ShortType.typeName_unsigned = typeName_unsigned;
+	}
 
 	public static void setTypeName(String typeName) {
 		ShortType.typeName = typeName;
@@ -42,7 +51,10 @@ public class ShortType
 
     public String typeName()
     {
-        return typeName;
+    	if(unsigned)
+    		return typeName_unsigned;
+    	else
+    		return typeName;
     }
 
     public TypeSpec typeSpec()

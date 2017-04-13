@@ -39,7 +39,8 @@ public class Member
      */
     SymbolList declarators;
 
-    public Vector extendVector;
+    @SuppressWarnings("rawtypes")
+	public Vector extendVector;
     public TypeDeclaration containingType;
 
     public Declarator declarator;
@@ -62,7 +63,8 @@ public class Member
             declarators.setPackage( s );
     }
 
-    public void setEnclosingSymbol( IdlSymbol s )
+    @SuppressWarnings("rawtypes")
+	public void setEnclosingSymbol( IdlSymbol s )
     {
         enclosing_symbol = s;
         type_spec.setEnclosingSymbol( s );
@@ -79,7 +81,8 @@ public class Member
     /**
      * must be set by MemberList before parsing
      */
-    public void setExtendVector( Vector v )
+    @SuppressWarnings("rawtypes")
+	public void setExtendVector( Vector v )
     {
         extendVector = v;
     }
@@ -99,7 +102,8 @@ public class Member
      * Parsing members means creating new members for definitions
      * with more than one declarator.
      */
-    public void parse()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void parse()
     {
         boolean clone_and_parse = true;
 
@@ -286,21 +290,19 @@ public class Member
     public void member_print( PrintWriter ps, Vector<String> template )
     {
         /* only print members that are not interfaces */
-
-        if( ( type_spec.typeSpec() instanceof ConstrTypeSpec &&
-                !( ( ( (ConstrTypeSpec)type_spec.typeSpec() ).c_type_spec.declaration()
-                instanceof Interface ) ||
-                ( ( (ConstrTypeSpec)type_spec.typeSpec() ).c_type_spec.declaration()
-                instanceof Value ) ) ) ||
-                type_spec.typeSpec() instanceof SequenceType ||
-                type_spec.typeSpec() instanceof ArrayTypeSpec )
-        {
-            type_spec.print( ps );
-        }
-
+    	//FIXME
         if( type_spec.typeSpec().toString().equals("string") && template.get(0).contains(":string"))
         {
             for(int i = 1 ; i < template.size() ; i++)
+            {
+            	String tmp = template.get(i).replaceAll("<memberType>", type_spec.toString());
+            	tmp = tmp.replaceAll("<memberName>", declarator.toString());
+            	ps.println(tmp);
+            }
+        }
+        else if(!template.get(0).contains(":string"))
+        {
+        	for(int i = 1 ; i < template.size() ; i++)
             {
             	String tmp = template.get(i).replaceAll("<memberType>", type_spec.toString());
             	tmp = tmp.replaceAll("<memberName>", declarator.toString());
@@ -311,9 +313,7 @@ public class Member
         {
         	for(int i = 1 ; i < template.size() ; i++)
             {
-            	String tmp = template.get(i).replaceAll("<memberType>", type_spec.toString());
-            	tmp = tmp.replaceAll("<memberName>", declarator.toString());
-            	ps.println(tmp);
+            	continue;
             }
         }
     }

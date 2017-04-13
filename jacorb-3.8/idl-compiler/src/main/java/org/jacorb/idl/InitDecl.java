@@ -32,19 +32,22 @@ import java.util.Vector;
 public class InitDecl
     extends Declaration
 {
-    public Vector paramDecls;
+    @SuppressWarnings("rawtypes")
+	public Vector paramDecls;
     public IdlSymbol myValue;
 
     /** new in CORBA 3.0, factory methods may raise exceptions */
     public RaisesExpr raisesExpr;
 
-    public InitDecl( int num )
+    @SuppressWarnings("rawtypes")
+	public InitDecl( int num )
     {
         super( num );
         paramDecls = new Vector();
     }
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
 
@@ -70,7 +73,8 @@ public class InitDecl
         raisesExpr.setEnclosingSymbol( s );
     }
 
-    public void parse()
+    @SuppressWarnings("rawtypes")
+	public void parse()
     {
         myValue = enclosing_symbol;
 
@@ -107,7 +111,8 @@ public class InitDecl
      * Prints the method's signature, for inclusion in the
      * factory interface.
      */
-    public void print( PrintWriter ps, Vector<String> template )
+    @SuppressWarnings("rawtypes")
+	public void print( PrintWriter ps, Vector<String> template )
     {
     	//FIXME
         int i = 0 ;
@@ -225,43 +230,6 @@ public class InitDecl
         //raisesExpr.print( ps );
     }
 
-    /**
-     * Prints the Helper method that corresponds to this factory method.
-     */
-    public void printHelperMethod( PrintWriter ps, String type_name )
-    {
-        ps.print( "\tpublic static " + type_name + " " + name + "( " );
-        ps.print( "org.omg.CORBA.ORB orb" );
-
-        for ( Enumeration e = paramDecls.elements();
-              e.hasMoreElements(); )
-        {
-            ps.print( ", " );
-            ( (ParamDecl)e.nextElement() ).print( ps );
-        }
-        ps.println (" )");
-
-        ps.println ("\t{");
-        ps.println ("\t\t" + type_name + "ValueFactory f = "
-                    + "( " + type_name + "ValueFactory )"
-                    + "((org.omg.CORBA_2_3.ORB)orb).lookup_value_factory(id());");
-        ps.println ("\t\tif (f == null)");
-        ps.println ("\t\t\tthrow new org.omg.CORBA.MARSHAL( "
-                    + "1, org.omg.CORBA.CompletionStatus.COMPLETED_NO );");
-        ps.print   ("\t\treturn f." + name + "( ");
-
-        for ( Enumeration e = paramDecls.elements();
-              e.hasMoreElements(); )
-        {
-            ps.print (( (ParamDecl)e.nextElement() ).simple_declarator );
-            if (e.hasMoreElements()) ps.print (", ");
-        }
-
-        ps.println (" );");
-
-        ps.println ("\t}");
-    }
-
     public String name()
     {
         return name;
@@ -272,7 +240,8 @@ public class InitDecl
         return name();
     }
     
-    private String paramList()
+    @SuppressWarnings("rawtypes")
+	private String paramList()
     {
     	String result = "";
     	for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )
@@ -285,7 +254,8 @@ public class InitDecl
     	return result;
     }
     
-    private String paramTypeList()
+    @SuppressWarnings("rawtypes")
+	private String paramTypeList()
     {
     	String result = "";
     	for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )
@@ -298,7 +268,8 @@ public class InitDecl
     	return result;
     }
     
-    private String paramNameList()
+    @SuppressWarnings("rawtypes")
+	private String paramNameList()
     {
     	String result = "";
     	for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )

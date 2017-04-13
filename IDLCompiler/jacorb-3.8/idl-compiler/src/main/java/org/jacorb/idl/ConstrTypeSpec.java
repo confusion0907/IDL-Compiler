@@ -116,7 +116,8 @@ public class ConstrTypeSpec
     }
 
 
-    public String getTypeCodeExpression( Set knownTypeSpecs )
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression( Set knownTypeSpecs )
     {
         return c_type_spec.getTypeCodeExpression( knownTypeSpecs );
     }

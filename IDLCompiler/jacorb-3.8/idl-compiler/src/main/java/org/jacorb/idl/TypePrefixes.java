@@ -30,9 +30,11 @@ import java.util.Hashtable;
 
 public class TypePrefixes
 {
-    private static final Hashtable/*<String,String>*/ typePrefixes = new Hashtable/*<String,String>*/();
+    @SuppressWarnings("rawtypes")
+	private static final Hashtable/*<String,String>*/ typePrefixes = new Hashtable/*<String,String>*/();
 
-    public static void define(String moduleName, String prefix)
+    @SuppressWarnings("unchecked")
+	public static void define(String moduleName, String prefix)
     {
         typePrefixes.put(moduleName, prefix);
     }
@@ -47,7 +49,8 @@ public class TypePrefixes
         return (String)typePrefixes.get(moduleName);
     }
 
-    public static Hashtable/*<String,String>*/ getTypePrefixes()
+    @SuppressWarnings("rawtypes")
+	public static Hashtable/*<String,String>*/ getTypePrefixes()
     {
         return typePrefixes;
     }

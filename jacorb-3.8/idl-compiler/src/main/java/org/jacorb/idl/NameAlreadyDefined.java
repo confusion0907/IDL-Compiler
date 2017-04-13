@@ -28,7 +28,9 @@ package org.jacorb.idl;
 public class NameAlreadyDefined
         extends java.lang.Exception
 {
-    public NameAlreadyDefined( String s )
+	private static final long serialVersionUID = 1L;
+
+	public NameAlreadyDefined( String s )
     {
         super( s );
     }

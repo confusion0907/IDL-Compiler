@@ -76,7 +76,8 @@ public class JavaMappingGeneratingVisitor
      *
      */
 
-    public void visitSpec( Spec spec )
+    @SuppressWarnings("rawtypes")
+	public void visitSpec( Spec spec )
     {
 
         Enumeration e = spec.definitions.elements();
@@ -89,7 +90,8 @@ public class JavaMappingGeneratingVisitor
         // PrintStream ps = new PrintStream( System.out );
     }
 
-    public void visitDefinitions( Definitions defs )
+    @SuppressWarnings("rawtypes")
+	public void visitDefinitions( Definitions defs )
     {
         Enumeration e = defs.getElements();
         while( e.hasMoreElements() )
@@ -163,7 +165,8 @@ public class JavaMappingGeneratingVisitor
         }
     }
 
-    public void visitOpDecl( OpDecl op )
+    @SuppressWarnings("rawtypes")
+	public void visitOpDecl( OpDecl op )
     {
         //    op.opAttribute == OpDecl.ONEWAY ? "true" : "false") );
 
@@ -180,12 +183,9 @@ public class JavaMappingGeneratingVisitor
     public void visitParamDecl( ParamDecl param )
     {
 
-        String direction = "in";
-
-        if( param.paramAttribute == ParamDecl.MODE_OUT )
-            direction = "out";
-        else if( param.paramAttribute == ParamDecl.MODE_INOUT )
-            direction = "inout";
+        if( param.paramAttribute == ParamDecl.MODE_OUT ) {
+		} else if( param.paramAttribute == ParamDecl.MODE_INOUT ) {
+		}
 
 
     }
@@ -200,12 +200,9 @@ public class JavaMappingGeneratingVisitor
         //
     }
 
-    public void visitStruct( StructType struct )
+    @SuppressWarnings("rawtypes")
+	public void visitStruct( StructType struct )
     {
-        int length = -1;
-        boolean isSeq = false;
-        boolean isArray = false;
-
         MemberList members = struct.memberlist;
         if( members != null )
         {
@@ -213,22 +210,19 @@ public class JavaMappingGeneratingVisitor
             for( Enumeration e = members.elements(); e.hasMoreElements(); )
             {
                 Member m = (Member)e.nextElement();
-                String memberType = typeSpecDesignator( m.type_spec );
+                typeSpecDesignator( m.type_spec );
 
 
                 if( m.type_spec instanceof VectorType )
                 {
-                    memberType =
-                        typeSpecDesignator( ((VectorType)m.type_spec).elementTypeSpec() );
-                    length = ((VectorType)m.type_spec).length();
+                    typeSpecDesignator( ((VectorType)m.type_spec).elementTypeSpec() );
+                    ((VectorType)m.type_spec).length();
 
                     if(  m.type_spec instanceof SequenceType )
                     {
-                        isSeq = true;
                     }
                     else if( m.type_spec  instanceof ArrayTypeSpec )
                     {
-                        isArray = true;
                     }
                     else
                     {
@@ -243,7 +237,8 @@ public class JavaMappingGeneratingVisitor
      *
      */
 
-    public void visitEnum( EnumType enumType )
+    @SuppressWarnings("rawtypes")
+	public void visitEnum( EnumType enumType )
     {
 
         for( Enumeration e = enumType.enumlist.elements(); e.hasMoreElements(); )
@@ -276,26 +271,20 @@ public class JavaMappingGeneratingVisitor
 
     public void visitAlias( AliasTypeSpec alias )
     {
-        boolean isSeq = false;
-        boolean isArray = false;
-        int length = -1;
-        String aliasedType = typeSpecDesignator( alias.originalType() );
+        typeSpecDesignator( alias.originalType() );
 
 
 
         if(  alias.originalType() instanceof VectorType )
         {
-            aliasedType =
-                typeSpecDesignator( ((VectorType)alias.originalType()).elementTypeSpec());
-            length = ((VectorType)alias.originalType()).length();
+            typeSpecDesignator( ((VectorType)alias.originalType()).elementTypeSpec());
+            ((VectorType)alias.originalType()).length();
 
             if( alias.originalType() instanceof SequenceType )
             {
-                isSeq = true;
             }
             else if( alias.originalType() instanceof ArrayTypeSpec )
             {
-                isArray = true;
             }
             else
             {

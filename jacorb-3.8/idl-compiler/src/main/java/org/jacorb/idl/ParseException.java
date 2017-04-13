@@ -29,7 +29,8 @@ package org.jacorb.idl;
 public class ParseException
     extends RuntimeException
 {
-    /** remember the error position  */
+	private static final long serialVersionUID = 1L;
+	/** remember the error position  */
     private PositionInfo position = null;
 
     public ParseException()

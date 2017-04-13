@@ -82,7 +82,8 @@ public class TypeCodeTypeSpec
         return "org.omg.CORBA.ORB.init().get_primitive_tc( org.omg.CORBA.TCKind.tk_TypeCode)";
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression(Set knownTypes)
     {
         return getTypeCodeExpression();
     }

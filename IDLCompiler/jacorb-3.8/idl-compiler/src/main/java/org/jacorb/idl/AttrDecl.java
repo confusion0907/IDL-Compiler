@@ -42,7 +42,8 @@ public class AttrDecl
     public RaisesExpr getRaisesExpr;
     public RaisesExpr setRaisesExpr;
 
-    private Vector operations = new Vector();
+    @SuppressWarnings("rawtypes")
+	private Vector operations = new Vector();
 
     public AttrDecl( int num )
     {
@@ -78,7 +79,8 @@ public class AttrDecl
         setRaisesExpr.setEnclosingSymbol( s );
     }
 
-    public void parse()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void parse()
     {
         IdlSymbol myInterface = enclosing_symbol;
 
@@ -130,7 +132,8 @@ public class AttrDecl
         }
     }
 
-    public void print( PrintWriter ps , Vector<String> template )
+    @SuppressWarnings("rawtypes")
+	public void print( PrintWriter ps , Vector<String> template )
     {
     	//FIXME
     	boolean judge = false;
@@ -148,7 +151,7 @@ public class AttrDecl
     			if(template.get(i).startsWith("%newfile"))
             	{
             		judge = true;
-            		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+            		String tmp = template.get(i).replaceAll("<attributeName>", name);
             		PrintWriter _ps;
             		
             		try{
@@ -212,7 +215,8 @@ public class AttrDecl
     	}
     }
 
-    public Enumeration getOperations()
+    @SuppressWarnings("rawtypes")
+	public Enumeration getOperations()
     {
         return operations.elements();
     }
@@ -221,7 +225,8 @@ public class AttrDecl
      * collect Interface Repository information in the argument hashtable
      */
 
-    public void getIRInfo( Hashtable irInfoTable )
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void getIRInfo( Hashtable irInfoTable )
     {
         for( Enumeration e = declarators.v.elements(); e.hasMoreElements(); )
         {

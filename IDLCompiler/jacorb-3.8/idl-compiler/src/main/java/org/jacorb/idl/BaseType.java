@@ -118,7 +118,8 @@ public class BaseType
         return typeCodeExpressionSkeleton( getTCKind() );
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression(Set knownTypes)
     {
         return typeCodeExpressionSkeleton( getTCKind() );
     }

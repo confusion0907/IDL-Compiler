@@ -35,13 +35,15 @@ public class Definitions
     extends SymbolList
 {
 
-    public Definitions( int num )
+    @SuppressWarnings("rawtypes")
+	public Definitions( int num )
     {
         super( num );
         v = new Vector();
     }
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
         Enumeration e = getElements();
@@ -52,7 +54,8 @@ public class Definitions
         }
     }
 
-    public void setEnclosingSymbol( IdlSymbol s )
+    @SuppressWarnings("rawtypes")
+	public void setEnclosingSymbol( IdlSymbol s )
     {
         if( enclosing_symbol != null && enclosing_symbol != s )
         {
@@ -66,7 +69,8 @@ public class Definitions
             ( (IdlSymbol)e.nextElement() ).setEnclosingSymbol( s );
     }
 
-    public void set_included( boolean i )
+    @SuppressWarnings("rawtypes")
+	public void set_included( boolean i )
     {
         included = i;
         Enumeration e = getElements();
@@ -74,11 +78,13 @@ public class Definitions
             ( (IdlSymbol)e.nextElement() ).set_included( i );
     }
 
-    public Enumeration getElements()
+    @SuppressWarnings("rawtypes")
+	public Enumeration getElements()
     {
         return v.elements();
     }
 
+	@SuppressWarnings("rawtypes")
 	public void print( PrintWriter ps , Vector<String> template )
     {
     	int i = 0;
@@ -199,7 +205,7 @@ public class Definitions
 					str = template.get(i);
 					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
-					if(str.startsWith("%") && !str.equals("%%"))
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
 					else if(str.equals("%%"))
 						index = index-1;
@@ -220,7 +226,7 @@ public class Definitions
 					str = template.get(i);
 					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
-					if(str.startsWith("%") && !str.equals("%%"))
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
 					else if(str.equals("%%"))
 						index = index-1;
@@ -241,7 +247,7 @@ public class Definitions
 					str = template.get(i);
 					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
-					if(str.startsWith("%") && !str.equals("%%"))
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
 					else if(str.equals("%%"))
 						index = index-1;
@@ -262,7 +268,7 @@ public class Definitions
 					str = template.get(i);
 					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
-					if(str.startsWith("%") && !str.equals("%%"))
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
 					else if(str.equals("%%"))
 						index = index-1;
@@ -308,6 +314,27 @@ public class Definitions
         		Enumeration e = getElements();
         		while( e.hasMoreElements() )
 		            ( (IdlSymbol)e.nextElement() ).print( ps , _template , "valuetype" );
+        	}
+        	else if(str.startsWith("%typeprefix"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(str.equals("%%") && index == 0))
+        		{
+        			i = i+1;
+					str = template.get(i);
+					str = str.replaceAll("<moduleName>", name);
+					_template.add(str);
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
+						index = index+1;
+					else if(str.equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		
+        		Enumeration e = getElements();
+        		while( e.hasMoreElements() )
+		            ( (IdlSymbol)e.nextElement() ).print( ps , _template , "typeprefix" );
         	}
         	else if(ps == null)
         		throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");

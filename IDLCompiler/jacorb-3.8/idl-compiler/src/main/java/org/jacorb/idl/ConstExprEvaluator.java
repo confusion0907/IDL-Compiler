@@ -20,9 +20,6 @@ package org.jacorb.idl;
  *   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
-import java.util.HashMap;
-
 /**
  * Based on the MathEvaluator class by The-Son LAI,
  * <a href="mailto:Lts@writeme.com">Lts@writeme.com</a>

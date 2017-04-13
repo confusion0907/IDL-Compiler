@@ -132,7 +132,8 @@ public class ValueAbsDecl
         included = i;
     }
 
-    public void parse()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void parse()
     {
         boolean justAnotherOne = false;
 
@@ -246,12 +247,14 @@ public class ValueAbsDecl
         return body;
     }
 
-    public String getTypeCodeExpression()
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression()
     {
         return this.getTypeCodeExpression(new HashSet());
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public String getTypeCodeExpression(Set knownTypes)
     {
         if (knownTypes.contains(this))
         {
@@ -291,7 +294,8 @@ public class ValueAbsDecl
      * operations and attributes
      */
 
-    public void print(PrintWriter ps , Vector<String> template)
+    @SuppressWarnings("rawtypes")
+	public void print(PrintWriter ps , Vector<String> template)
     {
     	//FIXME
     	if(!template.get(0).equals("abstract"))
@@ -351,6 +355,12 @@ public class ValueAbsDecl
             		{
             			i = i + 1;
             			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+            			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+            			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+            			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
     					_template.add(tmp);
     					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
     						index = index+1;
@@ -370,6 +380,12 @@ public class ValueAbsDecl
             		{
             			i = i + 1;
             			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+            			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+            			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+            			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
     					_template.add(tmp);
     					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
     						index = index+1;
@@ -387,6 +403,12 @@ public class ValueAbsDecl
             		while(!template.get(i).equals("%%"))
             		{
             			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+            			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+            			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+            			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
     					_template.add(tmp);
     					i = i+1;
             		}
@@ -401,6 +423,12 @@ public class ValueAbsDecl
             		{
             			i = i + 1;
             			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+            			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+            			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+            			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
     					_template.add(tmp);
     					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
     						index = index+1;
@@ -419,6 +447,12 @@ public class ValueAbsDecl
             		{
             			i = i + 1;
             			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+            			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+            			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+            			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
     					_template.add(tmp);
     					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
     						index = index+1;
@@ -437,6 +471,12 @@ public class ValueAbsDecl
             		{
             			i = i + 1;
             			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+            			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+            			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+            			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
     					_template.add(tmp);
     					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
     						index = index+1;
@@ -455,6 +495,12 @@ public class ValueAbsDecl
             		{
             			i = i + 1;
             			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+            			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+            			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+            			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
     					_template.add(tmp);
     					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
     						index = index+1;
@@ -474,6 +520,12 @@ public class ValueAbsDecl
             		{
             			i = i + 1;
             			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+            			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+            			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+            			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
     					_template.add(tmp);
     					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
     						index = index+1;
@@ -483,6 +535,74 @@ public class ValueAbsDecl
             		_template.remove(_template.size()-1);
             		body.printOperationSignatures(ps,_template,"attribute");
             		i = i+1;
+            	}
+            	else if(template.get(i).startsWith("%truncatable"))
+            	{
+            		Vector<String> _template = new Vector<String>();
+            		_template.add(template.get(i));
+            		int index = 1;
+            		while(!(template.get(i).equals("%%") && index == 0))
+            		{
+            			i = i + 1;
+            			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+            			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+            			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+            			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+    					_template.add(tmp);
+    					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+    						index = index+1;
+    					else if(template.get(i).equals("%%"))
+    						index = index-1;
+            		}
+            		_template.remove(_template.size()-1);
+            		Enumeration e = inheritanceSpec.getValueTypes();
+                	if (!e.hasMoreElements() && inheritanceSpec.truncatable == null)
+                	{
+                		i = i + 1;
+                		continue;
+                	}
+            		if(_template.size() == 2 && !(_template.get(1).contains("<truncatableName>") || (_template.get(1).contains("<supportsName>"))))
+            			ps.println(_template.get(1));
+            		else
+            			inheritanceSpec.print(ps,_template);
+            		i = i + 1;
+            	}
+            	else if(template.get(i).startsWith("%supports"))
+            	{
+            		Vector<String> _template = new Vector<String>();
+            		_template.add(template.get(i));
+            		int index = 1;
+            		while(!(template.get(i).equals("%%") && index == 0))
+            		{
+            			i = i + 1;
+            			String tmp = template.get(i).replaceAll("<valuetypeName>", name);
+            			tmp = tmp.replaceAll("<truncatableList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractTruncatableList>", getAbstractTruncatableList());
+            			tmp = tmp.replaceAll("<statefulTruncatableList>", getStatefulTruncatableList());
+            			tmp = tmp.replaceAll("<supportsList>", getTruncatableList());
+            			tmp = tmp.replaceAll("<abstractSupportsList>", getAbstractSupportsList());
+            			tmp = tmp.replaceAll("<statefulSupportsList>", getStatefulSupportsList());
+    					_template.add(tmp);
+    					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+    						index = index+1;
+    					else if(template.get(i).equals("%%"))
+    						index = index-1;
+            		}
+            		_template.remove(_template.size()-1);
+            		Enumeration enumeration = inheritanceSpec.getSupportedInterfaces();
+            		if (!enumeration.hasMoreElements())
+                	{
+                		i = i + 1;
+                		continue;
+                	}
+            		if(_template.size() == 2 && !(_template.get(1).contains("<truncatableName>") || (_template.get(1).contains("<supportsName>"))))
+            			ps.println(_template.get(1));
+            		else
+            			inheritanceSpec.print(ps,_template);
+            		i = i + 1;
             	}
             	else if(ps == null)
 					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
@@ -520,6 +640,116 @@ public class ValueAbsDecl
             throw new RuntimeException ("Could not open output file for "
                                         + typeName + " (" + e + ")");
         }
+    }
+    
+    @SuppressWarnings("rawtypes")
+	public String getTruncatableList()
+    {
+    	String result = "";
+    	Enumeration e = inheritanceSpec.getValueTypes();
+    	if (e.hasMoreElements() || inheritanceSpec.truncatable != null)
+        {
+            for(; e.hasMoreElements();)
+            {
+                ScopedName scopedName = (ScopedName)e.nextElement();
+                ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                result = result + "," + ts.toString();
+            }
+            if (inheritanceSpec.truncatable != null)
+            	result = result + "," + inheritanceSpec.truncatable.scopedName;
+            if(!result.equals(""))
+            	result = result.substring(1);
+        }
+    	return result;
+    }
+	
+	@SuppressWarnings("rawtypes")
+	public String getAbstractTruncatableList()
+    {
+    	String result = "";
+    	Enumeration e = inheritanceSpec.getValueTypes();
+    	if (e.hasMoreElements() || inheritanceSpec.truncatable != null)
+        {
+            for(; e.hasMoreElements();)
+            {
+                ScopedName scopedName = (ScopedName)e.nextElement();
+                ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                if (ts.c_type_spec instanceof ValueAbsDecl)
+                	result = result + "," + ts.toString();
+            }
+            if(!result.equals(""))
+            	result = result.substring(1);
+        }
+    	return result;
+    }
+	
+	@SuppressWarnings("rawtypes")
+	public String getStatefulTruncatableList()
+    {
+    	String result = "";
+    	Enumeration e = inheritanceSpec.getValueTypes();
+    	if (e.hasMoreElements() || inheritanceSpec.truncatable != null)
+        {
+            for(; e.hasMoreElements();)
+            {
+                ScopedName scopedName = (ScopedName)e.nextElement();
+                ConstrTypeSpec ts = (ConstrTypeSpec)scopedName.resolvedTypeSpec().typeSpec();
+                if (!(ts.c_type_spec instanceof ValueAbsDecl))
+                	result = result + "," + ts.toString();
+            }
+            if (inheritanceSpec.truncatable != null)
+            	result = result + "," + inheritanceSpec.truncatable.scopedName;
+            if(!result.equals(""))
+            	result = result.substring(1);
+        }
+    	return result;
+    }
+	
+	@SuppressWarnings("rawtypes")
+	public String getSupportsList()
+    {
+    	String result = "";
+    	Enumeration enumeration = inheritanceSpec.getSupportedInterfaces();
+        for(; enumeration.hasMoreElements();)
+        {
+        	ScopedName sne = (ScopedName)enumeration.nextElement();
+        	result = result + ", " + sne;
+        }
+        if(!result.equals(""))
+        	result = result.substring(1);
+    	return result;
+    }
+	
+	@SuppressWarnings("rawtypes")
+	public String getStatefulSupportsList()
+    {
+    	String result = "";
+    	Enumeration enumeration = inheritanceSpec.getSupportedInterfaces();
+        for(; enumeration.hasMoreElements();)
+        {
+        	ScopedName sne = (ScopedName)enumeration.nextElement();
+        	if (Interface.abstractInterfaces == null || !Interface.abstractInterfaces.contains (sne.toString()))
+        		result = result + ", " + sne;
+        }
+        if(!result.equals(""))
+        	result = result.substring(1);
+    	return result;
+    }
+	
+	@SuppressWarnings("rawtypes")
+	public String getAbstractSupportsList()
+    {
+    	String result = "";
+    	Enumeration enumeration = inheritanceSpec.getSupportedInterfaces();
+        for(; enumeration.hasMoreElements();)
+        {
+        	ScopedName sne = (ScopedName)enumeration.nextElement();
+        	if (!(Interface.abstractInterfaces == null) && Interface.abstractInterfaces.contains (sne.toString()))
+        		result = result + ", " + sne;
+        }
+        if(!result.equals(""))
+        	result = result.substring(1);
+    	return result;
     }
 
     public void printInsertIntoAny(PrintWriter ps,

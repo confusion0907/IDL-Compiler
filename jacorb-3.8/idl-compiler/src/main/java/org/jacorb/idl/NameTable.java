@@ -34,11 +34,14 @@ import java.util.logging.Level;
 
 public class NameTable
 {
-    private static final Hashtable/*<String, IDLTypes>*/ names = new Hashtable/*<String, IDLTypes>*/( 10000 );
+    @SuppressWarnings("rawtypes")
+	private static final Hashtable/*<String, IDLTypes>*/ names = new Hashtable/*<String, IDLTypes>*/( 10000 );
 
-    private static final Map shadows = new Hashtable();
+    @SuppressWarnings("rawtypes")
+	private static final Map shadows = new Hashtable();
 
-    private static final Map ancestors = new Hashtable();
+    @SuppressWarnings("rawtypes")
+	private static final Map ancestors = new Hashtable();
 
     /**
      key: operation name,
@@ -46,11 +49,14 @@ public class NameTable
      necessary to track legal diamond inheritance of operations
      */
 
-    private static final Map operationSources = new Hashtable();
+    @SuppressWarnings("rawtypes")
+	private static final Map operationSources = new Hashtable();
 
-    public static final Map parsed_interfaces = new Hashtable();
+    @SuppressWarnings("rawtypes")
+	public static final Map parsed_interfaces = new Hashtable();
 
-    public static void init()
+    @SuppressWarnings("unchecked")
+	public static void init()
     {
         names.clear();
         operationSources.clear();
@@ -139,7 +145,8 @@ public class NameTable
      *  @param kind the type of name, e.g. "type"
      *  @throws NameAlreadyDefined if the name is already defined
      */
-    public static void define( String originalName, String name, IDLTypes kind )
+    @SuppressWarnings("unchecked")
+	public static void define( String originalName, String name, IDLTypes kind )
         throws NameAlreadyDefined
     {
         if( parser.logger.isLoggable(Level.FINEST) )
@@ -235,7 +242,8 @@ public class NameTable
         }
     }
 
-    private static void defineInheritedOperation( String name,
+    @SuppressWarnings("unchecked")
+	private static void defineInheritedOperation( String name,
                                                   String inheritedFrom )
             throws NameAlreadyDefined
     {
@@ -298,7 +306,8 @@ public class NameTable
      *  @throws NameAlreadyDefined if a name is already defined
      */
 
-    private static void defineShadows( Hashtable/*<String, IDLTypes>*/ shadowEntries )
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private static void defineShadows( Hashtable/*<String, IDLTypes>*/ shadowEntries )
         throws NameAlreadyDefined
     {
         String firstViolation = null;
@@ -335,7 +344,8 @@ public class NameTable
      *  @throws NameAlreadyDefined
      */
 
-    public static synchronized void inheritFrom( String name,
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public static synchronized void inheritFrom( String name,
                                                  SymbolList ancestors )
         throws NameAlreadyDefined
     {

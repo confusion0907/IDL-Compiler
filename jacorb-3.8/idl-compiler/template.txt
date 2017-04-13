@@ -1,4 +1,7 @@
 %newfile new<fileName>.idl
+%typeprefix
+string <scopeName> = <prefixString>;
+%%
 %valuetype:box
 <valuetypeType> <valuetypeName>;
 %%
@@ -79,6 +82,15 @@ union <unionName> switch(<switchType>){
 };
 %%
 %interface
+%typedef:array
+<typedefType> <typedefName>;
+%%
+%native
+native <nativeName>;
+%%
+%typedef:fixed
+<typedefType> <typedefName> = <digitsNumber>+<scaleNumber>;
+%%
 %constants
 const <constantsType> <constantsName> = <constantsValue>;
 %%

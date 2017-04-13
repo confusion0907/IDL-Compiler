@@ -36,13 +36,15 @@ public class ValueInheritanceSpec
     //Vector v;
 
     /** the IDL interfaces inherited ("supported") by this value type */
-    Vector supports;
+    @SuppressWarnings("rawtypes")
+	Vector supports;
 
     /** if the value type this spec belongs to is truncatable to the
      single stateful ancestor value type */
     Truncatable truncatable = null;
 
-    public ValueInheritanceSpec( int num )
+    @SuppressWarnings("rawtypes")
+	public ValueInheritanceSpec( int num )
     {
         super( num );
         //v = new Vector();
@@ -63,17 +65,20 @@ public class ValueInheritanceSpec
         return ( v.size() == 0 && truncatable == null );
     }
 
-    public Enumeration getValueTypes()
+    @SuppressWarnings("rawtypes")
+	public Enumeration getValueTypes()
     {
         return v.elements();
     }
 
-    public Enumeration getSupportedInterfaces()
+    @SuppressWarnings("rawtypes")
+	public Enumeration getSupportedInterfaces()
     {
         return supports.elements();
     }
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
         if( pack_name.length() > 0 )
@@ -91,7 +96,8 @@ public class ValueInheritanceSpec
             ( (IdlSymbol)e.nextElement() ).setPackage( s );
     }
 
-    public void parse()
+    @SuppressWarnings("rawtypes")
+	public void parse()
     {
         if( truncatable != null )
         {
@@ -111,7 +117,8 @@ public class ValueInheritanceSpec
 
     }
 
-    public void print( PrintWriter ps , Vector<String> template )
+    @SuppressWarnings("rawtypes")
+	public void print( PrintWriter ps , Vector<String> template )
     {
     	int i = 1;
     	if(template.get(0).startsWith("%truncatable"))
@@ -257,7 +264,8 @@ public class ValueInheritanceSpec
     	}
     }
 
-    public String toString()
+    @SuppressWarnings("rawtypes")
+	public String toString()
     {
         StringBuffer sb = new StringBuffer();
 

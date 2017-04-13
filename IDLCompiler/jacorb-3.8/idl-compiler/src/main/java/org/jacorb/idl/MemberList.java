@@ -32,7 +32,8 @@ import java.util.logging.Level;
 public class MemberList
     extends SymbolList
 {
-    Vector extendVector = new Vector();
+    @SuppressWarnings("rawtypes")
+	Vector extendVector = new Vector();
     private boolean parsed = false;
 
     public MemberList( int num )
@@ -40,7 +41,8 @@ public class MemberList
         super( num );
     }
 
-    public void setContainingType( TypeDeclaration t )
+    @SuppressWarnings("rawtypes")
+	public void setContainingType( TypeDeclaration t )
     {
         Enumeration e = v.elements();
         for( ; e.hasMoreElements(); )
@@ -50,7 +52,8 @@ public class MemberList
         }
     }
 
-    public void parse()
+    @SuppressWarnings("rawtypes")
+	public void parse()
     {
         if( parsed )
             throw new RuntimeException( "Compiler error: MemberList already parsed!" );
@@ -72,7 +75,8 @@ public class MemberList
 
     }
 
-    public void setEnclosingSymbol( IdlSymbol s )
+    @SuppressWarnings("rawtypes")
+	public void setEnclosingSymbol( IdlSymbol s )
     {
 
         if( enclosing_symbol != null && enclosing_symbol != s )

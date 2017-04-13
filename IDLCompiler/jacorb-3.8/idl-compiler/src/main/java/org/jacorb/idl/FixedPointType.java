@@ -34,9 +34,25 @@ public class FixedPointType
     public ConstExpr digit_expr = null;
     public ConstExpr scale_expr = null;
     public int digits = 0;
-    public int scale = 0;
+    
+    public int getDigits() 
+    {
+		return digits;
+	}
 
-    public FixedPointType(int num)
+	public int getScale() 
+	{
+		return scale;
+	}
+
+	public int scale = 0;
+    static private String typeName = "BigDecimal";
+
+    public static void setTypeName(String typeName) {
+		FixedPointType.typeName = typeName;
+	}
+
+	public FixedPointType(int num)
     {
         super(num);
     }
@@ -73,7 +89,7 @@ public class FixedPointType
 
     public String typeName()
     {
-        return "java.math.BigDecimal";
+        return typeName;
     }
 
 
@@ -222,7 +238,8 @@ public class FixedPointType
         return "org.omg.CORBA.ORB.init().create_fixed_tc((short)" + digits + ",(short)" + scale + ")";
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression(Set knownTypes)
     {
         return getTypeCodeExpression();
     }

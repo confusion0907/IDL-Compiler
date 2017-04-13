@@ -33,10 +33,13 @@ import java.util.Vector;
 public class AttrRaisesExpr
         extends IdlSymbol
 {
-    public Vector getNameList;
-    public Vector setNameList;
+    @SuppressWarnings("rawtypes")
+	public Vector getNameList;
+    @SuppressWarnings("rawtypes")
+	public Vector setNameList;
 
-    public AttrRaisesExpr( int num )
+    @SuppressWarnings("rawtypes")
+	public AttrRaisesExpr( int num )
     {
         super( num );
         getNameList = new Vector();

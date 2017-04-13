@@ -31,6 +31,15 @@ public class CharType
 {
     private boolean wide = false;
     static private String typeName = "char";
+    static private String typeName_wide = "char";
+
+	public static String getTypeName_wide() {
+		return typeName_wide;
+	}
+
+	public static void setTypeName_wide(String typeName_wide) {
+		CharType.typeName_wide = typeName_wide;
+	}
 
 	public static void setTypeName(String typeName) {
 		CharType.typeName = typeName;
@@ -63,7 +72,10 @@ public class CharType
 
     public String typeName()
     {
-        return typeName;
+    	if(wide)
+    		return typeName_wide;
+    	else
+    		return typeName;
     }
 
 

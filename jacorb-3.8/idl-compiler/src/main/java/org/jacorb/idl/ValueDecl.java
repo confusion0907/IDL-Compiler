@@ -21,7 +21,6 @@
 package org.jacorb.idl;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -41,9 +40,12 @@ public class ValueDecl
     extends Value
 {
     private MemberList stateMembers;
-    private List operations;
-    private List exports;
-    private List factories;
+    @SuppressWarnings("rawtypes")
+	private List operations;
+    @SuppressWarnings("rawtypes")
+	private List exports;
+    @SuppressWarnings("rawtypes")
+	private List factories;
     private ValueInheritanceSpec inheritanceSpec;
 
     // some flags...
@@ -53,7 +55,8 @@ public class ValueDecl
 
     /** public c'tor, called by parser */
 
-    public ValueDecl(int num)
+    @SuppressWarnings("rawtypes")
+	public ValueDecl(int num)
     {
         super(num);
         stateMembers = new MemberList(new_num());
@@ -62,7 +65,8 @@ public class ValueDecl
         factories = new ArrayList();
     }
 
-    public void setValueElements(Definitions d)
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void setValueElements(Definitions d)
     {
         hasBody = true;
 
@@ -113,7 +117,8 @@ public class ValueDecl
         return this.isCustomMarshalled;
     }
 
-    public void setPackage(String s)
+    @SuppressWarnings("rawtypes")
+	public void setPackage(String s)
     {
         s = parser.pack_replace(s);
         if (pack_name.length() > 0)
@@ -141,7 +146,8 @@ public class ValueDecl
         return this;
     }
 
-    public void parse()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void parse()
     {
         if (inheritanceSpec != null)
         {
@@ -384,12 +390,14 @@ public class ValueDecl
         return full_name();
     }
 
-    public String getTypeCodeExpression()
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression()
     {
         return this.getTypeCodeExpression(new HashSet());
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public String getTypeCodeExpression(Set knownTypes)
     {
         if (knownTypes.contains(this))
         {
@@ -432,7 +440,8 @@ public class ValueDecl
         return result.toString();
     }
 
-    private String getValueMemberExpression(StateMember m, Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	private String getValueMemberExpression(StateMember m, Set knownTypes)
     {
         TypeSpec typeSpec = m.typeSpec();
         //if the type is not a basic type and is in the typeMap
@@ -455,7 +464,8 @@ public class ValueDecl
             "(short)" + access + ")";
     }
 
-    public void print(PrintWriter ps , Vector<String> template)
+    @SuppressWarnings("rawtypes")
+	public void print(PrintWriter ps , Vector<String> template)
     {
     	//FIXME
     	if(!template.get(0).equals("normal") && !template.get(0).equals("custom") && !template.get(0).equals("nocustom") && !template.get(0).equals("all"))
@@ -887,7 +897,8 @@ public class ValueDecl
         	ps.close();
     }
     
-    private void printFactory(PrintWriter ps, Vector<String> template) 
+    @SuppressWarnings("rawtypes")
+	private void printFactory(PrintWriter ps, Vector<String> template) 
     {
     	if (factories.size() == 0)
         {
@@ -926,6 +937,7 @@ public class ValueDecl
         }
     }
 	
+	@SuppressWarnings("rawtypes")
 	public String getTruncatableList()
     {
     	String result = "";
@@ -946,6 +958,7 @@ public class ValueDecl
     	return result;
     }
 	
+	@SuppressWarnings("rawtypes")
 	public String getAbstractTruncatableList()
     {
     	String result = "";
@@ -965,6 +978,7 @@ public class ValueDecl
     	return result;
     }
 	
+	@SuppressWarnings("rawtypes")
 	public String getStatefulTruncatableList()
     {
     	String result = "";
@@ -986,6 +1000,7 @@ public class ValueDecl
     	return result;
     }
 	
+	@SuppressWarnings("rawtypes")
 	public String getSupportsList()
     {
     	String result = "";
@@ -1000,6 +1015,7 @@ public class ValueDecl
     	return result;
     }
 	
+	@SuppressWarnings("rawtypes")
 	public String getStatefulSupportsList()
     {
     	String result = "";
@@ -1015,6 +1031,7 @@ public class ValueDecl
     	return result;
     }
 	
+	@SuppressWarnings("rawtypes")
 	public String getAbstractSupportsList()
     {
     	String result = "";

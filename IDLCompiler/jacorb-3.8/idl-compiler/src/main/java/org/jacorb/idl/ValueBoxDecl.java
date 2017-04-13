@@ -182,7 +182,8 @@ public class ValueBoxDecl
      *
      */
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public String getTypeCodeExpression(Set knownTypes)
     {
         if (knownTypes.contains(this))
         {
@@ -203,159 +204,10 @@ public class ValueBoxDecl
         }
     }
 
-    public String getTypeCodeExpression()
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression()
     {
         return this.getTypeCodeExpression(new HashSet());
-    }
-
-    private void printHolderClass(String className, PrintWriter ps)
-    {
-        if (!pack_name.equals(""))
-        {
-            ps.println("package " + pack_name + ";");
-        }
-
-        ps.println("public" + parser.getFinalString() + " class " + className + "Holder");
-        ps.println("\timplements org.omg.CORBA.portable.Streamable");
-        ps.println("{");
-
-        ps.println("\tpublic " + typeName() + " value;" + Environment.NL);
-
-        ps.println("\tpublic " + className + "Holder ()");
-        ps.println("\t{");
-        ps.println("\t}");
-
-        ps.println("\tpublic " + className + "Holder (final " + typeName() + " initial)");
-        ps.println("\t{");
-        ps.println("\t\tvalue = initial;");
-        ps.println("\t}");
-
-        ps.println("\tpublic org.omg.CORBA.TypeCode _type ()");
-        ps.println("\t{");
-        ps.println("\t\treturn " + helperName() + ".type ();");
-        ps.println("\t}");
-
-        ps.println("\tpublic void _read (final org.omg.CORBA.portable.InputStream _in)");
-        ps.println("\t{");
-        ps.println("\t\tvalue = " + helperName() + ".read (_in);");
-        ps.println("\t}");
-
-        ps.println("\tpublic void _write (final org.omg.CORBA.portable.OutputStream _out)");
-        ps.println("\t{");
-        ps.println("\t\t" + helperName() + ".write (_out,value);");
-        ps.println("\t}");
-
-        ps.println("}");
-    }
-
-
-    private void printHelperClass(String className, PrintWriter ps)
-    {
-        if (!pack_name.equals(""))
-        {
-            ps.println("package " + pack_name + ";");
-        }
-
-        ps.println("public" + parser.getFinalString() + " class " + className + "Helper");
-        ps.println("\timplements org.omg.CORBA.portable.BoxedValueHelper");
-        ps.println("{");
-        ps.println("\tprivate static org.omg.CORBA.TypeCode _type = " + getTypeCodeExpression() + ";");
-
-        String type = typeName();
-
-        ps.println( "\tpublic static org.omg.CORBA.TypeCode type()" );
-        ps.println( "\t{" );
-        ps.println( "\t\treturn _type;" );
-        ps.println( "\t}" );
-
-        ps.println();
-
-        ps.println( "\tpublic static void insert (final org.omg.CORBA.Any any, final " + type + " s)" );
-        ps.println( "\t{" );
-        ps.println( "\t\tany.insert_Value(s, type());" );
-        ps.println( "\t}" + Environment.NL );
-
-        ps.println( "\tpublic static " + type + " extract (final org.omg.CORBA.Any any)" );
-        ps.println( "\t{" );
-        ps.println( "\t\treturn (" + type + ") any.extract_Value();" );
-        ps.println( "\t}" + Environment.NL );
-
-
-        printIdMethod(ps); // inherited from IdlSymbol
-
-        /* read */
-        ps.println("\tpublic static " + type +
-                    " read (final org.omg.CORBA.portable.InputStream in)");
-        ps.println("\t{");
-
-        if (typeSpec.typeSpec() instanceof BaseType)
-        {
-            ps.println("\t\t" + type + " result = new " + type +
-                        "(" + typeSpec.typeSpec().printReadExpression("in") + ");");
-        }
-        else
-        {
-            ps.println("\t\t" + type + " result;");
-            ps.println("\t\t" + typeSpec.typeSpec().printReadStatement("result", "in"));
-        }
-        ps.println("\t\treturn result;");
-        ps.println("\t}");
-
-        /* write */
-        ps.println("\tpublic static void write (final org.omg.CORBA.portable.OutputStream out, final " + type + " s)");
-        ps.println("\t{");
-        if (typeSpec.typeSpec() instanceof BaseType)
-        {
-            ps.println("\t\t" + typeSpec.typeSpec().printWriteStatement("s.value", "out"));
-        }
-        else
-            ps.println("\t\t" + typeSpec.typeSpec().printWriteStatement("s", "out"));
-        ps.println("\t}");
-
-        ps.println("\tpublic java.io.Serializable read_value (final org.omg.CORBA.portable.InputStream is)");
-        ps.println("\t{");
-        ps.println("\t\treturn " + helperName() + ".read (is);");
-        ps.println("\t}");
-
-        ps.println("\tpublic void write_value (final org.omg.CORBA.portable.OutputStream os, final java.io.Serializable value)");
-        ps.println("\t{");
-        ps.println("\t\t" + helperName() + ".write (os, (" + type + ")value);");
-        ps.println("\t}");
-
-        ps.println("\tpublic java.lang.String get_id()");
-        ps.println("\t{");
-        ps.println("\t\treturn " + helperName() + ".id();");
-        ps.println("\t}");
-        ps.println("}");
-    }
-
-    private void printValueClass(String className, PrintWriter ps)
-    {
-        if (!pack_name.equals(""))
-        {
-            ps.println("package " + pack_name + ";");
-        }
-
-        ps.println("public class " + className);
-        ps.println("\timplements org.omg.CORBA.portable.ValueBase");
-        ps.println("{");
-
-        printSerialVersionUID(ps);
-
-        ps.println("\tpublic " + typeSpec.typeName() + " value;");
-        ps.println("\tprivate static String[] _ids = { " + className + "Helper.id() };");
-
-        ps.println("\tpublic " + className + "(" + typeSpec.typeName() + " initial)");
-        ps.println("\t{");
-        ps.println("\t\tvalue = initial;");
-        ps.println("\t}");
-
-        ps.println("\tpublic String[] _truncatable_ids()");
-        ps.println("\t{");
-        ps.println("\t\treturn _ids;");
-        ps.println("\t}");
-
-        ps.println("}");
     }
 
     /** generate required classes */

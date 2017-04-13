@@ -27,7 +27,8 @@ package org.jacorb.idl;
 public class IllegalRedefinition
         extends NameAlreadyDefined
 {
-    public String newDef;
+	private static final long serialVersionUID = 1L;
+	public String newDef;
 
     public IllegalRedefinition( String s )
     {

@@ -56,7 +56,8 @@ public class ArrayDeclarator
         }
     }
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
         if( pack_name.length() > 0 )
@@ -91,7 +92,8 @@ public class ArrayDeclarator
         return name;
     }
 
-    public void parse()
+    @SuppressWarnings("rawtypes")
+	public void parse()
     {
         for( Enumeration e = fixed_array_size_list.v.elements();
              e.hasMoreElements();
@@ -119,7 +121,8 @@ public class ArrayDeclarator
         return enclosing_symbol;
     }
 
-    public int[] dimensions()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public int[] dimensions()
     {
         if( dimensions == null )
         {

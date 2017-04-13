@@ -292,7 +292,8 @@ public class IdlSymbol
         throw new java.lang.RuntimeException( "--abstract--!" );
     }
 
-    public void printImport( PrintWriter ps )
+    @SuppressWarnings("rawtypes")
+	public void printImport( PrintWriter ps )
     {
         if( !pack_name.equals( "" ) )
         {
@@ -570,7 +571,8 @@ public class IdlSymbol
      *
      * @return Returns null if typeprefix undefined
      */
-    private String getPrefix()
+    @SuppressWarnings("rawtypes")
+	private String getPrefix()
     {
         //check directly defined typeprefix for this module
         String prefix = TypePrefixes.getDefined(this.pack_name);
@@ -600,7 +602,8 @@ public class IdlSymbol
         return prefix;
     }
 
-    private String version()
+    @SuppressWarnings("rawtypes")
+	private String version()
     {
         IdlSymbol enc = this;
         String tmp;

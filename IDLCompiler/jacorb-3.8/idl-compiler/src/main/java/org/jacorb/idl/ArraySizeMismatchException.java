@@ -22,8 +22,9 @@ package org.jacorb.idl;
 
 public class ArraySizeMismatchException extends java.lang.RuntimeException
 {
+	private static final long serialVersionUID = 1L;
 
-    public ArraySizeMismatchException()
+	public ArraySizeMismatchException()
     {
         ;
     }

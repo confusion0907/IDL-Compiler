@@ -69,10 +69,13 @@ public class JacIDL
     private String helperCompatLevel;
 
 
-    private List _defines = new ArrayList();
-    private List _undefines = new ArrayList();
+    @SuppressWarnings("rawtypes")
+	private List _defines = new ArrayList();
+    @SuppressWarnings("rawtypes")
+	private List _undefines = new ArrayList();
     private File _compileList[] = new File[ 0 ];
-    private List _i2jpackages = new ArrayList();
+    @SuppressWarnings("rawtypes")
+	private List _i2jpackages = new ArrayList();
 
     private I2JPackageTagHandler i2jHandler = new I2JPackageTagHandler();
 
@@ -274,14 +277,16 @@ public class JacIDL
     // **** Nested elements
     // ******************************
 
-    public void addDefine(org.apache.tools.ant.types.Environment.Variable
+    @SuppressWarnings("unchecked")
+	public void addDefine(org.apache.tools.ant.types.Environment.Variable
                            def)
     {
         // The variable can only be evaluated in the execute() method
         _defines.add(def);
     }
 
-    public void addUndefine(org.apache.tools.ant.types.Environment.Variable
+    @SuppressWarnings("unchecked")
+	public void addUndefine(org.apache.tools.ant.types.Environment.Variable
                              def)
     {
         // The variable can only be evaluated in the execute() method
@@ -326,7 +331,8 @@ public class JacIDL
     // *****************************************************************
 
     // Helper for handling i2jpackage tags
-    private void addPackage(String mapping)
+    @SuppressWarnings("unchecked")
+	private void addPackage(String mapping)
     {
         // Testing bad format now avoids a System.exit() in parser.java later
         if (mapping.indexOf(':') < 0)
@@ -361,7 +367,8 @@ public class JacIDL
      * The execute() method of the task.
      * @throws BuildException
      */
-    public void execute() throws BuildException
+    @SuppressWarnings("deprecation")
+	public void execute() throws BuildException
     {
         parser myparser = null;
 
@@ -550,8 +557,6 @@ public class JacIDL
     protected void scanFiles(String files[]) throws BuildException
     {
         File file;
-
-        // TODO: create an own pattern mapper
         GlobPatternMapper m = new GlobPatternMapper();
         m.setFrom("*.idl");
         m.setTo("*.java");

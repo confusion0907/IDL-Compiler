@@ -36,7 +36,8 @@ public class ValueBody
         super( num );
     }
 
-    public void setEnclosingSymbol( IdlSymbol s )
+    @SuppressWarnings("rawtypes")
+	public void setEnclosingSymbol( IdlSymbol s )
     {
         if( enclosing_symbol != null && enclosing_symbol != s )
             throw new RuntimeException( "Compiler Error: trying to reassign container for " + name );

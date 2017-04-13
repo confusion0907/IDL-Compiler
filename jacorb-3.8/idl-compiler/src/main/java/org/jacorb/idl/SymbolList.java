@@ -31,9 +31,11 @@ import java.util.Vector;
 public class SymbolList
     extends IdlSymbol
 {
-    Vector v;
+    @SuppressWarnings("rawtypes")
+	Vector v;
 
-    public SymbolList( int num )
+    @SuppressWarnings("rawtypes")
+	public SymbolList( int num )
     {
         super( num );
         v = new Vector();
@@ -42,13 +44,15 @@ public class SymbolList
     /**
      * Constructs a new SymbolList with a single element.
      */
-    public SymbolList (SimpleDeclarator element)
+    @SuppressWarnings("unchecked")
+	public SymbolList (SimpleDeclarator element)
     {
         this (new_num());
         v.add (element);
     }
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
         if( pack_name.length() > 0 )
@@ -66,19 +70,22 @@ public class SymbolList
         return v.size();
     }
 
-    public Enumeration elements()
+    @SuppressWarnings("rawtypes")
+	public Enumeration elements()
     {
         return v.elements();
     }
 
-    public void parse()
+    @SuppressWarnings("rawtypes")
+	public void parse()
     {
         Enumeration e = v.elements();
         for( ; e.hasMoreElements(); )
             ( (IdlSymbol)e.nextElement() ).parse();
     }
 
-    public void print( PrintWriter ps )
+    @SuppressWarnings("rawtypes")
+	public void print( PrintWriter ps )
     {
         Enumeration e = v.elements();
         if( e.hasMoreElements() )
@@ -91,7 +98,8 @@ public class SymbolList
         }
     }
 
-    public String toString()
+    @SuppressWarnings("rawtypes")
+	public String toString()
     {
         StringBuffer sb = new StringBuffer();
         Enumeration e = v.elements();

@@ -82,7 +82,8 @@ public class TypeDeclaration
      * then a recursive type code is returned.
      */
 
-    public String getTypeCodeExpression( Set knownTypes )
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression( Set knownTypes )
     {
         if( type_decl instanceof Value )
         {
@@ -158,6 +159,8 @@ public class TypeDeclaration
     	else if(text.equals("union") && type_decl instanceof UnionType)
     		type_decl.print( ps , template );
     	else if(text.equals("enum") && type_decl instanceof EnumType)
+    		type_decl.print( ps , template );
+    	else if(text.equals("native") && type_decl instanceof NativeType)
     		type_decl.print( ps , template );
     }
 

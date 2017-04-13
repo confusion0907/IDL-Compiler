@@ -20,10 +20,10 @@
 
 package org.jacorb.idl;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Level;
 
 /**
@@ -207,14 +207,15 @@ public class ArrayTypeSpec
      * classes (so Helper.type() is not an option)
      */
 
-    public String getTypeCodeExpression()
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression()
     {
         return getTypeCodeExpression(new HashSet());
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression(Set knownTypes)
     {
-        //TODO: what happens, when actual type is in knownTypes?
         String originalType =
             "org.omg.CORBA.ORB.init().create_array_tc(" + dims[ my_dim ] + ","
             + elementTypeSpec().getTypeCodeExpression(knownTypes) + ")";
@@ -347,170 +348,21 @@ public class ArrayTypeSpec
     }
 
 
-    private void printHolderClass(String className, PrintWriter ps)
-    {
-        if (!pack_name.equals(""))
-            ps.println("package " + pack_name + ";" + Environment.NL);
-
-        String type = typeName();
-
-        ps.println("public" + parser.getFinalString() + " class " + className + "Holder");
-        ps.println("\timplements org.omg.CORBA.portable.Streamable");
-
-        ps.println("{");
-        ps.println("\tpublic " + type + " value;");
-        ps.println("\tpublic " + className + "Holder ()");
-        ps.println("\t{");
-        ps.println("\t}");
-
-        ps.println("\tpublic " + className + "Holder (final " + type + " initial)" + Environment.NL + "\t{");
-        ps.println("\t\tvalue = initial;");
-        ps.println("\t}");
-
-        ps.println("\tpublic org.omg.CORBA.TypeCode _type ()");
-        ps.println("\t{");
-        ps.println("\t\treturn " + className + "Helper.type ();");
-        ps.println("\t}");
-
-        ps.println("\tpublic void _read (final org.omg.CORBA.portable.InputStream _in)");
-        ps.println("\t{");
-        ps.println("\t\tvalue = " + className + "Helper.read (_in);");
-        ps.println("\t}");
-
-        ps.println("\tpublic void _write (final org.omg.CORBA.portable.OutputStream _out)");
-        ps.println("\t{");
-        ps.println("\t\t" + className + "Helper.write (_out,value);");
-        ps.println("\t}");
-
-        ps.println("}");
-    }
-
-
-    private void printHelperClass(String className, PrintWriter ps)
-    {
-        if (!pack_name.equals(""))
-            ps.println("package " + pack_name + ";");
-
-        String type = typeName();
-
-        ps.println("public abstract class " + className + "Helper");
-        ps.println("{");
-
-        ps.println("\tprivate static org.omg.CORBA.TypeCode _type = " +
-                   getTypeCodeExpression() + ";");
-        TypeSpec.printHelperClassMethods(ps, type);
-        printIdMethod(ps);
-
-        /* read */
-
-        ps.println("\tpublic static " + type +
-                   " read (final org.omg.CORBA.portable.InputStream _in)");
-        ps.println("\t{");
-
-        ps.print("\t\t" + type + " result = new " +
-                 type.substring(0, type.indexOf('[')) + "[" + length() + "]");
-
-        ps.println(type.substring(type.indexOf(']')+1) + "; // " + type);
-
-
-        if (elementTypeSpec() instanceof BaseType &&
-            !(elementTypeSpec() instanceof AnyType))
-        {
-            String _tmp = elementTypeSpec().printReadExpression("_in");
-            ps.println("\t\t" + _tmp.substring(0, _tmp.indexOf("(")) +
-                       "_array(result,0," + length() + ");");
-        }
-        else
-        {
-            ps.println("\t\tfor (int i = 0; i < " + length() + "; i++)" + Environment.NL + "\t\t{");
-            ps.println("\t\t\t" + elementTypeSpec().printReadStatement("result[i]", "_in") + Environment.NL + "\t\t}");
-        }
-        ps.println("\t\treturn result;");
-        ps.println("\t}");
-
-        /* write */
-
-        ps.println("\tpublic static void write (final org.omg.CORBA.portable.OutputStream out, final " + type + " s)");
-        ps.println("\t{");
-        if (declarator.dimensions()[ 0 ] != 0)
-        {
-            ps.println("\t\tif (s.length != " + declarator.dimensions()[ 0 ] + ")");
-            ps.println("\t\t\tthrow new org.omg.CORBA.MARSHAL(\"Incorrect array size\");");
-        }
-        if (elementTypeSpec() instanceof BaseType &&
-            !(elementTypeSpec() instanceof AnyType))
-        {
-            String _tmp = elementTypeSpec().printWriteStatement("s", "out");
-            ps.println("\t\t" + _tmp.substring(0, _tmp.indexOf("(")) + "_array(s,0," + length() + ");");
-        }
-        else
-        {
-            ps.println("\t\tfor (int i = 0; i < s.length; i++)" + Environment.NL + "\t\t{");
-            ps.println("\t\t\t" + elementTypeSpec().printWriteStatement("s[i]", "out")
-                       + Environment.NL + "\t\t}");
-        }
-        ps.println("\t}");
-        ps.println("}");
-    }
-
-
-    public void print(PrintWriter _ps)
+    public void print(PrintWriter ps, Vector<String> template)
     {
         if (included && !generateIncluded())
             return; // no code generation
 
-        try
+        if ((!written) && typedefd)
         {
-            // print the element type, may be a locally defined member type, e.g.
-            // a struct member type
-            type_spec.print(_ps);
+            // write holder file
 
-            // only generate class files for explicitly
-            // defined sequence types, i.e. for typedef'd ones
-
-            if ((!written) && typedefd)
-            {
-                // write holder file
-
-                String className = className();
-                String path = parser.out_dir + fileSeparator + pack_name.replace('.', fileSeparator);
-                File dir = new File(path);
-                if (!dir.exists())
-                {
-                    if (!dir.mkdirs())
-                    {
-                        org.jacorb.idl.parser.fatal_error("Unable to create " + path, null);
-                    }
-                }
-
-                String fname = className + "Holder.java";
-                File f = new File(dir, fname);
-
-                if (GlobalInputStream.isMoreRecentThan(f))
-                {
-                    // print the mapped java class
-                    PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
-                    printHolderClass(className, ps);
-                    ps.close();
-                }
-
-                fname = className + "Helper.java";
-                f = new File(dir, fname);
-
-                if (GlobalInputStream.isMoreRecentThan(f))
-                {
-                    // print the mapped java class
-                    PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));
-                    printHelperClass(className, ps);
-                    ps.close();
-                }
-
-                written = true;
-            }
-        }
-        catch (java.io.IOException i)
-        {
-            throw new RuntimeException("File IO error" + i);
+            String className = className();
+            
+            for(int i = 0 ; i < template.size() ; i++)
+            	ps.println(template.get(i).replaceAll("<arrayType>", className));
+            
+            written = true;
         }
     }
 

@@ -38,23 +38,27 @@ import java.util.Vector;
 public class Spec
     extends IdlSymbol
 {
-    public Vector definitions;
+    @SuppressWarnings("rawtypes")
+	public Vector definitions;
     public static int line = 0;
 
-    public Spec( int num )
+    @SuppressWarnings("rawtypes")
+	public Spec( int num )
     {
         super( num );
         definitions = new Vector();
     }
 
-    public void parse()
+    @SuppressWarnings("rawtypes")
+	public void parse()
     {
         Enumeration e = definitions.elements();
         for( ; e.hasMoreElements(); )
             ( (IdlSymbol)e.nextElement() ).parse();
     }
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
         Enumeration e = definitions.elements();
@@ -65,10 +69,51 @@ public class Spec
         }
     }
 
+	@SuppressWarnings("rawtypes")
 	public void print( PrintWriter ps )
     {
+		File file = new File("typeMapping.type");
+		try {
+			RandomAccessFile raf = new RandomAccessFile(file, "r");
+			long ptr = 0;
+			String str = "";
+			Vector<String> type = new Vector<String>();
+			int index = 0;
+			while (ptr < file.length() && index < 19) 
+			{
+				str = raf.readLine();
+				ptr = raf.getFilePointer();
+				type.add(new String(str));
+				++index;
+			}
+			ShortType.setTypeName(type.get(0));
+			ShortType.setTypeName_unsigned(type.get(1));
+			LongType.setTypeName(type.get(2));
+			LongType.setTypeName_unsigned(type.get(3));
+			LongLongType.setTypeName(type.get(4));
+			LongLongType.setTypeName_unsigned(type.get(5));
+			OctetType.setTypeName(type.get(6));
+			FloatType.setTypeName(type.get(7));
+			DoubleType.setTypeName(type.get(8));
+			CharType.setTypeName(type.get(9));
+			CharType.setTypeName_wide(type.get(10));
+			StringType.setTypeName(type.get(11));
+			StringType.setTypeName_wide(type.get(12));
+			BooleanType.setTypeName(type.get(13));
+			AnyType.setTypeName(type.get(14));
+			ObjectTypeSpec.setTypeName(type.get(15));
+			ValueBase.setTypeName(type.get(16));
+			FixedPointType.setTypeName(type.get(17));
+			VoidTypeSpec.setTypeName(type.get(18));
+			raf.close();
+		} catch (FileNotFoundException e2) {
+			e2.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     	File f = new File("template.txt");
     	try {
+			@SuppressWarnings("resource")
 			RandomAccessFile raf = new RandomAccessFile(f, "r");
 			
 			long ptr = 0;
@@ -318,12 +363,6 @@ public class Spec
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-    	
-    	/*
-        Enumeration e = definitions.elements();
-        while( e.hasMoreElements() )
-            ( (IdlSymbol)e.nextElement() ).print( ps );
-            */
     }
 
     /**
@@ -357,27 +396,3 @@ public class Spec
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -31,6 +31,15 @@ public class StringType
     extends TemplateTypeSpec
 {
 	static private String typeName = "string";
+	static private String typeName_wide = "string";
+
+	public static String getTypeName_wide() {
+		return typeName_wide;
+	}
+
+	public static void setTypeName_wide(String typeName_wide) {
+		StringType.typeName_wide = typeName_wide;
+	}
 
 	public static void setTypeName(String typeName) {
 		StringType.typeName = typeName;
@@ -70,7 +79,10 @@ public class StringType
 
     public String typeName()
     {
-        return typeName;
+    	if(wide)
+    		return typeName_wide;
+    	else
+    		return typeName;
     }
 
     public TypeSpec typeSpec()
@@ -131,7 +143,8 @@ public class StringType
         );
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression(Set knownTypes)
     {
     	return getTypeCodeExpression();
     }

@@ -32,6 +32,15 @@ public class LongLongType
     extends IntType
 {
 	static private String typeName = "long long";
+	static private String typeName_unsigned = "long long"; 
+
+	public static String getTypeName_unsigned() {
+		return typeName_unsigned;
+	}
+
+	public static void setTypeName_unsigned(String typeName_unsigned) {
+		LongLongType.typeName_unsigned = typeName_unsigned;
+	}
 
 	public static void setTypeName(String typeName) {
 		LongLongType.typeName = typeName;
@@ -54,7 +63,10 @@ public class LongLongType
 
     public String typeName()
     {
-        return typeName;
+    	if(unsigned)
+    		return typeName_unsigned;
+    	else
+    		return typeName;
     }
 
     public boolean basic()

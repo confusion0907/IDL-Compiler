@@ -1,0 +1,19 @@
+short
+short
+long
+long
+long long
+long long
+octet
+float
+double
+char
+wchar
+string
+wstring
+bool
+any
+object
+valuebase
+BigDecimal
+void

@@ -138,12 +138,14 @@ public class SequenceType
      * @return a string for an expression of type TypeCode that describes this type
      */
 
-    public String getTypeCodeExpression()
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression()
     {
         return getTypeCodeExpression(new HashSet());
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public String getTypeCodeExpression(Set knownTypes)
     {
         if (parser.logger.isLoggable(Level.ALL))
         {

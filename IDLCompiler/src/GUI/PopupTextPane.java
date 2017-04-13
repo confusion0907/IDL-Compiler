@@ -173,7 +173,7 @@ class SyntaxHighlighter implements DocumentListener,UndoableEditListener
 		StyleConstants.setBold(functionStyle, true);
 		StyleConstants.setBold(keywordStyle, true);
 		
-		KeyWords key = new KeyWords();
+		KeyWords key = KeyWords.getInstance();
 		keywords = key.getKeywords();
 		labelwords = key.getLabelwords();
 		functionwords = key.getFunctionwords();

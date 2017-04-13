@@ -29,7 +29,9 @@ import java.util.Hashtable;
 
 public class ScopeData
 {
-    public Hashtable versionMap = new Hashtable();
-    public Hashtable idMap = new Hashtable();
+    @SuppressWarnings("rawtypes")
+	public Hashtable versionMap = new Hashtable();
+    @SuppressWarnings("rawtypes")
+	public Hashtable idMap = new Hashtable();
 }
 

@@ -196,14 +196,14 @@ public class AliasTypeSpec
      * the original type.
      */
 
-    public String getTypeCodeExpression()
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression()
     {
         return getTypeCodeExpression(new HashSet());
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    public String getTypeCodeExpression(@SuppressWarnings("rawtypes") Set knownTypes)
     {
-        //TODO: what happens, when actual type is in knownTypes?
         return "org.omg.CORBA.ORB.init().create_alias_tc(" +
                full_name() + "Helper.id(), \"" + name + "\"," +
                originalType.typeSpec().getTypeCodeExpression(knownTypes) + ")";
@@ -287,7 +287,7 @@ public class AliasTypeSpec
 						if(template.get(i).startsWith("%newfile"))
 			        	{
 			        		judge = true;
-			        		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+			        		String tmp = template.get(i).replaceAll("<typedefName>", className);
 			        		PrintWriter _ps;
 			        		
 			        		try{
@@ -328,7 +328,7 @@ public class AliasTypeSpec
 						if(template.get(i).startsWith("%newfile"))
 			        	{
 			        		judge = true;
-			        		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+			        		String tmp = template.get(i).replaceAll("<typedefName>", className);
 			        		PrintWriter _ps;
 			        		
 			        		try{
@@ -377,6 +377,106 @@ public class AliasTypeSpec
 					}
 				}
 			}
+			else if(template.get(0).contains(":fixed"))
+			{
+				if(originalType instanceof FixedPointType)
+				{
+					for(int i = 1 ; i < template.size() ; i++)
+					{
+						if(template.get(i).startsWith("%newfile"))
+			        	{
+			        		judge = true;
+			        		String tmp = template.get(i).replaceAll("<typedefName>", className);
+			        		PrintWriter _ps;
+			        		
+			        		try{
+								_ps = openOutput(tmp.substring(9));
+								if(_ps == null)
+									throw new Exception();
+							}catch(Exception e){
+								throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+							}
+			        		
+			        		if(ps != null)
+			        		{
+			        			ps.close();
+			        			ps = _ps;
+			        		}
+			        		else
+			        			ps = _ps;
+			        		
+			        		i = i+1;
+			        	}
+						else if(ps == null)
+							throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+						else
+						{
+							String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+							tmp = tmp.replaceAll("<typedefName>", className);
+							tmp = tmp.replaceAll("<digitsNumber>", Integer.toString(originalType.typeSpec().getDigits()));
+							tmp = tmp.replaceAll("<scaleNumber>", Integer.toString(originalType.typeSpec().getScale()));
+							ps.println(tmp);
+						}
+					}
+				}
+			}
+			else if(template.get(0).contains(":array"))
+			{
+				if(originalType.typeSpec() instanceof ArrayTypeSpec)
+				{
+					for(int i = 1 ; i < template.size() ; i++)
+					{
+						if(template.get(i).startsWith("%newfile"))
+			        	{
+			        		judge = true;
+			        		String tmp = template.get(i).replaceAll("<typedefName>", className);
+			        		PrintWriter _ps;
+			        		
+			        		try{
+								_ps = openOutput(tmp.substring(9));
+								if(_ps == null)
+									throw new Exception();
+							}catch(Exception e){
+								throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+							}
+			        		
+			        		if(ps != null)
+			        		{
+			        			ps.close();
+			        			ps = _ps;
+			        		}
+			        		else
+			        			ps = _ps;
+			        		
+			        		i = i+1;
+			        	}
+						/*
+						else if(template.get(i).startsWith("%arraytypedef"))
+						{
+							i = i+1;
+							Vector<String> _template = new Vector<String>();
+							while(!template.get(i).equals("%%"))
+							{
+								String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+								tmp = tmp.replaceAll("<typedefName>", className);
+								_template.add(tmp);
+								i = i+1;
+							}
+							originalType.type_spec.print(ps, _template);
+							i = i+1;
+						}
+						*/
+						else if(ps == null)
+							throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+						else
+						{
+							String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+							tmp = tmp.replaceAll("<typedefName>", className);
+							ps.println(tmp);
+						}
+					}
+				}
+			}
 			else
 			{
 				for(int i = 1 ; i < template.size() ; i++)
@@ -384,7 +484,7 @@ public class AliasTypeSpec
 					if(template.get(i).startsWith("%newfile"))
 		        	{
 		        		judge = true;
-		        		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+		        		String tmp = template.get(i).replaceAll("<typedefName>", className);
 		        		PrintWriter _ps;
 		        		
 		        		try{
@@ -508,151 +608,6 @@ public class AliasTypeSpec
         }
 
         return full_name() + "Holder";
-    }
-
-    /**
-     * generates the holder class for this alias type
-     */
-
-    private void printHolderClass(String className, PrintWriter ps)
-    {
-        if (!pack_name.equals(""))
-            ps.println("package " + pack_name + ";");
-
-        printImport(ps);
-
-        printClassComment("alias", className, ps);
-
-        ps.println("public" + parser.getFinalString() + " class " + className + "Holder");
-        ps.println("\timplements org.omg.CORBA.portable.Streamable");
-        ps.println("{");
-
-        ps.println("\tpublic " + originalType.typeName() + " value;" + Environment.NL);
-
-        ps.println("\tpublic " + className + "Holder ()");
-        ps.println("\t{");
-        ps.println("\t}");
-
-        ps.println("\tpublic " + className + "Holder (final " + originalType.typeName() + " initial)");
-        ps.println("\t{");
-        ps.println("\t\tvalue = initial;");
-        ps.println("\t}");
-
-        ps.println("\tpublic org.omg.CORBA.TypeCode _type ()");
-        ps.println("\t{");
-        ps.println("\t\treturn " + className + "Helper.type ();");
-        ps.println("\t}");
-
-        ps.println("\tpublic void _read (final org.omg.CORBA.portable.InputStream in)");
-        ps.println("\t{");
-        ps.println("\t\tvalue = " + className + "Helper.read (in);");
-        ps.println("\t}");
-
-        ps.println("\tpublic void _write (final org.omg.CORBA.portable.OutputStream out)");
-        ps.println("\t{");
-        ps.println("\t\t" + className + "Helper.write (out,value);");
-        ps.println("\t}");
-
-        ps.println("}");
-    }
-
-    /**
-     * generates the holder class for this alias type
-     */
-
-    private void printHelperClass(String className, PrintWriter ps)
-    {
-        if (!pack_name.equals(""))
-        {
-            ps.println("package " + pack_name + ";");
-        }
-
-        printImport(ps);
-
-        printClassComment("alias", className, ps);
-
-        ps.println("public abstract class " + className + "Helper");
-        ps.println("{");
-
-        ps.println("\tprivate volatile static org.omg.CORBA.TypeCode _type;" + Environment.NL);
-
-        String type = originalType.typeName();
-
-        ps.println("\tpublic static void insert (org.omg.CORBA.Any any, " +
-                    type + " s)");
-        ps.println("\t{");
-
-        TypeSpec origType = this.originalType();
-        boolean useAnySpeedAccessor =
-            !(origType instanceof TemplateTypeSpec) &&
-            !(origType instanceof ConstrTypeSpec) &&
-            BaseType.isBasicName(origType.typeName());
-
-        if (useAnySpeedAccessor)
-        {
-            ps.print("\t\tany.");
-            ps.print(this.originalType().printInsertExpression());
-            ps.println("(s);");
-        }
-        else
-        {
-            ps.println("\t\tany.type (type ());");
-            ps.println("\t\twrite (any.create_output_stream (), s);");
-        }
-        ps.println("\t}" + Environment.NL);
-
-        ps.println("\tpublic static " + type + " extract (final org.omg.CORBA.Any any)");
-        ps.println("\t{");
-
-        if (useAnySpeedAccessor)
-        {
-            ps.print("\t\treturn any.");
-            ps.print(this.originalType().printExtractExpression());
-            ps.println("();");
-        }
-        else
-        {
-            ps.println ("\t\tif ( any.type().kind() == org.omg.CORBA.TCKind.tk_null)");
-            ps.println ("\t\t{");
-            ps.println ("\t\t\tthrow new org.omg.CORBA.BAD_OPERATION (\"Can't extract from Any with null type.\");");
-            ps.println ("\t\t}");
-            ps.println("\t\treturn read (any.create_input_stream ());");
-        }
-
-        ps.println("\t}" + Environment.NL);
-
-        ps.println("\tpublic static org.omg.CORBA.TypeCode type ()");
-        ps.println("\t{");
-        ps.println("\t\tif (_type == null)");
-        ps.println("\t\t{");
-        ps.println("\t\t\tsynchronized(" + className + "Helper.class)");
-        ps.println("\t\t\t{");
-        ps.println("\t\t\t\tif (_type == null)");
-        ps.println("\t\t\t\t{");
-        ps.println("\t\t\t\t\t_type = " + getTypeCodeExpression() + ";");
-        ps.println("\t\t\t\t}");
-        ps.println("\t\t\t}");
-        ps.println("\t\t}");
-        ps.println("\t\treturn _type;");
-        ps.println("\t}" + Environment.NL);
-
-        printIdMethod(ps); // inherited from IdlSymbol
-
-        /* read */
-        ps.println("\tpublic static " + type +
-                    " read (final org.omg.CORBA.portable.InputStream _in)");
-        ps.println("\t{");
-        ps.println("\t\t" + type + " _result;");
-        ps.println("\t\t" + originalType.printReadStatement("_result", "_in"));
-        ps.println("\t\treturn _result;");
-        ps.println("\t}" + Environment.NL);
-
-        /* write */
-        ps.println("\tpublic static void write (final org.omg.CORBA.portable.OutputStream _out, " + type + " _s)");
-        ps.println("\t{");
-        ps.println("\t\t" + originalType.printWriteStatement("_s", "_out"));
-        ps.println("\t}");
-        ps.println("}");
     }
 
     public void printInsertIntoAny(PrintWriter ps,

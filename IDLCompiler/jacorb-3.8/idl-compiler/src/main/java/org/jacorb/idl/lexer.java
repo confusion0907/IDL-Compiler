@@ -71,7 +71,8 @@ public class lexer
      * string of  the name  is the  key here,  which  indexes Integer
      * objects holding the symbol number.
      */
-    protected static Hashtable keywords = new Hashtable();
+    @SuppressWarnings("rawtypes")
+	protected static Hashtable keywords = new Hashtable();
 
     /** Table of keywords, stored in lower case.  Keys are the
      *  lower case version of the keywords used as keys for the keywords
@@ -156,7 +157,8 @@ public class lexer
      * type.
      */
 
-    public static void init()
+    @SuppressWarnings("unchecked")
+	public static void init()
         throws java.io.IOException
     {
         /* set up standard symbols */
@@ -616,7 +618,8 @@ public class lexer
      *  Preprocessor directives are handled here.
      */
 
-    protected static void preprocess()
+    @SuppressWarnings("unchecked")
+	protected static void preprocess()
         throws java.io.IOException
     {
         for( ; ; )

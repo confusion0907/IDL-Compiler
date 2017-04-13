@@ -43,7 +43,8 @@ public enum IDLTypes
     TYPE_STRUCT,
     TYPE_UNION;
 
-    public static boolean isTypeKind(IDLTypes type)
+    @SuppressWarnings("incomplete-switch")
+	public static boolean isTypeKind(IDLTypes type)
     {
         switch (type)
         {

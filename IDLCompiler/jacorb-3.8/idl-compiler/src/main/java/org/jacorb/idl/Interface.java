@@ -52,12 +52,14 @@ public class Interface
     private ReplyHandler replyHandler = null;
 
     /** IR information that would otherwise be lost */
-    private Hashtable irInfoTable = new Hashtable();
+    @SuppressWarnings("rawtypes")
+	private Hashtable irInfoTable = new Hashtable();
 
     /** <code>abstractInterfaces</code> is to keep a record of those interfaces
      * that are abstract so any inheriting interface know what to inherit from.
      */
-    protected static HashSet abstractInterfaces;
+    @SuppressWarnings("rawtypes")
+	protected static HashSet abstractInterfaces;
 
 
     public Interface(int num)
@@ -206,7 +208,8 @@ public class Interface
         );
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression(Set knownTypes)
     {
         if (knownTypes.contains(this))
         {
@@ -253,7 +256,8 @@ public class Interface
         return javaName() + "Helper.write(" + Streamname + "," + var_name + ");";
     }
 
-    public void parse()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void parse()
     {
         boolean justAnotherOne = false;
 
@@ -465,7 +469,8 @@ public class Interface
      *  If this interface inherits from classes in the unnamed package,
      *  generate explicit import statements for them.
      */
-    protected void printSuperclassImports(PrintWriter ps)
+    @SuppressWarnings("rawtypes")
+	protected void printSuperclassImports(PrintWriter ps)
     {
         if (inheritanceSpec.v.isEmpty())
         {
@@ -494,7 +499,8 @@ public class Interface
      *  generate the signature interface
      */
 
-    protected void printInterface()
+    @SuppressWarnings("rawtypes")
+	protected void printInterface()
     {
         PrintWriter ps = openOutput(name);
         if (ps == null)
@@ -947,7 +953,8 @@ public class Interface
         ps.close();
     }
 
-    public String[] get_ids()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public String[] get_ids()
     {
         if (ids == null)
         {
@@ -987,7 +994,8 @@ public class Interface
     /**
      * Returns true if this interface has at least one abstract base type.
      */
-    protected boolean hasAbstractBase()
+    @SuppressWarnings("rawtypes")
+	protected boolean hasAbstractBase()
     {
         if (inheritanceSpec != null && inheritanceSpec.v.size() > 0)
         {
@@ -1250,7 +1258,8 @@ public class Interface
         ps.close();
     }
 
-    protected void printIRHelper()
+    @SuppressWarnings("rawtypes")
+	protected void printIRHelper()
     {
         PrintWriter ps = openOutput(name + "IRHelper");
         if (ps == null)
@@ -1372,7 +1381,8 @@ public class Interface
         ps.close();
     }
 
-    private void printBody(PrintWriter _ps , Vector<String> template)
+    @SuppressWarnings("rawtypes")
+	private void printBody(PrintWriter _ps , Vector<String> template)
     {
     	//FIXME printBody
     	boolean judge = false;
@@ -1545,7 +1555,7 @@ public class Interface
         		body.print(_ps,_template,"enum");
         		i = i+1;
         	}
-        	else if(template.get(i).startsWith("%inheritanceSpec"))
+        	else if(template.get(i).startsWith("%inheritance"))
         	{
         		int index = 1;
         		Vector<String> _template = new Vector<String>();
@@ -1595,6 +1605,24 @@ public class Interface
         		}
         		_template.remove(_template.size()-1);
         		body.printOperationSignatures(_ps,_template,"attribute");
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%native"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(template.get(i).equals("%%") && index == 0))
+        		{
+        			i = i + 1;
+        			String tmp = template.get(i).replaceAll("<interfaceName>", name);
+					_template.add(tmp);
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
+						index = index+1;
+					else if(template.get(i).equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		body.print(_ps,_template,"native");
         		i = i+1;
         	}
         	else if(_ps == null)
@@ -1696,7 +1724,8 @@ public class Interface
         return stub_name;
     }
     
-    private String getScopeList()
+    @SuppressWarnings("rawtypes")
+	private String getScopeList()
     {
     	String result = "";
     	if (inheritanceSpec.v.size() > 0)

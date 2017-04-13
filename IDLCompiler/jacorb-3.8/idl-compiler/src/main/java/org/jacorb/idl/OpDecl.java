@@ -46,11 +46,13 @@ public class OpDecl
 
     public int opAttribute; // either NO_ATTRIBUTE or ONEWAY
     public TypeSpec opTypeSpec;
-    public Vector paramDecls;
+    @SuppressWarnings("rawtypes")
+	public Vector paramDecls;
     public RaisesExpr raisesExpr;
     public IdlSymbol myInterface;
 
-    public OpDecl( int num )
+    @SuppressWarnings("rawtypes")
+	public OpDecl( int num )
     {
         super( num );
         paramDecls = new Vector();
@@ -59,7 +61,8 @@ public class OpDecl
     /**
      *  Constructs a new OpDecl with the given characteristics.
      */
-    public OpDecl (IdlSymbol myInterface,
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public OpDecl (IdlSymbol myInterface,
                    int opAttribute,
                    TypeSpec opTypeSpec,
                    String name,
@@ -81,7 +84,8 @@ public class OpDecl
      *  Constructs a normal (not oneway) operation with void return type
      *  and no raises-Expression.
      */
-    public OpDecl (IdlSymbol myInterface,
+    @SuppressWarnings("rawtypes")
+	public OpDecl (IdlSymbol myInterface,
                    String    name,
                    List      paramDecls)
     {
@@ -93,7 +97,8 @@ public class OpDecl
               new RaisesExpr (new_num()));
     }
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
 
@@ -126,7 +131,8 @@ public class OpDecl
         raisesExpr.setEnclosingSymbol( s );
     }
 
-    public void parse()
+    @SuppressWarnings("rawtypes")
+	public void parse()
     {
         if( enclosing_symbol  == null )
             throw new RuntimeException( "Compiler Error: enclosing symbol in parse is null!");
@@ -224,7 +230,8 @@ public class OpDecl
     }
 
 
-    public void print( PrintWriter ps )
+    @SuppressWarnings("rawtypes")
+	public void print( PrintWriter ps )
     {
         if( is_pseudo )
             ps.print( "\tpublic abstract " + opTypeSpec.toString() );
@@ -251,7 +258,8 @@ public class OpDecl
     /**
      * Writes the Stream-based Body of the Method for the stub
      */
-    public void printStreamBody( PrintWriter ps,
+    @SuppressWarnings("rawtypes")
+	public void printStreamBody( PrintWriter ps,
                                  String classname,
                                  String idl_name,
                                  boolean is_local,
@@ -491,7 +499,8 @@ public class OpDecl
     /**
      * Writes the DII-based Body of the Method for the stub
      */
-    private void printDIIBody(PrintWriter ps,
+    @SuppressWarnings("rawtypes")
+	private void printDIIBody(PrintWriter ps,
                               String classname,
                               String idl_name,
                               boolean is_local,
@@ -616,7 +625,8 @@ public class OpDecl
     }
 
 
-    public void printMethod( PrintWriter ps,
+    @SuppressWarnings("rawtypes")
+	public void printMethod( PrintWriter ps,
                              String classname,
                              boolean is_local,
                              boolean is_abstract)
@@ -654,7 +664,8 @@ public class OpDecl
          ps.println( "\t}" + Environment.NL ); // end method^M
      }
 
-    public void print_sendc_Method( PrintWriter ps,
+    @SuppressWarnings("rawtypes")
+	public void print_sendc_Method( PrintWriter ps,
                                     String classname )
     {
         /* in some cases generated name have an underscore prepended for the
@@ -716,7 +727,8 @@ public class OpDecl
         ps.println( "\t}" + Environment.NL ); // end method
     }
 
-    public void printDelegatedMethod( PrintWriter ps )
+    @SuppressWarnings("rawtypes")
+	public void printDelegatedMethod( PrintWriter ps )
     {
         ps.print( "\tpublic " + opTypeSpec.toString() + " " + name + "(" );
 
@@ -755,7 +767,8 @@ public class OpDecl
         ps.println( "\t}" + Environment.NL );
     }
 
-    public void printInvocation( PrintWriter ps )
+    @SuppressWarnings("rawtypes")
+	public void printInvocation( PrintWriter ps )
     {
         if( !raisesExpr.empty() )
         {
@@ -932,7 +945,8 @@ public class OpDecl
 
     }
 
-    public String signature()
+    @SuppressWarnings("rawtypes")
+	public String signature()
     {
         StringBuffer sb = new StringBuffer();
         sb.append( name + "(" );
@@ -970,7 +984,8 @@ public class OpDecl
      * @param printModifiers whether "public abstract" should be added
      */
     
-    public void printSignature( PrintWriter ps, Vector<String> template, boolean printModifiers )
+    @SuppressWarnings("rawtypes")
+	public void printSignature( PrintWriter ps, Vector<String> template, boolean printModifiers )
     {
     	//FIXME
     	boolean judge = false;
@@ -1250,7 +1265,7 @@ public class OpDecl
         	}
         	else if(template.get(i).startsWith("%return"))
         	{
-        		if(template.get(i).contains("void") || (!template.get(i).contains("void") && !opTypeSpec.toString().equals("void")))
+        		if(template.get(i).contains(":void") || (!template.get(i).contains(":void") && !opTypeSpec.toString().equals("void")))
         		{
         			i = i+1;
         			while(!template.get(i).equals("%%"))
@@ -1330,7 +1345,8 @@ public class OpDecl
         	ps.close();
     }
     
-    private String paramList()
+    @SuppressWarnings("rawtypes")
+	private String paramList()
     {
     	String result = "";
     	for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )
@@ -1343,7 +1359,8 @@ public class OpDecl
     	return result;
     }
     
-    private String paramTypeList()
+    @SuppressWarnings("rawtypes")
+	private String paramTypeList()
     {
     	String result = "";
     	for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )
@@ -1356,7 +1373,8 @@ public class OpDecl
     	return result;
     }
     
-    private String paramNameList()
+    @SuppressWarnings("rawtypes")
+	private String paramNameList()
     {
     	String result = "";
     	for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); )
@@ -1400,7 +1418,8 @@ public class OpDecl
      *    collect Interface Repository information in the argument hashtable
      */
 
-    public void getIRInfo( Hashtable irInfoTable )
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void getIRInfo( Hashtable irInfoTable )
     {
         StringBuffer sb = new StringBuffer();
 

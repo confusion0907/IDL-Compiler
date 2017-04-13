@@ -57,7 +57,8 @@ public class InterfaceBody
     }
 
 
-    public void setEnclosingSymbol( IdlSymbol s )
+    @SuppressWarnings("rawtypes")
+	public void setEnclosingSymbol( IdlSymbol s )
     {
         if( enclosing_symbol != null && enclosing_symbol != s )
             throw new RuntimeException( "Compiler Error: trying to reassign container for " + name );
@@ -72,7 +73,8 @@ public class InterfaceBody
     }
 
 
-    public void set_name( String n )
+    @SuppressWarnings("rawtypes")
+	public void set_name( String n )
     {
         name = n;
         for( Enumeration e = v.elements(); e.hasMoreElements(); )
@@ -80,7 +82,8 @@ public class InterfaceBody
     }
 
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
         if( pack_name.length() > 0 )
@@ -97,7 +100,8 @@ public class InterfaceBody
         this.v.add (new Definition (d));
     }
 
-    public void parse()
+    @SuppressWarnings("rawtypes")
+	public void parse()
     {
         escapeName();
 
@@ -253,7 +257,8 @@ public class InterfaceBody
         }
     }
 
-    public Operation[] getMethods()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public Operation[] getMethods()
     {
         if( methods == null )
         {
@@ -426,7 +431,8 @@ public class InterfaceBody
         ps.println( "\t\treturn _out;" );
     }
 
-    void getIRInfo( Hashtable irInfoTable )
+    @SuppressWarnings("rawtypes")
+	void getIRInfo( Hashtable irInfoTable )
     {
         for( Enumeration<Definition> e = v.elements(); e.hasMoreElements(); )
         {
@@ -471,7 +477,8 @@ public class InterfaceBody
           start();
        }
 
-       public void run()
+       @SuppressWarnings("rawtypes")
+	public void run()
        {
           parser.set_pending( b.full_name(), b );
           Object o = null;

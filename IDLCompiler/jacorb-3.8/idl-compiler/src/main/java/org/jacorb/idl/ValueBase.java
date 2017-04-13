@@ -27,7 +27,13 @@ package org.jacorb.idl;
 public class ValueBase
     extends BaseType
 {
-    public ValueBase( int num )
+	static private String typeName = "Serializable";
+	
+    public static void setTypeName(String typeName) {
+		ValueBase.typeName = typeName;
+	}
+
+	public ValueBase( int num )
     {
         super( num );
     }
@@ -39,7 +45,7 @@ public class ValueBase
 
     public String typeName()
     {
-        return "java.io.Serializable";
+        return typeName;
     }
 
     public TypeSpec typeSpec()

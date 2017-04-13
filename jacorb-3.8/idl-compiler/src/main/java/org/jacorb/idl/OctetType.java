@@ -29,7 +29,13 @@ import java.io.PrintWriter;
 public class OctetType
         extends BaseType
 {
-    public OctetType( int num )
+	static private String typeName = "octet";
+	
+    public static void setTypeName(String typeName) {
+		OctetType.typeName = typeName;
+	}
+
+	public OctetType( int num )
     {
         super( num );
     }
@@ -41,7 +47,7 @@ public class OctetType
 
     public String typeName()
     {
-        return "octet";
+        return typeName;
     }
 
     public TypeSpec typeSpec()

@@ -30,5 +30,6 @@ package org.jacorb.idl;
 
 
 public class NoHelperException extends Exception {
+	private static final long serialVersionUID = 1L;
 
 }

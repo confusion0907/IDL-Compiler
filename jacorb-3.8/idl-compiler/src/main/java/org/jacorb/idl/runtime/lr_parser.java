@@ -239,7 +239,8 @@ public abstract class lr_parser {
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** The parse stack itself. */
-  protected Stack stack = new Stack();
+  @SuppressWarnings("rawtypes")
+protected Stack stack = new Stack();
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -269,7 +270,8 @@ public abstract class lr_parser {
    * @param stack     the parse stack of that object.
    * @param top       the index of the top element of the parse stack.
    */
-  public abstract symbol do_action(
+  @SuppressWarnings("rawtypes")
+public abstract symbol do_action(
     int       act_num,
     lr_parser parser,
     Stack     stack,
@@ -470,7 +472,8 @@ public abstract class lr_parser {
    *  documentation for the class regarding how shift/reduce parsers operate
    *  and how the various tables are used.
    */
-  public void parse() throws java.lang.Exception
+  @SuppressWarnings("unchecked")
+public void parse() throws java.lang.Exception
     {
       /* the current action code */
       int act;
@@ -635,7 +638,8 @@ public abstract class lr_parser {
    *  debug_reduce() when shift and reduce moves are taken by the parser
    *  and produces various other debugging messages.
    */
-  public void debug_parse()
+  @SuppressWarnings("unchecked")
+public void debug_parse()
     throws java.lang.Exception
     {
       /* the current action code */
@@ -833,7 +837,8 @@ public abstract class lr_parser {
    *
    * @param debug should we produce debugging messages as we parse.
    */
-  protected boolean find_recovery_config(boolean debug)
+  @SuppressWarnings("unchecked")
+protected boolean find_recovery_config(boolean debug)
     {
       token error_token;
       int act;
@@ -1025,7 +1030,8 @@ public abstract class lr_parser {
    *
    * @param debug should we produce debugging messages as we parse.
    */
-  protected void parse_lookahead(boolean debug)
+  @SuppressWarnings("unchecked")
+protected void parse_lookahead(boolean debug)
     throws java.lang.Exception
     {
       /* the current action code */

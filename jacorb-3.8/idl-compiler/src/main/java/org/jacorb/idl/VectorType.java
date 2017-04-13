@@ -103,13 +103,13 @@ public abstract class VectorType
     }
 
 
-    protected String elementTypeExpression(Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	protected String elementTypeExpression(Set knownTypes)
     {
         TypeSpec ts = type_spec.typeSpec();
 
         if( ts instanceof AliasTypeSpec )
         {
-            //TODO: Check for recursive TypeCodes?
         	return type_spec.full_name() + "Helper.type()";
         }
         else if( ts instanceof BaseType ||

@@ -30,8 +30,13 @@ import java.util.Set;
 public class ObjectTypeSpec
     extends TypeSpec
 {
+	static private String typeName = "Object";
+	
+    public static void setTypeName(String typeName) {
+		ObjectTypeSpec.typeName = typeName;
+	}
 
-    public ObjectTypeSpec( int num )
+	public ObjectTypeSpec( int num )
     {
         super( num );
     }
@@ -43,7 +48,7 @@ public class ObjectTypeSpec
 
     public String typeName()
     {
-        return "org.omg.CORBA.Object";
+        return typeName;
     }
 
     public TypeSpec typeSpec()
@@ -82,7 +87,8 @@ public class ObjectTypeSpec
         return "org.omg.CORBA.ORB.init().get_primitive_tc( org.omg.CORBA.TCKind.tk_objref)";
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression(Set knownTypes)
     {
         return getTypeCodeExpression();
     }

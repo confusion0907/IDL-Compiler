@@ -26,11 +26,8 @@ package org.jacorb.idl;
  * @author Gerald Brose
  */
 
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Vector;
-import java.util.logging.Level;
 
 /**
  * Note: a module's name is its package name!

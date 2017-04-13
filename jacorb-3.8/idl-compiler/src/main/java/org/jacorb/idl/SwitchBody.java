@@ -29,7 +29,8 @@ public class SwitchBody
         extends IdlSymbol
 {
     /** holds case list */
-    public Vector caseListVector = new Vector();
+    @SuppressWarnings("rawtypes")
+	public Vector caseListVector = new Vector();
 
     TypeSpec ts = null;
     UnionType myUnion = null;
@@ -39,7 +40,8 @@ public class SwitchBody
         super( num );
     }
 
-    public void setTypeSpec( TypeSpec s )
+    @SuppressWarnings("rawtypes")
+	public void setTypeSpec( TypeSpec s )
     {
         ts = s;
         for( Enumeration e = caseListVector.elements(); e.hasMoreElements(); )
@@ -55,7 +57,8 @@ public class SwitchBody
      * to the case elements, which pass it on
      */
 
-    public void setUnion( UnionType ut )
+    @SuppressWarnings("rawtypes")
+	public void setUnion( UnionType ut )
     {
         myUnion = ut;
         for( Enumeration e = caseListVector.elements(); e.hasMoreElements(); )
@@ -65,7 +68,8 @@ public class SwitchBody
         }
     }
 
-    public void setEnclosingSymbol( IdlSymbol s )
+    @SuppressWarnings("rawtypes")
+	public void setEnclosingSymbol( IdlSymbol s )
     {
         if( enclosing_symbol != null && enclosing_symbol != s )
             throw new RuntimeException( "Compiler Error: trying to reassign container for " + name );
@@ -90,7 +94,8 @@ public class SwitchBody
      * do the parsing
      */
 
-    public void parse()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void parse()
     {
         Map usedLabelNames = new HashMap();
 
@@ -127,7 +132,8 @@ public class SwitchBody
 
     }
 
-    public void print( java.io.PrintWriter ps )
+    @SuppressWarnings("rawtypes")
+	public void print( java.io.PrintWriter ps )
     {
         for( Enumeration e = caseListVector.elements(); e.hasMoreElements(); )
         {

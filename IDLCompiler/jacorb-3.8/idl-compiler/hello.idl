@@ -4,7 +4,7 @@ exception error{
 
 valuetype sundown{
 	factory register() raises(error);
-	private short a;
+	private long double a;
 	public string b;
 	string countdown(out boolean already);
 	typedef short time;
@@ -13,6 +13,9 @@ valuetype sundown{
 };
 
 interface HelloWorld{
+	typedef long just[5][6][7];
+	native nativetest;
+	typedef fixed <5,2> text;
 	const boolean judge = TRUE | FALSE;
 	attribute short time getraises(error) setraises(error);
 	oneway void sayGoodbye(in string name,inout string number);

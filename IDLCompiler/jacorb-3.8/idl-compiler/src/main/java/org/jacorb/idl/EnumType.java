@@ -109,7 +109,8 @@ public class EnumType
         enclosing_symbol = s;
     }
 
-    public void parse()
+    @SuppressWarnings("rawtypes")
+	public void parse()
     {
         if (parsed)
         {
@@ -192,12 +193,14 @@ public class EnumType
     }
 
 
-    public String getTypeCodeExpression()
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression()
     {
         return getTypeCodeExpression(new HashSet());
     }
 
-    public String getTypeCodeExpression(Set knownTypes)
+    @SuppressWarnings("rawtypes")
+	public String getTypeCodeExpression(Set knownTypes)
     {
         if (knownTypes.contains(this))
         {
@@ -221,168 +224,8 @@ public class EnumType
         return sb.toString();
     }
 
-
-    private void printHolderClass(String className, PrintWriter ps)
-    {
-        if (!pack_name.equals(""))
-            ps.println("package " + pack_name + ";");
-
-        printClassComment("enum", className, ps);
-
-        ps.println("public" + parser.getFinalString() + " class " + className + "Holder");
-        ps.println("\timplements org.omg.CORBA.portable.Streamable");
-        ps.println("{");
-
-        ps.println("\tpublic " + className + " value;" + Environment.NL);
-
-        ps.println("\tpublic " + className + "Holder ()");
-        ps.println("\t{");
-        ps.println("\t}");
-
-        ps.println("\tpublic " + className + "Holder (final " + className + " initial)");
-        ps.println("\t{");
-        ps.println("\t\tvalue = initial;");
-        ps.println("\t}");
-
-        ps.println("\tpublic org.omg.CORBA.TypeCode _type ()");
-        ps.println("\t{");
-        ps.println("\t\treturn " + className + "Helper.type ();");
-        ps.println("\t}");
-
-        ps.println("\tpublic void _read (final org.omg.CORBA.portable.InputStream in)");
-        ps.println("\t{");
-        ps.println("\t\tvalue = " + className + "Helper.read (in);");
-        ps.println("\t}");
-
-        ps.println("\tpublic void _write (final org.omg.CORBA.portable.OutputStream out)");
-        ps.println("\t{");
-        ps.println("\t\t" + className + "Helper.write (out,value);");
-        ps.println("\t}");
-
-        ps.println("}");
-    }
-
-    private void printHelperClass(String className, PrintWriter ps)
-    {
-        if (!pack_name.equals(""))
-            ps.println("package " + pack_name + ";");
-
-        printClassComment("enum", className, ps);
-
-        ps.println("public abstract class " + className + "Helper");
-        ps.println("{");
-
-        ps.println("\tprivate volatile static org.omg.CORBA.TypeCode _type;");
-
-        /* type() method */
-        ps.println("\tpublic static org.omg.CORBA.TypeCode type ()");
-        ps.println("\t{");
-        ps.println("\t\tif (_type == null)");
-        ps.println("\t\t{");
-        ps.println("\t\t\tsynchronized(" + className + "Helper.class)");
-        ps.println("\t\t\t{");
-        ps.println("\t\t\t\tif (_type == null)");
-        ps.println("\t\t\t\t{");
-        ps.println("\t\t\t\t\t_type = " + getTypeCodeExpression() + ";");
-        ps.println("\t\t\t\t}");
-        ps.println("\t\t\t}");
-        ps.println("\t\t}");
-        ps.println("\t\treturn _type;");
-        ps.println("\t}" + Environment.NL);
-
-        String type = typeName();
-
-        TypeSpec.printInsertExtractMethods(ps, type);
-        printIdMethod(ps);
-
-        ps.println("\tpublic static " + className + " read (final org.omg.CORBA.portable.InputStream in)");
-        ps.println("\t{");
-        ps.println("\t\treturn " + className + ".from_int(in.read_long());");
-        ps.println("\t}" + Environment.NL);
-
-        ps.println("\tpublic static void write (final org.omg.CORBA.portable.OutputStream out, final " + className + " s)");
-        ps.println("\t{");
-        ps.println("\t\tout.write_long(s.value());");
-        ps.println("\t}");
-        ps.println("}");
-    }
-
-    /** print the class that maps the enum */
-
-    private void printEnumClass(String className, PrintWriter pw)
-    {
-        if (!pack_name.equals(""))
-            pw.println("package " + pack_name + ";");
-
-        printClassComment("enum", className, pw);
-
-        pw.println("public" + parser.getFinalString() + " class " + className);
-        pw.println("\timplements org.omg.CORBA.portable.IDLEntity" + Environment.NL + "{");
-
-        printSerialVersionUID(pw);
-
-        pw.println("\tprivate int value = -1;");
-
-        for (Enumeration e = enumlist.v.elements(); e.hasMoreElements();)
-        {
-            String label = (String) e.nextElement();
-            pw.println("\tpublic static final int _" + label + " = " + (const_counter++) + ";");
-            pw.println("\tpublic static final " + name + " " + label + " = new " + name + "(_" + label + ");");
-        }
-        pw.println("\tpublic int value()");
-        pw.println("\t{");
-        pw.println("\t\treturn value;");
-        pw.println("\t}");
-
-        pw.println("\tpublic static " + name + " from_int(int value)");
-        pw.println("\t{");
-        pw.println("\t\tswitch (value) {");
-
-        for (Enumeration e = enumlist.v.elements(); e.hasMoreElements();)
-        {
-            String label = (String) e.nextElement();
-            pw.println("\t\t\tcase _" + label + ": return " + label + ";");
-        }
-        pw.println("\t\t\tdefault: throw new org.omg.CORBA.BAD_PARAM();");
-        pw.println("\t\t}");
-        pw.println("\t}");
-
-        pw.println("\tpublic String toString()");
-        pw.println("\t{");
-        pw.println("\t\tswitch (value) {");
-        for (Enumeration e = enumlist.v.elements(); e.hasMoreElements();)
-        {
-            String label = (String) e.nextElement();
-            pw.println("\t\t\tcase _" + label + ": return \"" + label + "\";");
-        }
-        pw.println("\t\t\tdefault: throw new org.omg.CORBA.BAD_PARAM();");
-        pw.println("\t\t}");
-        pw.println("\t}");
-
-        pw.println("\tprotected " + name + "(int i)");
-        pw.println("\t{");
-        pw.println("\t\tvalue = i;");
-        pw.println("\t}");
-
-        pw.println("\t/**");
-        pw.println("\t * Designate replacement object when deserialized from stream. See");
-        pw.println("\t * http://www.omg.org/docs/ptc/02-01-03.htm#Issue4271");
-        pw.println("\t *");
-        pw.println("\t * @throws java.io.ObjectStreamException");
-        pw.println("\t */");
-        pw.println("\tjava.lang.Object readResolve()");
-        if (!parser.cldc10 )
-            pw.println("\tthrows java.io.ObjectStreamException");
-        pw.println("\t{");
-        pw.println("\t\treturn from_int(value());");
-        pw.println("\t}");
-        pw.println("}");
-    }
-
-
-    /** generate required classes */
-
-    public void print(PrintWriter ps,Vector<String> template)
+    @SuppressWarnings("rawtypes")
+	public void print(PrintWriter ps,Vector<String> template)
     {
     	//FIXME
         setPrintPhaseNames();
@@ -406,7 +249,7 @@ public class EnumType
         		if(template.get(i).startsWith("%newfile"))
             	{
             		judge = true;
-            		String tmp = template.get(i).replaceAll("<interfaceName>", name);
+            		String tmp = template.get(i).replaceAll("<enumName>", name);
             		PrintWriter _ps;
             		
             		try{

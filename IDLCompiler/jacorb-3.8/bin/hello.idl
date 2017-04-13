@@ -1,0 +1,16 @@
+struct student{
+	short number;
+	string message;
+};
+
+interface HelloService{
+	typedef string id;
+	const short number = 5;
+	string sayHello(in string name,inout string number);
+	void shutdown(out short time);	
+};
+
+interface HelloWorld{
+	const string name = "HelloWorld";
+	string sayGoodbye(in string name,inout string number);
+};

@@ -38,7 +38,8 @@ public class TypeDeclarator extends IdlSymbol
         super( num );
     }
 
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
         type_spec.setPackage( s );
@@ -69,14 +70,16 @@ public class TypeDeclarator extends IdlSymbol
         return type_spec.typeName();
     }
 
-    public void print( PrintWriter ps )
+    @SuppressWarnings("rawtypes")
+	public void print( PrintWriter ps )
     {
         type_spec.print( ps );
         for( Enumeration e = declarators.v.elements(); e.hasMoreElements(); )
             ( (Declarator)e.nextElement() ).print( ps );
     }
 
-    public void setEnclosingSymbol( IdlSymbol s )
+    @SuppressWarnings("rawtypes")
+	public void setEnclosingSymbol( IdlSymbol s )
     {
         enclosing_symbol = s;
         type_spec.setEnclosingSymbol( s );
@@ -84,7 +87,8 @@ public class TypeDeclarator extends IdlSymbol
             ( (Declarator)e.nextElement() ).setEnclosingSymbol( s );
     }
 
-    public String toString()
+    @SuppressWarnings("rawtypes")
+	public String toString()
     {
         StringBuffer sb = new StringBuffer();
         sb.append( type_spec.toString() );

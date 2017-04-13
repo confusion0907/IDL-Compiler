@@ -33,7 +33,8 @@ public class TypeDef
     extends TypeDeclaration
 {
     public TypeDeclarator type_declarator;
-    private Vector typeSpecs = new Vector();
+    @SuppressWarnings("rawtypes")
+	private Vector typeSpecs = new Vector();
 
     public TypeDef( int num )
     {
@@ -41,7 +42,8 @@ public class TypeDef
         pack_name = "";
     }
 
-    public Vector getTypeSpecs()
+    @SuppressWarnings("rawtypes")
+	public Vector getTypeSpecs()
     {
         return typeSpecs;
     }
@@ -84,7 +86,8 @@ public class TypeDef
         type_declarator.setEnclosingSymbol( s );
     }
 
-    public void parse()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void parse()
     {
         for( Enumeration e = type_declarator.declarators.v.elements();
              e.hasMoreElements(); )
@@ -136,7 +139,8 @@ public class TypeDef
         }
     }
 
-    public void print( PrintWriter ps , Vector<String> template )
+    @SuppressWarnings("rawtypes")
+	public void print( PrintWriter ps , Vector<String> template )
     {
         if( included && !generateIncluded() )
             return;
@@ -152,7 +156,8 @@ public class TypeDef
     /**
      */
 
-    public void accept( IDLTreeVisitor visitor )
+    @SuppressWarnings("rawtypes")
+	public void accept( IDLTreeVisitor visitor )
     {
         for( Enumeration e = typeSpecs.elements();
              e.hasMoreElements(); )

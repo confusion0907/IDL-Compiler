@@ -32,9 +32,11 @@ import java.util.Vector;
 public class RaisesExpr
         extends IdlSymbol
 {
-    public Vector nameList;
+    @SuppressWarnings("rawtypes")
+	public Vector nameList;
 
-    public RaisesExpr( int num )
+    @SuppressWarnings("rawtypes")
+	public RaisesExpr( int num )
     {
         super( num );
         nameList = new Vector();
@@ -52,13 +54,15 @@ public class RaisesExpr
      * Constructs a 
      * @param nameList
      */
-    public RaisesExpr (Vector nameList)
+    @SuppressWarnings("rawtypes")
+	public RaisesExpr (Vector nameList)
     {
         super (new_num());
         this.nameList = (Vector)nameList.clone();
     }
     
-    public void setPackage( String s )
+    @SuppressWarnings("rawtypes")
+	public void setPackage( String s )
     {
         s = parser.pack_replace( s );
         for( Enumeration e = nameList.elements();
@@ -72,7 +76,8 @@ public class RaisesExpr
         return ( nameList.size() == 0 );
     }
 
-    public String[] getExceptionNames()
+    @SuppressWarnings("rawtypes")
+	public String[] getExceptionNames()
     {
         String[] result = new String[ nameList.size() ];
         Enumeration e = nameList.elements();
@@ -83,7 +88,8 @@ public class RaisesExpr
         return result;
     }
 
-    public String[] getExceptionIds()
+    @SuppressWarnings("rawtypes")
+	public String[] getExceptionIds()
     {
         String[] result = new String[ nameList.size() ];
         Enumeration e = nameList.elements();
@@ -94,7 +100,8 @@ public class RaisesExpr
         return result;
     }
 
-    public String[] getExceptionClassNames()
+    @SuppressWarnings("rawtypes")
+	public String[] getExceptionClassNames()
     {
         String[] result = new String[ nameList.size() ];
         Enumeration e = nameList.elements();
@@ -105,7 +112,8 @@ public class RaisesExpr
         return result;
     }
 
-    public void parse()
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void parse()
     {
         Hashtable h = new Hashtable(); // for removing duplicate exception names
         for( Enumeration e = nameList.elements(); e.hasMoreElements(); )
@@ -147,7 +155,8 @@ public class RaisesExpr
         }
     }
 
-    public void print( PrintWriter ps , Vector<String> template )
+    @SuppressWarnings("rawtypes")
+	public void print( PrintWriter ps , Vector<String> template )
     {
     	//FIXME
     	Enumeration e = nameList.elements();
@@ -172,7 +181,8 @@ public class RaisesExpr
         }
     }
     
-    public String getRaisesList()
+    @SuppressWarnings("rawtypes")
+	public String getRaisesList()
     {
     	String result = "";
     	Enumeration e = nameList.elements();

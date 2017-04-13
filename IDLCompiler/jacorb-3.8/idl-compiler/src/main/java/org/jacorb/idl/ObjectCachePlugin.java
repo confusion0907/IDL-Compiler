@@ -107,7 +107,8 @@ public interface ObjectCachePlugin
        }
      * </code>
      */
-    void printSkeletonCheckin(PrintWriter ps, List paramDecls, String variablePrefix);
+    @SuppressWarnings("rawtypes")
+	void printSkeletonCheckin(PrintWriter ps, List paramDecls, String variablePrefix);
 
     /**
      * Code insertion point to add methods to a struct's or union's helper class.
@@ -136,7 +137,8 @@ public interface ObjectCachePlugin
        }
      * </code>
      */
-    void printPreParamRead(PrintWriter ps, List paramDecls);
+    @SuppressWarnings("rawtypes")
+	void printPreParamRead(PrintWriter ps, List paramDecls);
 
     /**
      * Code insertion point in the skeleton after reading the parameters,
@@ -161,7 +163,8 @@ public interface ObjectCachePlugin
        }
      * </code>
      */
-    void printPostParamRead(PrintWriter ps, List paramDecls);
+    @SuppressWarnings("rawtypes")
+	void printPostParamRead(PrintWriter ps, List paramDecls);
 
     /**
      * Code insertion point in the read method of a helper class of a
