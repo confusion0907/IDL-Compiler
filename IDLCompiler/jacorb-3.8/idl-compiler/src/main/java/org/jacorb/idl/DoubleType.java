@@ -68,7 +68,7 @@ public class DoubleType
 
     public String toString()
     {
-        return typeName();
+        return "double";
     }
 
     public String holderName()

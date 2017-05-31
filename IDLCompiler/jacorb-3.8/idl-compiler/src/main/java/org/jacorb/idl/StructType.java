@@ -39,7 +39,6 @@ public class StructType
     extends TypeDeclaration
     implements Scope
 {
-    private boolean written = false;
     public boolean exc;
     public MemberList memberlist = null;
     private boolean parsed = false;
@@ -393,96 +392,210 @@ public class StructType
         }
 
         // only generate code once
-
-        if (!written)
+        
+        String className = className();
+        
+        int i = 0;
+        boolean judge = false;
+        while(i < template.size())
         {
-            // guard against recursive entries, which can happen due to
-            // containments, e.g., an alias within an interface that refers
-            // back to the interface
-            written = true;
-
-            String className = className();
-            
-            int i = 0;
-            boolean judge = false;
-            while(i < template.size())
-            {
-            	if(template.get(i).startsWith("%newfile"))
-            	{
-            		judge = true;
-            		String tmp = template.get(i).replaceAll("<structName>", name);
-            		PrintWriter _ps = openOutput(tmp.substring(9));
-            		
-            		if(_ps == null)
-            		{
-            			System.out.println("文件"+tmp.substring(9)+"已存在，代码生成失败");
-            			return;
-            		}
-            		else if(ps != null)
-            		{
-            			ps.close();
-            			ps = _ps;
-            		}
-            		else
-            			ps = _ps;
-            		
-            		i = i+1;
-            	}
-            	else if(ps == null)
-					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
-            	else if(template.get(i).startsWith("%member"))
-            	{
-            		Vector<String> _template = new Vector<String>();
-            		while(!template.get(i).equals("%%"))
-            		{
-            			_template.add(template.get(i).replaceAll("<structName>", className));
-            			i = i+1;
-            		}
-            		if ( ! isSystemException( className ) )
-                    {
-            			for (Enumeration e = memberlist.v.elements(); e.hasMoreElements();)
-            			{
-            				((Member)e.nextElement()).member_print(ps, _template);
-            			}
-            		}
-            		i = i+1;
-            	}
-            	else if(template.get(i).startsWith("%exception"))
-            	{
-            		Vector<String> _template = new Vector<String>();
-            		while(!template.get(i).equals("%%"))
-            		{
-            			_template.add(template.get(i).replaceAll("<exceptionName>", className));
-            			i = i+1;
-            		}
-            		if ( ! isSystemException( className ) )
-                    {
-            			for (Enumeration e = memberlist.v.elements(); e.hasMoreElements();)
-            			{
-            				((Member)e.nextElement()).member_print(ps, _template);
-            			}
-            		}
-            		i = i+1;
-            	}
-            	else
-            	{
-            		String tmp = template.get(i).replaceAll("<structName>", className);
-            		tmp = tmp.replaceAll("<exceptionName>", className);
-            		ps.println(tmp);
-            		i = i+1;
-            	}
-            }
-            
-            if(ps != null && judge)
-            	ps.close();
+        	if(template.get(i).startsWith("%newfile"))
+        	{
+        		judge = true;
+        		String tmp = template.get(i).replaceAll("<structName>", name);
+        		PrintWriter _ps = openOutput(tmp.substring(9));
+        		
+        		if(_ps == null)
+        		{
+        			System.out.println("文件"+tmp.substring(9)+"已存在，代码生成失败");
+        			return;
+        		}
+        		else if(ps != null)
+        		{
+        			ps.close();
+        			ps = _ps;
+        		}
+        		else
+        			ps = _ps;
+        		
+        		i = i+1;
+        	}
+        	else if(ps == null)
+				throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+        	else if(template.get(i).startsWith("%member"))
+        	{
+        		Vector<String> _template = new Vector<String>();
+        		while(!template.get(i).equals("%%"))
+        		{
+        			String tmp = template.get(i).replaceAll("<exceptionName>", className).replaceAll("getTypeCodeExpression()", getTypeCodeExpression());
+        			tmp = tmp.replace("CHARACTERIZATION()", Characterization());
+        			tmp = tmp.replaceAll("<memberList>", getMemberList());
+        			_template.add(tmp);
+        			i = i+1;
+        		}
+        		if ( ! isSystemException( className ) )
+                {
+        			for (Enumeration e = memberlist.v.elements(); e.hasMoreElements();)
+        			{
+        				((Member)e.nextElement()).member_print(ps, _template);
+        			}
+        		}
+        		i = i+1;
+        	}
+        	else if(template.get(i).startsWith("%exception"))
+        	{
+        		Vector<String> _template = new Vector<String>();
+        		while(!template.get(i).equals("%%"))
+        		{
+        			String tmp = template.get(i).replaceAll("<exceptionName>", className).replaceAll("getTypeCodeExpression()", getTypeCodeExpression());
+        			tmp = tmp.replace("CHARACTERIZATION()", Characterization());
+        			tmp = tmp.replaceAll("<memberList>", getMemberList());
+        			_template.add(tmp);
+        			i = i+1;
+        		}
+        		if ( ! isSystemException( className ) )
+                {
+        			for (Enumeration e = memberlist.v.elements(); e.hasMoreElements();)
+        			{
+        				((Member)e.nextElement()).member_print(ps, _template);
+        			}
+        		}
+        		i = i+1;
+        	}
+        	else
+        	{
+        		String tmp = template.get(i).replaceAll("<structName>", className);
+        		tmp = tmp.replaceAll("<exceptionName>", className);
+        		tmp = tmp.replaceAll("getTypeCodeExpression()", getTypeCodeExpression());
+        		tmp = tmp.replace("CHARACTERIZATION()", Characterization());
+        		tmp = tmp.replaceAll("<memberList>", getMemberList());
+        		ps.println(tmp);
+        		i = i+1;
+        	}
         }
+        
+        if(ps != null && judge)
+        	ps.close();
+    }
+    
+    private String Characterization()
+    {
+    	String result = "";
+    	result = result + "0,\r\n";
+    	String str = "IDL:"+ className() +":1.0";
+    	result = result + "BIG_ENDIAN_LONG (" + (str.length()+1) + "),\r\n";
+    	int number = 4 - str.length()%4 + str.length();
+    	String temp = "";
+    	for(int i = 0 ; i < number ; i++)
+		{
+			if(i < str.length())
+			{
+				if(i%4 == 0)
+					temp = "MAKE_BIG_LONG ('" + str.charAt(i) + "',";
+				else if(i%4 == 3)
+				{
+					temp = temp + "'" + str.charAt(i) + "'" + "),\r\n";
+					result = result + temp;
+				}
+				else
+					temp = temp + "'" + str.charAt(i) + "'" + ",";
+			}
+			else
+			{
+				if(i%4 == 3)
+				{
+					temp = temp + " 0 " + "),\r\n";
+					result = result + temp;
+				}
+				else
+					temp = temp + " 0 " + ",";
+			}
+		}
+    	str = className();
+    	result = result + "BIG_ENDIAN_LONG (" + (str.length()+1) + "),\r\n";
+    	number = 4 - str.length()%4 + str.length();
+    	for(int i = 0 ; i < number ; i++)
+		{
+			if(i < str.length())
+			{
+				if(i%4 == 0)
+					temp = "MAKE_BIG_LONG ('" + str.charAt(i) + "',";
+				else if(i%4 == 3)
+				{
+					temp = temp + "'" + str.charAt(i) + "'" + "),\r\n";
+					result = result + temp;
+				}
+				else
+					temp = temp + "'" + str.charAt(i) + "'" + ",";
+			}
+			else
+			{
+				if(i%4 == 3)
+				{
+					temp = temp + " 0 " + "),\r\n";
+					result = result + temp;
+				}
+				else
+					temp = temp + " 0 " + ",";
+			}
+		}
+    	for (Enumeration e = memberlist.v.elements(); e.hasMoreElements();)
+		{
+    		Member m = (Member)e.nextElement();
+			String tmp = m.declarator.toString();
+			result = result + "BIG_ENDIAN_LONG (" + (tmp.length()+1) + "),\r\n";
+			int index = 4 - tmp.length()%4+tmp.length();
+			String temp2 = "";
+			for(int i = 0 ; i < index ; i++)
+			{
+				if(i < tmp.length())
+				{
+					if(i%4 == 0)
+						temp2 = "MAKE_BIG_LONG ('" + tmp.charAt(i) + "',";
+					else if(i%4 == 3)
+					{
+						temp2 = temp2 + "'" + tmp.charAt(i) + "'" + "),\r\n";
+						result = result + temp2;
+					}
+					else
+						temp2 = temp2 + "'" + tmp.charAt(i) + "'" + ",";
+				}
+				else
+				{
+					if(i%4 == 3)
+					{
+						temp2 = temp2 + " 0 " + "),\r\n";
+						result = result + temp2;
+					}
+					else
+						temp2 = temp2 + " 0 " + ",";
+				}
+			}
+			result = result + "BIG_ENDIAN_LONG (tk_"+ m.typeSpec().toString() +"),\r\n";
+			if(m.typeSpec().toString().equals("string"))
+				result = result + "BIG_ENDIAN_LONG (0),\r\n";
+		}
+    	return result;
+    }
+    
+    private String getMemberList()
+    {
+    	String result = "";
+    	for (Enumeration e = memberlist.v.elements(); e.hasMoreElements();)
+		{
+    		Member m = (Member)e.nextElement();
+			result = result + "," +m.typeSpec().typeName()+" "+m.declarator.toString();
+		}
+    	if(!result.equals(""))
+    		result = result.substring(1);
+    	return result;
     }
     
     protected PrintWriter openOutput(String typeName)
     {
         try
         {
-            final File f = new File(typeName);
+            final File f = new File(parser.out_dir+"\\"+typeName);
             if (GlobalInputStream.isMoreRecentThan(f))
             {
                 PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));

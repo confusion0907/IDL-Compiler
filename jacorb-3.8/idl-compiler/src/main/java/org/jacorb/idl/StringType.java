@@ -116,7 +116,10 @@ public class StringType
 
     public String toString()
     {
-        return typeName();
+    	if(wide)
+    		return "wstring";
+    	else
+    		return "string";
     }
 
     public String holderName()

@@ -359,134 +359,128 @@ public class UnionType
         if (included && !generateIncluded())
             return;
 
-        // only write once
-        if (!written)
+        // Forward declaration
+        if (switch_type_spec != null)
         {
-            // Forward declaration
-            if (switch_type_spec != null)
-            {
-                // JAC570: when the enum declaration is used in union declaration
-				// the following code will generate implementation classes for enum
-				//if (switch_type_spec.type_spec instanceof ConstrTypeSpec)
-				//{
-				    //switch_type_spec.print(_ps);
-				//}
+            // JAC570: when the enum declaration is used in union declaration
+			// the following code will generate implementation classes for enum
+			//if (switch_type_spec.type_spec instanceof ConstrTypeSpec)
+			//{
+			    //switch_type_spec.print(_ps);
+			//}
 
-				//switch_body.print(_ps);
+			//switch_body.print(_ps);
 
-				String className = className();
-				
-				int i = 0;
-				TypeSpec ts = switch_type_spec.typeSpec();
-				while(i < template.size())
+			String className = className();
+			
+			int i = 0;
+			TypeSpec ts = switch_type_spec.typeSpec();
+			while(i < template.size())
+			{
+				if(template.get(i).startsWith("%newfile"))
+            	{
+            		judge = true;
+            		String tmp = template.get(i).replaceAll("<unionName>", className);
+            		tmp = tmp.replaceAll("<switchType>", ts.toString());
+            		PrintWriter ps = openOutput(tmp.substring(9));
+            		
+            		if(ps == null)
+            		{
+            			System.out.println("文件"+tmp.substring(9)+"已存在，代码生成失败");
+            			return;
+            		}
+            		else if(_ps != null)
+            		{
+            			_ps.close();
+            			_ps = ps;
+            		}
+            		else
+            			_ps = ps;
+            		
+            		i = i+1;
+            	}
+				else if(_ps == null)
+					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+				else if(template.get(i).startsWith("%case"))
 				{
-					if(template.get(i).startsWith("%newfile"))
-	            	{
-	            		judge = true;
-	            		String tmp = template.get(i).replaceAll("<unionName>", className);
-	            		tmp = tmp.replaceAll("<switchType>", ts.toString());
-	            		PrintWriter ps = openOutput(tmp.substring(9));
-	            		
-	            		if(ps == null)
-	            		{
-	            			System.out.println("文件"+tmp.substring(9)+"已存在，代码生成失败");
-	            			return;
-	            		}
-	            		else if(_ps != null)
-	            		{
-	            			_ps.close();
-	            			_ps = ps;
-	            		}
-	            		else
-	            			_ps = ps;
-	            		
-	            		i = i+1;
-	            	}
-					else if(_ps == null)
-						throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
-					else if(template.get(i).startsWith("%case"))
+					i = i+1;
+					Enumeration e = switch_body.caseListVector.elements();
+					String type = "",name = "",value = "";
+					while (e.hasMoreElements())
+			        {
+			            Case c = (Case)e.nextElement();
+			            for (int k = 0; k < c.case_label_list.v.size(); k++)
+			            {
+			                Object ce = c.case_label_list.v.elementAt(k);
+			                if (ce != null)
+			                {
+			                    name = c.element_spec.declarator.name();
+			                    type = c.element_spec.typeSpec.toString();
+			                    value = ((ConstExpr)ce).toString();
+			                    int position = i;
+			                    while(!template.get(i).equals("%%"))
+			                    {
+			                    	String tmp = template.get(i).replaceAll("<unionName>", className);
+									tmp = tmp.replaceAll("<switchType>", ts.toString());
+									tmp = tmp.replaceAll("<memberName>", name);
+									tmp = tmp.replaceAll("<memberType>", type);
+									tmp = tmp.replaceAll("<caseValue>", value);
+									_ps.println(tmp);
+									i = i+1;
+			                    }
+			                    i = position;
+			                }
+			            }
+			        }
+					while(!template.get(i).equals("%%"))
+						i = i+1;
+					i = i+1;
+				}
+				else if(template.get(i).startsWith("%default"))
+				{
+					i = i+1;
+					int def = 0;
+					Enumeration e = switch_body.caseListVector.elements();
+					String type = "",name = "";
+					while (e.hasMoreElements())
+			        {
+			            Case c = (Case)e.nextElement();
+			            for (int k = 0; k < c.case_label_list.v.size(); k++)
+			            {
+			                Object ce = c.case_label_list.v.elementAt(k);
+			                if (ce == null)
+			                {
+			                    def = 1;
+			                    name = c.element_spec.declarator.name();
+			                    type = c.element_spec.typeSpec.toString();
+			                }
+			            }
+			        }
+					while(!template.get(i).equals("%%"))
 					{
-						i = i+1;
-						Enumeration e = switch_body.caseListVector.elements();
-						String type = "",name = "",value = "";
-						while (e.hasMoreElements())
-				        {
-				            Case c = (Case)e.nextElement();
-				            for (int k = 0; k < c.case_label_list.v.size(); k++)
-				            {
-				                Object ce = c.case_label_list.v.elementAt(k);
-				                if (ce != null)
-				                {
-				                    name = c.element_spec.declarator.name();
-				                    type = c.element_spec.typeSpec.toString();
-				                    value = ((ConstExpr)ce).toString();
-				                    int position = i;
-				                    while(!template.get(i).equals("%%"))
-				                    {
-				                    	String tmp = template.get(i).replaceAll("<unionName>", className);
-										tmp = tmp.replaceAll("<switchType>", ts.toString());
-										tmp = tmp.replaceAll("<memberName>", name);
-										tmp = tmp.replaceAll("<memberType>", type);
-										tmp = tmp.replaceAll("<caseValue>", value);
-										_ps.println(tmp);
-										i = i+1;
-				                    }
-				                    i = position;
-				                }
-				            }
-				        }
-						while(!template.get(i).equals("%%"))
-							i = i+1;
-						i = i+1;
-					}
-					else if(template.get(i).startsWith("%default"))
-					{
-						i = i+1;
-						int def = 0;
-						Enumeration e = switch_body.caseListVector.elements();
-						String type = "",name = "";
-						while (e.hasMoreElements())
-				        {
-				            Case c = (Case)e.nextElement();
-				            for (int k = 0; k < c.case_label_list.v.size(); k++)
-				            {
-				                Object ce = c.case_label_list.v.elementAt(k);
-				                if (ce == null)
-				                {
-				                    def = 1;
-				                    name = c.element_spec.declarator.name();
-				                    type = c.element_spec.typeSpec.toString();
-				                }
-				            }
-				        }
-						while(!template.get(i).equals("%%"))
+						if(def == 1)
 						{
-							if(def == 1)
-							{
-								String tmp = template.get(i).replaceAll("<unionName>", className);
-								tmp = tmp.replaceAll("<switchType>", ts.toString());
-								tmp = tmp.replaceAll("<memberName>", name);
-								tmp = tmp.replaceAll("<memberType>", type);
-								_ps.println(tmp);
-							}
-							i = i+1;
+							String tmp = template.get(i).replaceAll("<unionName>", className);
+							tmp = tmp.replaceAll("<switchType>", ts.toString());
+							tmp = tmp.replaceAll("<memberName>", name);
+							tmp = tmp.replaceAll("<memberType>", type);
+							_ps.println(tmp);
 						}
 						i = i+1;
 					}
-					else
-					{
-						String tmp = template.get(i).replaceAll("<unionName>", className);
-						tmp = tmp.replaceAll("<switchType>", ts.toString());
-						_ps.println(tmp);
-						i = i+1;
-					}
+					i = i+1;
 				}
-				
-				if(_ps != null && judge)
-		        	_ps.close();
-				
-				written = true;
-            }
+				else
+				{
+					String tmp = template.get(i).replaceAll("<unionName>", className);
+					tmp = tmp.replaceAll("<switchType>", ts.toString());
+					_ps.println(tmp);
+					i = i+1;
+				}
+			}
+			
+			if(_ps != null && judge)
+	        	_ps.close();
         }
     }
     
@@ -494,7 +488,7 @@ public class UnionType
     {
         try
         {
-            final File f = new File(typeName);
+            final File f = new File(parser.out_dir+"\\"+typeName);
             if (GlobalInputStream.isMoreRecentThan(f))
             {
                 PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));

@@ -86,7 +86,10 @@ public class CharType
 
     public String toString()
     {
-        return typeName();
+    	if(wide)
+    		return "wchar";
+    	else
+    		return "char";
     }
 
     public boolean basic()

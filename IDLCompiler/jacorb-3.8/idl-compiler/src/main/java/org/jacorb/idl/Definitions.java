@@ -87,6 +87,7 @@ public class Definitions
 	@SuppressWarnings("rawtypes")
 	public void print( PrintWriter ps , Vector<String> template )
     {
+		//FIXME
     	int i = 0;
     	String str = "";
     	boolean judge = false;
@@ -205,7 +206,7 @@ public class Definitions
 					str = template.get(i);
 					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
-					if(str.startsWith("%") && !str.equals("%%"))
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
 					else if(str.equals("%%"))
 						index = index-1;
@@ -226,7 +227,7 @@ public class Definitions
 					str = template.get(i);
 					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
-					if(str.startsWith("%") && !str.equals("%%"))
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
 					else if(str.equals("%%"))
 						index = index-1;
@@ -247,7 +248,7 @@ public class Definitions
 					str = template.get(i);
 					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
-					if(str.startsWith("%") && !str.equals("%%"))
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
 					else if(str.equals("%%"))
 						index = index-1;
@@ -268,7 +269,7 @@ public class Definitions
 					str = template.get(i);
 					str = str.replaceAll("<moduleName>", name);
 					_template.add(str);
-					if(str.startsWith("%") && !str.equals("%%"))
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
 						index = index+1;
 					else if(str.equals("%%"))
 						index = index-1;
@@ -314,6 +315,27 @@ public class Definitions
         		Enumeration e = getElements();
         		while( e.hasMoreElements() )
 		            ( (IdlSymbol)e.nextElement() ).print( ps , _template , "valuetype" );
+        	}
+        	else if(str.startsWith("%typeprefix"))
+        	{
+        		int index = 1;
+        		Vector<String> _template = new Vector<String>();
+        		while(!(str.equals("%%") && index == 0))
+        		{
+        			i = i+1;
+					str = template.get(i);
+					str = str.replaceAll("<moduleName>", name);
+					_template.add(str);
+					if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
+						index = index+1;
+					else if(str.equals("%%"))
+						index = index-1;
+        		}
+        		_template.remove(_template.size()-1);
+        		
+        		Enumeration e = getElements();
+        		while( e.hasMoreElements() )
+		            ( (IdlSymbol)e.nextElement() ).print( ps , _template , "typeprefix" );
         	}
         	else if(ps == null)
         		throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");

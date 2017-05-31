@@ -79,7 +79,11 @@ public class LongType
 
     public String toString()
     {
-        return typeName();
+    	if( unsigned )
+        {
+            return "ulong";
+        }
+        return "long";
     }
 
 

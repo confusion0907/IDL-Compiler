@@ -21,7 +21,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicButtonUI;
-import javax.swing.undo.UndoManager;
 
 public class TabbedPanel extends JPanel 
 {
@@ -30,8 +29,8 @@ public class TabbedPanel extends JPanel
 	private HashMap<JPanel, String> pathDic;
 	private Vector<JPanel> contentlist;
 	private Vector<PopupTextPane> textlist;
-	private Vector<UndoManager> um;
-	public TabbedPanel(final JTabbedPane pane,HashMap<JPanel, String> pathDic,Vector<JPanel> contentlist,Vector<PopupTextPane> textlist,Vector<UndoManager> um)
+	private Vector<UndoableEdit> um;
+	public TabbedPanel(final JTabbedPane pane,HashMap<JPanel, String> pathDic,Vector<JPanel> contentlist,Vector<PopupTextPane> textlist,Vector<UndoableEdit> um)
 	{
 		super(new FlowLayout(FlowLayout.LEFT,0,0));
 		this.pathDic = pathDic;

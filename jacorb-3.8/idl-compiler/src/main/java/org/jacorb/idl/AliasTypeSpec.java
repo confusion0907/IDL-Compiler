@@ -37,7 +37,6 @@ public class AliasTypeSpec
 {
     /** the type for which this is an alias */
     public TypeSpec originalType;
-    private boolean written;
     private boolean originalTypeWasScopedName = false;
 
     /**
@@ -242,14 +241,10 @@ public class AliasTypeSpec
         if (included && !generateIncluded())
             return;
 
-        if (!written)
-        {
             // guard against recursive entries, which can happen due to
             // containments, e.g., an alias within an interface that refers
             // back to the interface
-            //written = true;
-
-            if (!(originalType instanceof FixedPointType) &&
+        if (!(originalType instanceof FixedPointType) &&
 			    !(originalType.typeSpec() instanceof ArrayTypeSpec) &&
 			    !(originalType.typeSpec() instanceof StringType) &&
 			    !(originalType.typeSpec() instanceof SequenceType) &&
@@ -264,220 +259,23 @@ public class AliasTypeSpec
 			    //originalType.print(ps);
 			}
 
-			if(originalType.typeSpec() instanceof ArrayTypeSpec)
-			{
+        if(originalType.typeSpec() instanceof ArrayTypeSpec)
+        {
 			    //originalType.type_spec.print(ps);
-			}
+        }
 
-			String className = className();
+        String className = className();
 			
-			if(template.get(0).contains(":local"))
-			{
-				if (!(originalType instanceof FixedPointType) &&
-						!(originalType.typeSpec() instanceof ArrayTypeSpec) &&
-						!(originalType.typeSpec() instanceof StringType) &&
-						!(originalType.typeSpec() instanceof SequenceType) &&
-						! originalTypeWasScopedName &&
-						!(originalType instanceof ConstrTypeSpec &&
-								((ConstrTypeSpec)originalType).declaration() instanceof Interface )
-						)
-				{
-					for(int i = 1 ; i < template.size() ; i++)
-					{
-						if(template.get(i).startsWith("%newfile"))
-			        	{
-			        		judge = true;
-			        		String tmp = template.get(i).replaceAll("<typedefName>", className);
-			        		PrintWriter _ps;
-			        		
-			        		try{
-								_ps = openOutput(tmp.substring(9));
-								if(_ps == null)
-									throw new Exception();
-							}catch(Exception e){
-								throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
-							}
-			        		
-			        		if(ps != null)
-			        		{
-			        			ps.close();
-			        			ps = _ps;
-			        		}
-			        		else
-			        			ps = _ps;
-			        		
-			        		i = i+1;
-			        	}
-						else if(ps == null)
-							throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
-						else
-						{
-							String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
-							tmp = tmp.replaceAll("<typedefName>", className);
-							ps.println(tmp);
-						}
-					}
-				}
-			}
-			else if(template.get(0).contains(":sequence"))
-			{
-				if(originalType instanceof SequenceType)
-				{
-					for(int i = 1 ; i < template.size() ; i++)
-					{
-						if(template.get(i).startsWith("%newfile"))
-			        	{
-			        		judge = true;
-			        		String tmp = template.get(i).replaceAll("<typedefName>", className);
-			        		PrintWriter _ps;
-			        		
-			        		try{
-								_ps = openOutput(tmp.substring(9));
-								if(_ps == null)
-									throw new Exception();
-							}catch(Exception e){
-								throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
-							}
-			        		
-			        		if(ps != null)
-			        		{
-			        			ps.close();
-			        			ps = _ps;
-			        		}
-			        		else
-			        			ps = _ps;
-			        		
-			        		i = i+1;
-			        	}
-						else if(ps == null)
-							throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
-						else if(template.get(i).startsWith("%length"))
-						{
-							i = i+1;
-							while(!template.get(i).equals("%%"))
-							{
-								if(originalType.getSequenceLength() != 0)
-								{
-									String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
-									tmp = tmp.replaceAll("<typedefName>", className);
-									tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
-									ps.println(tmp);
-								}
-								i = i+1;
-							}
-							i = i+1;
-						}
-						else
-						{
-							String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
-							tmp = tmp.replaceAll("<typedefName>", className);
-							tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
-							ps.println(tmp);
-						}
-					}
-				}
-			}
-			else if(template.get(0).contains(":fixed"))
-			{
-				if(originalType instanceof FixedPointType)
-				{
-					for(int i = 1 ; i < template.size() ; i++)
-					{
-						if(template.get(i).startsWith("%newfile"))
-			        	{
-			        		judge = true;
-			        		String tmp = template.get(i).replaceAll("<typedefName>", className);
-			        		PrintWriter _ps;
-			        		
-			        		try{
-								_ps = openOutput(tmp.substring(9));
-								if(_ps == null)
-									throw new Exception();
-							}catch(Exception e){
-								throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
-							}
-			        		
-			        		if(ps != null)
-			        		{
-			        			ps.close();
-			        			ps = _ps;
-			        		}
-			        		else
-			        			ps = _ps;
-			        		
-			        		i = i+1;
-			        	}
-						else if(ps == null)
-							throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
-						else
-						{
-							String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
-							tmp = tmp.replaceAll("<typedefName>", className);
-							tmp = tmp.replaceAll("<digitsNumber>", Integer.toString(originalType.typeSpec().getDigits()));
-							tmp = tmp.replaceAll("<scaleNumber>", Integer.toString(originalType.typeSpec().getScale()));
-							ps.println(tmp);
-						}
-					}
-				}
-			}
-			else if(template.get(0).contains(":array"))
-			{
-				if(originalType.typeSpec() instanceof ArrayTypeSpec)
-				{
-					for(int i = 1 ; i < template.size() ; i++)
-					{
-						if(template.get(i).startsWith("%newfile"))
-			        	{
-			        		judge = true;
-			        		String tmp = template.get(i).replaceAll("<typedefName>", className);
-			        		PrintWriter _ps;
-			        		
-			        		try{
-								_ps = openOutput(tmp.substring(9));
-								if(_ps == null)
-									throw new Exception();
-							}catch(Exception e){
-								throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
-							}
-			        		
-			        		if(ps != null)
-			        		{
-			        			ps.close();
-			        			ps = _ps;
-			        		}
-			        		else
-			        			ps = _ps;
-			        		
-			        		i = i+1;
-			        	}
-						/*
-						else if(template.get(i).startsWith("%arraytypedef"))
-						{
-							i = i+1;
-							Vector<String> _template = new Vector<String>();
-							while(!template.get(i).equals("%%"))
-							{
-								String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
-								tmp = tmp.replaceAll("<typedefName>", className);
-								_template.add(tmp);
-								i = i+1;
-							}
-							originalType.type_spec.print(ps, _template);
-							i = i+1;
-						}
-						*/
-						else if(ps == null)
-							throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
-						else
-						{
-							String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
-							tmp = tmp.replaceAll("<typedefName>", className);
-							ps.println(tmp);
-						}
-					}
-				}
-			}
-			else
+        if(template.get(0).contains(":local"))
+        {
+			if (!(originalType instanceof FixedPointType) &&
+					!(originalType.typeSpec() instanceof ArrayTypeSpec) &&
+					!(originalType.typeSpec() instanceof StringType) &&
+					!(originalType.typeSpec() instanceof SequenceType) &&
+					! originalTypeWasScopedName &&
+					!(originalType instanceof ConstrTypeSpec &&
+							((ConstrTypeSpec)originalType).declaration() instanceof Interface )
+					)
 			{
 				for(int i = 1 ; i < template.size() ; i++)
 				{
@@ -511,18 +309,217 @@ public class AliasTypeSpec
 					{
 						String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
 						tmp = tmp.replaceAll("<typedefName>", className);
-						if(originalType.typeSpec() instanceof SequenceType)
-							tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
-						else
-							tmp = tmp.replaceAll("<sequenceLength>", "");
 						ps.println(tmp);
 					}
 				}
 			}
 		}
+		else if(template.get(0).contains(":sequence"))
+		{
+			if(originalType instanceof SequenceType)
+			{
+				for(int i = 1 ; i < template.size() ; i++)
+				{
+					if(template.get(i).startsWith("%newfile"))
+		        	{
+		        		judge = true;
+		        		String tmp = template.get(i).replaceAll("<typedefName>", className);
+		        		PrintWriter _ps;
+		        		
+		        		try{
+							_ps = openOutput(tmp.substring(9));
+							if(_ps == null)
+								throw new Exception();
+						}catch(Exception e){
+							throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+						}
+		        		
+		        		if(ps != null)
+		        		{
+		        			ps.close();
+		        			ps = _ps;
+		        		}
+		        		else
+		        			ps = _ps;
+		        		
+		        		i = i+1;
+		        	}
+					else if(ps == null)
+						throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+					else if(template.get(i).startsWith("%length"))
+					{
+						i = i+1;
+						while(!template.get(i).equals("%%"))
+						{
+							if(originalType.getSequenceLength() != 0)
+							{
+								String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+								tmp = tmp.replaceAll("<typedefName>", className);
+								tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
+								ps.println(tmp);
+							}
+							i = i+1;
+						}
+						i = i+1;
+					}
+					else
+					{
+						String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+						tmp = tmp.replaceAll("<typedefName>", className);
+						tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
+						ps.println(tmp);
+					}
+				}
+			}
+		}
+		else if(template.get(0).contains(":fixed"))
+		{
+			if(originalType instanceof FixedPointType)
+			{
+				for(int i = 1 ; i < template.size() ; i++)
+				{
+					if(template.get(i).startsWith("%newfile"))
+		        	{
+		        		judge = true;
+		        		String tmp = template.get(i).replaceAll("<typedefName>", className);
+		        		PrintWriter _ps;
+		        		
+		        		try{
+							_ps = openOutput(tmp.substring(9));
+							if(_ps == null)
+								throw new Exception();
+						}catch(Exception e){
+							throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+						}
+		        		
+		        		if(ps != null)
+		        		{
+		        			ps.close();
+		        			ps = _ps;
+		        		}
+		        		else
+		        			ps = _ps;
+		        		
+		        		i = i+1;
+		        	}
+					else if(ps == null)
+						throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+					else
+					{
+						String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+						tmp = tmp.replaceAll("<typedefName>", className);
+						tmp = tmp.replaceAll("<digitsNumber>", Integer.toString(originalType.typeSpec().getDigits()));
+						tmp = tmp.replaceAll("<scaleNumber>", Integer.toString(originalType.typeSpec().getScale()));
+						ps.println(tmp);
+					}
+				}
+			}
+		}
+		else if(template.get(0).contains(":array"))
+		{
+			if(originalType.typeSpec() instanceof ArrayTypeSpec)
+			{
+				for(int i = 1 ; i < template.size() ; i++)
+				{
+					if(template.get(i).startsWith("%newfile"))
+		        	{
+		        		judge = true;
+		        		String tmp = template.get(i).replaceAll("<typedefName>", className);
+		        		PrintWriter _ps;
+		        		
+		        		try{
+							_ps = openOutput(tmp.substring(9));
+							if(_ps == null)
+								throw new Exception();
+						}catch(Exception e){
+							throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+						}
+		        		
+		        		if(ps != null)
+		        		{
+		        			ps.close();
+		        			ps = _ps;
+		        		}
+		        		else
+		        			ps = _ps;
+		        		
+		        		i = i+1;
+		        	}
+					/*
+					else if(template.get(i).startsWith("%arraytypedef"))
+					{
+						i = i+1;
+						Vector<String> _template = new Vector<String>();
+						while(!template.get(i).equals("%%"))
+						{
+							String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+							tmp = tmp.replaceAll("<typedefName>", className);
+							_template.add(tmp);
+							i = i+1;
+						}
+						originalType.type_spec.print(ps, _template);
+						i = i+1;
+					}
+					*/
+					else if(ps == null)
+						throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+					else
+					{
+						String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+						tmp = tmp.replaceAll("<typedefName>", className);
+						ps.println(tmp);
+					}
+				}
+			}
+		}
+		else
+		{
+			for(int i = 1 ; i < template.size() ; i++)
+			{
+				if(template.get(i).startsWith("%newfile"))
+	        	{
+	        		judge = true;
+	        		String tmp = template.get(i).replaceAll("<typedefName>", className);
+	        		PrintWriter _ps;
+	        		
+	        		try{
+						_ps = openOutput(tmp.substring(9));
+						if(_ps == null)
+							throw new Exception();
+					}catch(Exception e){
+						throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+					}
+	        		
+	        		if(ps != null)
+	        		{
+	        			ps.close();
+	        			ps = _ps;
+	        		}
+	        		else
+	        			ps = _ps;
+	        		
+	        		i = i+1;
+	        	}
+				else if(ps == null)
+					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+				else
+				{
+					String tmp = template.get(i).replaceAll("<typedefType>", originalType.typeName());
+					tmp = tmp.replaceAll("<typedefName>", className);
+					if(originalType.typeSpec() instanceof SequenceType)
+						tmp = tmp.replaceAll("<sequenceLength>", Integer.toString(originalType.getSequenceLength()));
+					else
+						tmp = tmp.replaceAll("<sequenceLength>", "");
+					ps.println(tmp);
+				}
+			}
+		}
+			
         
         if(ps != null && judge)
         	ps.close();
+
+            
     }
     
     protected PrintWriter openOutput(String typeName)

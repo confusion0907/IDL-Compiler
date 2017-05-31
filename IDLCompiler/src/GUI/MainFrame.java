@@ -24,8 +24,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
@@ -33,7 +31,6 @@ import javax.swing.text.Document;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import javax.swing.undo.UndoManager;
 
 public class MainFrame extends JFrame
 {
@@ -60,7 +57,7 @@ public class MainFrame extends JFrame
 	private HashMap<JPanel, String> pathDic = new HashMap<JPanel, String>();
 	private Vector<JPanel> contentlist = new Vector<JPanel>();
 	private Vector<PopupTextPane> textlist = new Vector<PopupTextPane>();
-	private Vector<UndoManager> um = new Vector<UndoManager>();
+	private Vector<UndoableEdit> um = new Vector<UndoableEdit>();
 	
 	public MainFrame()
 	{
@@ -157,7 +154,7 @@ public class MainFrame extends JFrame
 		jp.add("West",jt);
 		tb = new JTabbedPane();
 		textArea = new JTextPane();
-		textArea.getDocument().addDocumentListener(new Highlighter(textArea));
+		textArea.getDocument().addDocumentListener(new WarningHighlighter(textArea));
 		textArea.setForeground(Color.RED);
 		textArea.setEditable(false);
 		textArea.addMouseListener(new MouseAdapter(){
@@ -828,7 +825,6 @@ public class MainFrame extends JFrame
 				jd1.setVisible(true);
 				break;
 			case "基本类型翻译修改":
-				//FIXME
 				JDialog jd2 = new JDialog();
 				jd2.setTitle("基本类型翻译设置");
 				JLabel any = new JLabel("any",JLabel.CENTER);
@@ -1087,13 +1083,7 @@ public class MainFrame extends JFrame
 			textlist.add(ln.pane);
 			tb.addTab(title, jp);
 			ln.pane.setText(strb.toString());
-			UndoManager u = new UndoManager();
-			ln.pane.getDocument().addUndoableEditListener(new UndoableEditListener(){
-				public void undoableEditHappened(UndoableEditEvent e) {
-					u.addEdit(e.getEdit());
-					}
-			});
-			um.add(u);
+			um.add(ln.pane.getU());
 			return true;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -1106,6 +1096,7 @@ public class MainFrame extends JFrame
 	private void saveFile(File f, String str) 
 	{
 		try {
+			str = str.replaceAll("\r", "");
 			str = str.replaceAll("\n", "\r\n");
 			BufferedWriter writer = new BufferedWriter(new FileWriter(f));
 			writer.write(str);
@@ -1119,6 +1110,7 @@ public class MainFrame extends JFrame
 	private boolean templateApply(File f, String str)
 	{
 		try {
+			str = str.replaceAll("\r", "");
 			str = str.replaceAll("\n", "\r\n");
 			BufferedWriter writer = new BufferedWriter(new FileWriter(f));
 			if(ErrorDetection.getInstance().errorFinding(f.getName(), str, textArea))
@@ -1178,12 +1170,12 @@ public class MainFrame extends JFrame
 	}
 }
 
-class Highlighter implements DocumentListener
+class WarningHighlighter implements DocumentListener
 {
 	private Style warning;
 	private Style other;
 	
-	public Highlighter(JTextPane editor)
+	public WarningHighlighter(JTextPane editor)
 	{
 		warning = ((StyledDocument)editor.getDocument()).addStyle("Warning_Style", null);
 		other = ((StyledDocument)editor.getDocument()).addStyle("Keyword_Style", null);

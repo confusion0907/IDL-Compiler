@@ -85,7 +85,10 @@ public class LongLongType
 
     public String toString()
     {
-        return typeName();
+    	if(unsigned)
+    		return "ulonglong";
+    	else
+    		return "longlong";
     }
 
     public String holderName()

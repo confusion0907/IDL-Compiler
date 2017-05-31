@@ -65,7 +65,7 @@ public class VoidTypeSpec
 
     public String toString()
     {
-        return typeName();
+        return "void";
     }
 
     public void setEnclosingSymbol( IdlSymbol s )

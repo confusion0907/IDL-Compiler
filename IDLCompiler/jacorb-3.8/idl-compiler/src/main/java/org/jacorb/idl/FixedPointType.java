@@ -225,7 +225,7 @@ public class FixedPointType
 
     public String toString()
     {
-        return typeName();
+        return "fixed<" + digits + "," + scale + ">";
     }
 
     public String holderName()

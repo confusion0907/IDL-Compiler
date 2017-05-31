@@ -63,7 +63,7 @@ public class AnyType
 
     public String toString()
     {
-        return typeName();
+        return "any";
     }
 
     public String holderName()

@@ -291,12 +291,13 @@ public class Member
     {
         /* only print members that are not interfaces */
     	//FIXME
-        if( type_spec.typeSpec().toString().equals("string") && template.get(0).contains(":string"))
+        if( (type_spec.typeSpec().toString().equals("string") || type_spec.typeSpec().toString().equals("wstring")) && template.get(0).contains(":string"))
         {
             for(int i = 1 ; i < template.size() ; i++)
             {
-            	String tmp = template.get(i).replaceAll("<memberType>", type_spec.toString());
+            	String tmp = template.get(i).replaceAll("<memberType>", type_spec.typeName());
             	tmp = tmp.replaceAll("<memberName>", declarator.toString());
+            	tmp = tmp.replaceAll("<memberIDLType>", type_spec.typeSpec().toString());
             	ps.println(tmp);
             }
         }
@@ -304,8 +305,9 @@ public class Member
         {
         	for(int i = 1 ; i < template.size() ; i++)
             {
-            	String tmp = template.get(i).replaceAll("<memberType>", type_spec.toString());
+            	String tmp = template.get(i).replaceAll("<memberType>", type_spec.typeName());
             	tmp = tmp.replaceAll("<memberName>", declarator.toString());
+            	tmp = tmp.replaceAll("<memberIDLType>", type_spec.typeSpec().toString());
             	ps.println(tmp);
             }
         }

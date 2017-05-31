@@ -132,16 +132,13 @@ public class Spec
 				{
 					if(_ps != null)
 						_ps.close();
-					else
-					{
-						String tmp = str.substring(9);
-						try{
-							_ps = openOutput(tmp);
-							if(_ps == null)
-								throw new Exception();
-						}catch(Exception e){
-							throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
-						}
+					String tmp = str.substring(9);
+					try{
+						_ps = openOutput(tmp);
+						if(_ps == null)
+							throw new Exception();
+					}catch(Exception e){
+						throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
 					}
 				}
 				else if(str.startsWith("%interface"))

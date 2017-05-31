@@ -63,7 +63,7 @@ public class BooleanType
 
     public String toString()
     {
-        return typeName();
+        return "boolean";
     }
 
     public void parse()

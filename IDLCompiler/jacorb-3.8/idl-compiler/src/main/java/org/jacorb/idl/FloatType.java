@@ -62,7 +62,7 @@ public class FloatType
 
     public String toString()
     {
-        return typeName();
+        return "float";
     }
 
     public String holderName()

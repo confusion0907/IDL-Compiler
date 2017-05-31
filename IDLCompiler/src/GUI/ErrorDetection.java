@@ -20,21 +20,27 @@ public class ErrorDetection {
 	{
 		errorTree = new TreeNode("%spec");
 		errorTree.addKeywords("<fileName>");
+		errorTree.setNewfile(true);
 		TreeNode interface_all = new TreeNode("%interface");
 		interface_all.addKeywords("<interfaceName>");
 		interface_all.addKeywords("<scopeList>");
+		interface_all.setNewfile(true);
 		TreeNode interface_abstract = new TreeNode("%interface:abstract");
 		interface_abstract.addKeywords("<interfaceName>");
 		interface_abstract.addKeywords("<scopeList>");
+		interface_abstract.setNewfile(true);
 		TreeNode interface_pseudo = new TreeNode("%interface:pseudo");
 		interface_pseudo.addKeywords("<interfaceName>");
 		interface_pseudo.addKeywords("<scopeList>");
+		interface_pseudo.setNewfile(true);
 		TreeNode interface_local = new TreeNode("%interface:local");
 		interface_local.addKeywords("<interfaceName>");
 		interface_local.addKeywords("<scopeList>");
+		interface_local.setNewfile(true);
 		TreeNode interface_normal = new TreeNode("%interface:normal");
 		interface_normal.addKeywords("<interfaceName>");
 		interface_normal.addKeywords("<scopeList>");
+		interface_normal.setNewfile(true);
 		errorTree.addChildren(interface_all);
 		errorTree.addChildren(interface_abstract);
 		errorTree.addChildren(interface_pseudo);
@@ -42,35 +48,47 @@ public class ErrorDetection {
 		errorTree.addChildren(interface_normal);
 		TreeNode struct = new TreeNode("%struct");
 		struct.addKeywords("<structName>");
+		struct.addKeywords("<memberList>");
+		struct.setNewfile(true);
 		TreeNode member = new TreeNode("%member");
 		member.addKeywords("<memberType>");
 		member.addKeywords("<memberName>");
+		member.addKeywords("<memberIDLType>");
+		member.setNewfile(false);
 		struct.addChildren(member);
 		TreeNode member_string = new TreeNode("%member:string");
 		member_string.addKeywords("<memberType>");
 		member_string.addKeywords("<memberName>");
+		member_string.addKeywords("<memberIDLType>");
+		member_string.setNewfile(false);
 		struct.addChildren(member_string);
 		errorTree.addChildren(struct);
 		TreeNode typedef_all = new TreeNode("%typedef");
 		typedef_all.addKeywords("<typedefType>");
 		typedef_all.addKeywords("<typedefName>");
+		typedef_all.setNewfile(true);
 		TreeNode typedef_local = new TreeNode("%typedef:local");
 		typedef_local.addKeywords("<typedefType>");
 		typedef_local.addKeywords("<typedefName>");
+		typedef_local.setNewfile(true);
 		TreeNode typedef_sequence = new TreeNode("%typedef:sequence");
 		typedef_sequence.addKeywords("<typedefType>");
 		typedef_sequence.addKeywords("<typedefName>");
 		typedef_sequence.addKeywords("<sequenceLength>");
+		typedef_sequence.setNewfile(true);
 		TreeNode length = new TreeNode("%length");
+		length.setNewfile(false);
 		typedef_sequence.addChildren(length);
 		TreeNode typedef_fixed = new TreeNode("%typedef:fixed");
 		typedef_fixed.addKeywords("<typedefType>");
 		typedef_fixed.addKeywords("<typedefName>");
 		typedef_fixed.addKeywords("<digitsNumber>");
 		typedef_fixed.addKeywords("<scaleNumber>");
+		typedef_fixed.setNewfile(true);
 		TreeNode typedef_array = new TreeNode("%typedef:array");
 		typedef_array.addKeywords("<typedefType>");
 		typedef_array.addKeywords("<typedefName>");
+		typedef_array.setNewfile(true);
 		errorTree.addChildren(typedef_all);
 		errorTree.addChildren(typedef_local);
 		errorTree.addChildren(typedef_sequence);
@@ -78,31 +96,39 @@ public class ErrorDetection {
 		errorTree.addChildren(typedef_array);
 		TreeNode exception = new TreeNode("%exception");
 		exception.addKeywords("<exceptionName>");
+		exception.addKeywords("<memberList>");
+		exception.setNewfile(true);
 		exception.addChildren(member);
 		exception.addChildren(member_string);
 		errorTree.addChildren(exception);
 		TreeNode union = new TreeNode("%union");
 		union.addKeywords("<unionName>");
 		union.addKeywords("<switchType>");
+		union.setNewfile(true);
 		TreeNode case_ = new TreeNode("%case");
 		case_.addKeywords("<memberType>");
 		case_.addKeywords("<memberName>");
 		case_.addKeywords("<caseValue>");
+		case_.setNewfile(false);
 		union.addChildren(case_);
 		TreeNode default_ = new TreeNode("%default");
 		default_.addKeywords("<memberType>");
 		default_.addKeywords("<memberName>");
+		default_.setNewfile(false);
 		union.addChildren(default_);
 		errorTree.addChildren(union);
 		TreeNode enum_ = new TreeNode("%enum");
 		enum_.addKeywords("<enumName>");
+		enum_.setNewfile(true);
 		TreeNode label = new TreeNode("%label");
 		label.addKeywords("<enumLabel>");
+		label.setNewfile(false);
 		enum_.addChildren(label);
 		errorTree.addChildren(enum_);
 		TreeNode typeprefix = new TreeNode("%typeprefix");
 		typeprefix.addKeywords("<scopeName>");
 		typeprefix.addKeywords("<prefixString>");
+		typeprefix.setNewfile(true);
 		errorTree.addChildren(typeprefix);
 		TreeNode operation_all = new TreeNode("%operation");
 		operation_all.addKeywords("<operationName>");
@@ -111,6 +137,7 @@ public class ErrorDetection {
 		operation_all.addKeywords("<paramTypeList>");
 		operation_all.addKeywords("<paramNameList>");
 		operation_all.addKeywords("<raisesList>");
+		operation_all.setNewfile(true);
 		TreeNode operation_normal = new TreeNode("%operation:normal");
 		operation_normal.addKeywords("<operationName>");
 		operation_normal.addKeywords("<returnType>");
@@ -118,6 +145,7 @@ public class ErrorDetection {
 		operation_normal.addKeywords("<paramTypeList>");
 		operation_normal.addKeywords("<paramNameList>");
 		operation_normal.addKeywords("<raisesList>");
+		operation_normal.setNewfile(true);
 		TreeNode operation_oneway = new TreeNode("%operation:oneway");
 		operation_oneway.addKeywords("<operationName>");
 		operation_oneway.addKeywords("<returnType>");
@@ -125,6 +153,7 @@ public class ErrorDetection {
 		operation_oneway.addKeywords("<paramTypeList>");
 		operation_oneway.addKeywords("<paramNameList>");
 		operation_oneway.addKeywords("<raisesList>");
+		operation_oneway.setNewfile(true);
 		TreeNode operation_noraises = new TreeNode("%operation:noraises");
 		operation_noraises.addKeywords("<operationName>");
 		operation_noraises.addKeywords("<returnType>");
@@ -132,6 +161,7 @@ public class ErrorDetection {
 		operation_noraises.addKeywords("<paramTypeList>");
 		operation_noraises.addKeywords("<paramNameList>");
 		operation_noraises.addKeywords("<raisesList>");
+		operation_noraises.setNewfile(true);
 		TreeNode operation_raises = new TreeNode("%operation:raises");
 		operation_raises.addKeywords("<operationName>");
 		operation_raises.addKeywords("<returnType>");
@@ -139,6 +169,7 @@ public class ErrorDetection {
 		operation_raises.addKeywords("<paramTypeList>");
 		operation_raises.addKeywords("<paramNameList>");
 		operation_raises.addKeywords("<raisesList>");
+		operation_raises.setNewfile(true);
 		interface_all.addChildren(operation_all);
 		interface_all.addChildren(operation_normal);
 		interface_all.addChildren(operation_oneway);
@@ -166,20 +197,27 @@ public class ErrorDetection {
 		interface_normal.addChildren(operation_raises);
 		TreeNode raises = new TreeNode("%raises");
 		raises.addKeywords("<scopeName>");
+		raises.setNewfile(false);
 		TreeNode param_all = new TreeNode("%param");
 		param_all.addKeywords("<paramType>");
 		param_all.addKeywords("<paramName>");
+		param_all.setNewfile(false);
 		TreeNode param_INOUT = new TreeNode("%param:INOUT");
 		param_INOUT.addKeywords("<paramType>");
 		param_INOUT.addKeywords("<paramName>");
+		param_INOUT.setNewfile(false);
 		TreeNode param_IN = new TreeNode("%param:IN");
 		param_IN.addKeywords("<paramType>");
 		param_IN.addKeywords("<paramName>");
+		param_IN.setNewfile(false);
 		TreeNode param_OUT = new TreeNode("%param:OUT");
 		param_OUT.addKeywords("<paramType>");
 		param_OUT.addKeywords("<paramName>");
+		param_OUT.setNewfile(false);
 		TreeNode return_all = new TreeNode("%return");
 		TreeNode return_void = new TreeNode("%return:void");
+		return_all.setNewfile(false);
+		return_void.setNewfile(false);
 		operation_all.addChildren(raises);
 		operation_all.addChildren(param_all);
 		operation_all.addChildren(param_INOUT);
@@ -244,6 +282,7 @@ public class ErrorDetection {
 		constants.addKeywords("<constantsType>");
 		constants.addKeywords("<constantsName>");
 		constants.addKeywords("<constantsValue>");
+		constants.setNewfile(false);
 		interface_all.addChildren(constants);
 		interface_normal.addChildren(constants);
 		interface_abstract.addChildren(constants);
@@ -271,6 +310,7 @@ public class ErrorDetection {
 		interface_local.addChildren(enum_);
 		TreeNode inheritance = new TreeNode("%inheritance");
 		inheritance.addKeywords("<scopeName>");
+		inheritance.setNewfile(false);
 		interface_all.addChildren(inheritance);
 		interface_normal.addChildren(inheritance);
 		interface_abstract.addChildren(inheritance);
@@ -279,22 +319,27 @@ public class ErrorDetection {
 		TreeNode attribute_all = new TreeNode("%attribute");
 		attribute_all.addKeywords("<attributeType>");
 		attribute_all.addKeywords("<attributeName>");
+		attribute_all.setNewfile(true);
 		TreeNode getraises = new TreeNode("%getraises");
 		getraises.addKeywords("<scopeList>");
 		getraises.addKeywords("<scopeName>");
+		getraises.setNewfile(false);
 		attribute_all.addChildren(getraises);
 		TreeNode setraises = new TreeNode("%setraises");
 		setraises.addKeywords("<scopeList>");
 		setraises.addKeywords("<scopeName>");
+		setraises.setNewfile(false);
 		attribute_all.addChildren(setraises);
 		TreeNode attribute_normal = new TreeNode("%attribute:normal");
 		attribute_normal.addKeywords("<attributeType>");
 		attribute_normal.addKeywords("<attributeName>");
+		attribute_normal.setNewfile(true);
 		attribute_normal.addChildren(getraises);
 		attribute_normal.addChildren(setraises);
 		TreeNode attribute_readonly = new TreeNode("%attribute:readonly");
 		attribute_readonly.addKeywords("<attributeType>");
 		attribute_readonly.addKeywords("<attributeName>");
+		attribute_readonly.setNewfile(true);
 		interface_all.addChildren(attribute_all);
 		interface_all.addChildren(attribute_normal);
 		interface_all.addChildren(attribute_readonly);
@@ -312,15 +357,18 @@ public class ErrorDetection {
 		interface_local.addChildren(attribute_readonly);
 		TreeNode native_ = new TreeNode("%native");
 		native_.addKeywords("<nativeName>");
+		native_.setNewfile(true);
 		interface_all.addChildren(native_);
 		interface_normal.addChildren(native_);
 		interface_abstract.addChildren(native_);
 		interface_pseudo.addChildren(native_);
 		interface_local.addChildren(native_);
 		TreeNode module = new TreeNode("%module");
+		module.setNewfile(true);
 		TreeNode valuetype_box = new TreeNode("%valuetype:box");
 		valuetype_box.addKeywords("<valuetypeType>");
 		valuetype_box.addKeywords("<valuetypeName>");
+		valuetype_box.setNewfile(true);
 		TreeNode valuetype_abstract = new TreeNode("%valuetype:abstract");
 		valuetype_abstract.addKeywords("<valuetypeName>");
 		valuetype_abstract.addKeywords("<truncatableList>");
@@ -329,6 +377,7 @@ public class ErrorDetection {
 		valuetype_abstract.addKeywords("<supportsList>");
 		valuetype_abstract.addKeywords("<abstractSupportsList>");
 		valuetype_abstract.addKeywords("<statefulSupportsList>");
+		valuetype_abstract.setNewfile(true);
 		valuetype_abstract.addChildren(operation_all);
 		valuetype_abstract.addChildren(operation_normal);
 		valuetype_abstract.addChildren(operation_oneway);
@@ -349,13 +398,17 @@ public class ErrorDetection {
 		valuetype_abstract.addChildren(attribute_readonly);
 		TreeNode truncatable = new TreeNode("%truncatable");
 		truncatable.addKeywords("<truncatableName>");
+		truncatable.setNewfile(false);
 		TreeNode abstract_ = new TreeNode("%abstract");
+		abstract_.setNewfile(false);
 		TreeNode stateful_ = new TreeNode("%stateful");
+		stateful_.setNewfile(false);
 		truncatable.addChildren(abstract_);
 		truncatable.addChildren(stateful_);
 		valuetype_abstract.addChildren(truncatable);
 		TreeNode supports = new TreeNode("%supports");
 		supports.addKeywords("<supportsName>");
+		supports.setNewfile(false);
 		supports.addChildren(abstract_);
 		supports.addChildren(stateful_);
 		valuetype_abstract.addChildren(supports);
@@ -367,6 +420,7 @@ public class ErrorDetection {
 		valuetype_normal.addKeywords("<supportsList>");
 		valuetype_normal.addKeywords("<abstractSupportsList>");
 		valuetype_normal.addKeywords("<statefulSupportsList>");
+		valuetype_normal.setNewfile(true);
 		valuetype_normal.addChildren(operation_all);
 		valuetype_normal.addChildren(operation_normal);
 		valuetype_normal.addChildren(operation_oneway);
@@ -386,9 +440,11 @@ public class ErrorDetection {
 		valuetype_normal.addChildren(attribute_normal);
 		valuetype_normal.addChildren(attribute_readonly);
 		TreeNode statemember_public = new TreeNode("%statemember:public");
+		statemember_public.setNewfile(true);
 		statemember_public.addChildren(member);
 		statemember_public.addChildren(member_string);
 		TreeNode statemember_private = new TreeNode("%statemember:private");
+		statemember_private.setNewfile(true);
 		statemember_private.addChildren(member);
 		statemember_private.addChildren(member_string);
 		valuetype_normal.addChildren(statemember_public);
@@ -399,6 +455,7 @@ public class ErrorDetection {
 		factory.addKeywords("<paramTypeList>");
 		factory.addKeywords("<paramNameList>");
 		factory.addKeywords("<raisesList>");
+		factory.setNewfile(true);
 		factory.addChildren(param_all);
 		factory.addChildren(raises);
 		valuetype_normal.addChildren(factory);
@@ -412,6 +469,7 @@ public class ErrorDetection {
 		valuetype_nocustom.addKeywords("<supportsList>");
 		valuetype_nocustom.addKeywords("<abstractSupportsList>");
 		valuetype_nocustom.addKeywords("<statefulSupportsList>");
+		valuetype_nocustom.setNewfile(true);
 		valuetype_nocustom.addChildren(operation_all);
 		valuetype_nocustom.addChildren(operation_normal);
 		valuetype_nocustom.addChildren(operation_oneway);
@@ -443,6 +501,7 @@ public class ErrorDetection {
 		valuetype_custom.addKeywords("<supportsList>");
 		valuetype_custom.addKeywords("<abstractSupportsList>");
 		valuetype_custom.addKeywords("<statefulSupportsList>");
+		valuetype_custom.setNewfile(true);
 		valuetype_custom.addChildren(operation_all);
 		valuetype_custom.addChildren(operation_normal);
 		valuetype_custom.addChildren(operation_oneway);
@@ -536,7 +595,17 @@ public class ErrorDetection {
 					--labelMatch;
 				}
 			}
-			else if(code[i].startsWith("%") && !code[i].startsWith("%newfile"))
+			else if(code[i].startsWith("%newfile"))
+			{
+				if(stack.lastElement().hasNewfile())
+					continue;
+				else
+				{
+					textPane.setText(textPane.getText() + "\r\nerror:当前位置标签%newfile不可用 line(" + (i+1) + ")");
+					++error;
+				}
+			}
+			else if(code[i].startsWith("%"))
 			{
 				TreeNode newtemp = stack.lastElement().findChild(code[i]);
 				if(newtemp != null)
@@ -547,8 +616,8 @@ public class ErrorDetection {
 				}
 				else if(labelwords.contains(code[i]))
 				{
-					textPane.setText(textPane.getText() + "\r\nwarning:当前位置标签" + code[i] + "不可用 line(" + (i+1) + ")");
-					++warning;
+					textPane.setText(textPane.getText() + "\r\nerror:当前位置标签" + code[i] + "不可用 line(" + (i+1) + ")");
+					++error;
 				}
 				else
 				{
@@ -569,8 +638,8 @@ public class ErrorDetection {
 							continue;
 						else if(keywords.contains(newtemp))
 						{
-							textPane.setText(textPane.getText() + "\r\nwarning:当前位置关键字" + newtemp + "不可用 line(" + (i+1) + ")");
-							++warning;
+							textPane.setText(textPane.getText() + "\r\nerror:当前位置关键字" + newtemp + "不可用 line(" + (i+1) + ")");
+							++error;
 						}
 						else
 						{
@@ -620,6 +689,7 @@ class TreeNode
 	private String label;
 	private Vector<String> keywords;
 	private Vector<TreeNode> children;
+	private boolean newfile = false;
 	
 	public TreeNode(String label)
 	{
@@ -643,6 +713,16 @@ class TreeNode
 		this.keywords = keywords;
 	}
 	
+	public boolean hasNewfile() 
+	{
+		return newfile;
+	}
+
+	public void setNewfile(boolean newfile) 
+	{
+		this.newfile = newfile;
+	}
+
 	public void addChildren(TreeNode child)
 	{
 		children.add(child);

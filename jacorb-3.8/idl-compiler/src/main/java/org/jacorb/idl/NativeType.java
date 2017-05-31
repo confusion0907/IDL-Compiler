@@ -163,6 +163,7 @@ public class NativeType
 
     public void print( PrintWriter ps , Vector<String> template )
     {
+    	//FIXME
     	boolean judge = false;
     	for(int i = 0 ; i < template.size() ; i++)
     	{
