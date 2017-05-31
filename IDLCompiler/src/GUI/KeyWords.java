@@ -28,8 +28,6 @@ public class KeyWords {
 		functionwords = new HashSet<String>();
 		functionwords.add("HASH");
 		functionwords.add("IncNum");
-		functionwords.add("getTypeCodeExpression");
-		functionwords.add("CHARACTERIZATION");
 	}
 
 	private void initLabelwords() 
@@ -45,10 +43,8 @@ public class KeyWords {
 		keywords.add("<paramTypeList>");
 		keywords.add("<returnType>");
 		keywords.add("<structName>");
-		keywords.add("<memberList>");
 		keywords.add("<memberName>");
 		keywords.add("<memberType>");
-		keywords.add("<memberIDLType>");
 		keywords.add("<typedefName>");
 		keywords.add("<typedefType>");
 		keywords.add("<constantsName>");
@@ -67,8 +63,6 @@ public class KeyWords {
 		keywords.add("<valuetypeType>");
 		keywords.add("<valuetypeName>");
 		keywords.add("<sequenceLength>");
-		keywords.add("<truncatableName>");
-		keywords.add("<supportsName>");
 		keywords.add("<truncatableList>");
 		keywords.add("<abstractTruncatableList>");
 		keywords.add("<statefulTruncatableList>");
@@ -99,7 +93,6 @@ public class KeyWords {
 		labelwords.add("%label");
 		labelwords.add("%exception");
 		labelwords.add("%member");
-		labelwords.add("%member:string");
 		labelwords.add("%union");
 		labelwords.add("%case");
 		labelwords.add("%default");

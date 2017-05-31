@@ -918,7 +918,7 @@ public class ValueDecl
     {
         try
         {
-            final File f = new File(parser.out_dir+"\\"+typeName);
+            final File f = new File(typeName);
             if (GlobalInputStream.isMoreRecentThan(f))
             {
                 PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));

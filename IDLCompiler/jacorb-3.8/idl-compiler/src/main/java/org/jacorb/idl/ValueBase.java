@@ -73,7 +73,7 @@ public class ValueBase
 
     public String toString()
     {
-        return "value";
+        return typeName();
     }
 
     /**

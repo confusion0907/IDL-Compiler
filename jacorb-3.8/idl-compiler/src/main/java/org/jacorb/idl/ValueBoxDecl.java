@@ -36,6 +36,7 @@ import java.util.logging.Level;
 public class ValueBoxDecl
     extends Value
 {
+    private boolean written = false;
     private boolean parsed = false;
 
     TypeSpec typeSpec;
@@ -225,53 +226,57 @@ public class ValueBoxDecl
 
         // only write once
 
-        String className = boxTypeName();
-    	int i = 1;
-        boolean judge = false;
-        while(i < template.size())
+        if (!written)
         {
-        	if(template.get(i).startsWith("%newfile"))
-        	{
-        		judge = true;
-        		String tmp = template.get(i).replaceAll("<valuetypeName>", className);
-        		tmp = tmp.replaceAll("<valuetypeType>", typeSpec.toString());
-        		PrintWriter _ps = openOutput(tmp.substring(9));
-        		
-        		if(_ps == null)
-        		{
-        			System.out.println("文件"+tmp.substring(9)+"已存在，代码生成失败");
-        			return;
-        		}
-        		else if(ps != null)
-        		{
-        			ps.close();
-        			ps = _ps;
-        		}
-        		else
-        			ps = _ps;
-        		
-        		i = i+1;
-        	}
-        	else if(ps == null)
-				throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
-        	else
-        	{
-        		String tmp = template.get(i).replaceAll("<valuetypeName>", className);
-        		tmp = tmp.replaceAll("<valuetypeType>", typeSpec.toString());
-        		ps.println(tmp);
-        		i = i+1;
-        	}
+        	String className = boxTypeName();
+        	int i = 1;
+            boolean judge = false;
+            while(i < template.size())
+            {
+            	if(template.get(i).startsWith("%newfile"))
+            	{
+            		judge = true;
+            		String tmp = template.get(i).replaceAll("<valuetypeName>", className);
+            		tmp = tmp.replaceAll("<valuetypeType>", typeSpec.toString());
+            		PrintWriter _ps = openOutput(tmp.substring(9));
+            		
+            		if(_ps == null)
+            		{
+            			System.out.println("文件"+tmp.substring(9)+"已存在，代码生成失败");
+            			return;
+            		}
+            		else if(ps != null)
+            		{
+            			ps.close();
+            			ps = _ps;
+            		}
+            		else
+            			ps = _ps;
+            		
+            		i = i+1;
+            	}
+            	else if(ps == null)
+					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+(Spec.line-template.size()+i+1)+")");
+            	else
+            	{
+            		String tmp = template.get(i).replaceAll("<valuetypeName>", className);
+            		tmp = tmp.replaceAll("<valuetypeType>", typeSpec.toString());
+            		ps.println(tmp);
+            		i = i+1;
+            	}
+            }
+        	written = true;
+        	
+        	if(ps != null && judge)
+            	ps.close();
         }
-    	
-    	if(ps != null && judge)
-        	ps.close();
     }
     
     protected PrintWriter openOutput(String typeName)
     {
         try
         {
-            final File f = new File(parser.out_dir+"\\"+typeName);
+            final File f = new File(typeName);
             if (GlobalInputStream.isMoreRecentThan(f))
             {
                 PrintWriter ps = new PrintWriter(new java.io.FileWriter(f));

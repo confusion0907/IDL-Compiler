@@ -76,7 +76,7 @@ public class ObjectTypeSpec
 
     public String toString()
     {
-        return "Object";
+        return "org.omg.CORBA.Object";
     }
 
     /**

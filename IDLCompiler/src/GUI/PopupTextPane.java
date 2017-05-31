@@ -1,7 +1,6 @@
 package GUI;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -21,17 +20,20 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.undo.UndoManager;
 
 public class PopupTextPane extends JTextPane implements ActionListener,MouseListener{
 	private static final long serialVersionUID = 1L;
 	private JPopupMenu popupMenu;
 	private JMenuItem cutMenu,copyMenu,pasteMenu,selectAllMenu;
-	private UndoableEdit u;
+	private UndoManager u;
 	
 	PopupTextPane()
 	{
@@ -60,23 +62,10 @@ public class PopupTextPane extends JTextPane implements ActionListener,MouseList
 		
 		this.add(popupMenu);
 		this.addMouseListener(this);
-		//this.addKeyListener(this);
 		SyntaxHighlighter s = new SyntaxHighlighter(this);
+		this.getDocument().addUndoableEditListener(s);
 		this.getDocument().addDocumentListener(s);
-		u = new UndoableEdit(this);
-	}
-	
-	public boolean getScrollableTracksViewportWidth()
-	{
-		setSize(new Dimension(getParent().getSize()));
-		return false;
-	}	  
-	
-	public void setSize(Dimension d)
-	{
-		if(d.width<getParent().getSize().width)
-			d.width=getParent().getSize().width;
-		super.setSize(d);
+		u = s.getU();
 	}
 
 	public void actionPerformed(ActionEvent e) 
@@ -140,67 +129,21 @@ public class PopupTextPane extends JTextPane implements ActionListener,MouseList
 		}
 	}
 
-	public UndoableEdit getU() {
+	public void undoableEditHappened(UndoableEditEvent e) 
+	{
+		u.addEdit(e.getEdit());
+	}
+
+	public UndoManager getU() {
 		return u;
 	}
 
-	/*
-	public void keyPressed(KeyEvent arg0) {
-		
+	public void setU(UndoManager u) {
+		this.u = u;
 	}
-
-	public void keyReleased(KeyEvent arg0) {
-		try {
-			this.getU().setSetup(false);
-			if(arg0.getKeyChar() == '<' && this.getText(this.getCaretPosition()-1, 1).equals("<") && !this.getText(this.getCaretPosition(), 1).equals(">"))
-			{
-				int position = this.getCaretPosition();
-				String text = this.getText();
-				String result = "";
-				if(position != text.length())
-					result = text.substring(0, position+1)+">"+text.substring(position+1, text.length());
-				else
-					result = text + ">";
-				this.setText(result);
-				this.setCaretPosition(position);
-				this.setCaretPosition(position);
-			}
-			else if(arg0.getKeyChar() == '\n')
-			{
-				int position = this.getCaretPosition();
-				int currentLine = this.getDocument().getDefaultRootElement().getElementIndex(position)-1;
-				String []temp = this.getText().replaceAll("\r", "").split("\n");
-				if(temp.length <= currentLine || currentLine < 0)
-					return;
-				if(KeyWords.getInstance().getLabelwords().contains(temp[currentLine]))
-				{
-					String result = "";
-					for(int i = 0 ; i < temp.length ; i++)
-					{
-						if(i != currentLine && i != temp.length-1)
-							result = result + temp[i] + "\r\n";
-						else if(i == currentLine)
-							result = result + temp[i] + "\r\n" + "\r\n%%";
-						else
-							result = result + temp[i];
-							
-					}
-					this.setText(result);
-					this.setCaretPosition(position);
-				}
-			}
-			this.getU().setSetup(true);
-		} catch (BadLocationException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void keyTyped(KeyEvent arg0) {
-	}
-	*/
 }
 
-class SyntaxHighlighter implements DocumentListener
+class SyntaxHighlighter implements DocumentListener,UndoableEditListener
 {
 	private Set<String> keywords;
 	private Set<String> labelwords;
@@ -210,13 +153,11 @@ class SyntaxHighlighter implements DocumentListener
 	private Style labelStyle2;
 	private Style functionStyle;
 	private Style normalStyle;
-	private char last = ' ';
-	private boolean end = false;
-	private PopupTextPane textPane;
+	private UndoManager u;
 	
 	public SyntaxHighlighter(PopupTextPane editor)
 	{
-		this.textPane = editor;
+		u = new UndoManager();
 		keywordStyle = ((StyledDocument)editor.getDocument()).addStyle("Keyword_Style", null);
 		labelStyle1 = ((StyledDocument)editor.getDocument()).addStyle("Keyword_Style", null);
 		labelStyle2 = ((StyledDocument)editor.getDocument()).addStyle("Keyword_Style", null);
@@ -238,15 +179,10 @@ class SyntaxHighlighter implements DocumentListener
 		functionwords = key.getFunctionwords();
 	}
 	
-	public void changedUpdate(DocumentEvent e) 
-	{
-		textPane.getU().bufferUpdate();
-	}
+	public void changedUpdate(DocumentEvent e){}
 	
 	public void insertUpdate(DocumentEvent e)
 	{
-		if(!(textPane.getU().isundo || textPane.getU().isredo))
-			textPane.getU().bufferUpdate();
 		try{
 			colouring((StyledDocument) e.getDocument(), e.getOffset(), e.getLength());
 		} catch (BadLocationException e1) {
@@ -256,8 +192,6 @@ class SyntaxHighlighter implements DocumentListener
 	
 	public void removeUpdate(DocumentEvent e) 
 	{
-		if(!(textPane.getU().isundo || textPane.getU().isredo))
-			textPane.getU().bufferUpdate();
 		try{
 			colouring((StyledDocument) e.getDocument(), e.getOffset(), 0);
 		} catch (BadLocationException e1){
@@ -273,28 +207,19 @@ class SyntaxHighlighter implements DocumentListener
 	public boolean isWordCharacter(Document doc, int pos) throws BadLocationException
 	{
 		char ch = getCharAt(doc, pos);
-		if(last == '>' && end)
-			return false;
-		else if(Character.isLetter(ch) || Character.isDigit(ch) || ch == '%' || ch == '<' || ch == '>' || ch == ':')
-		{
-			last = ch;
+		if(Character.isLetter(ch) || Character.isDigit(ch) || ch == '%' || ch == '<' || ch == '>' || ch == ':')
 			return true;
-		}
 		return false;
 	}
 	
 	public int indexOfWordStart(Document doc, int pos) throws BadLocationException
 	{
-		last = ' ';
-		end = false;
 		for(; pos > 0 && isWordCharacter(doc, pos - 1); --pos);
 		return pos;
 	}
 	
 	public int indexOfWordEnd(Document doc, int pos) throws BadLocationException
 	{
-		last = ' ';
-		end = true;
 		for(; isWordCharacter(doc, pos); ++pos);
 		return pos;
 	}
@@ -313,7 +238,7 @@ class SyntaxHighlighter implements DocumentListener
 				start = colouringWord(doc, start);
 			else
 			{
-				SwingUtilities.invokeLater(new ColouringTask(doc, start, 1, normalStyle));
+				SwingUtilities.invokeLater(new ColouringTask(this,doc, start, 1, normalStyle));
 				++start;
 			}
 		}
@@ -324,33 +249,156 @@ class SyntaxHighlighter implements DocumentListener
 		int wordEnd = indexOfWordEnd(doc, pos);
 		String word = doc.getText(pos, wordEnd - pos);
 		
-		if(word.contains(">") || word.contains("<"))
+		if(!word.startsWith("%") && !word.startsWith("<") && ((word.contains("<") && word.contains(">")) || word.contains("%")))
 		{
-			while(getCharAt(doc, pos) != '<')
-				pos++;
+			if(!functionwords.contains(word))
+			{
+				while(!word.startsWith("<") && !word.startsWith("%"))
+				{
+					word = word.substring(1);
+					pos = pos+1;
+				}
+				
+				if(word.startsWith("<"))
+				{
+					while(!word.endsWith(">"))
+					{
+						word = word.substring(0,word.length()-1);
+						wordEnd = wordEnd - 1;
+					}
+				}
+			}
 		}
 		
-		word = doc.getText(pos, wordEnd - pos);
+		if(word.contains(">:"))
+		{
+			String[] s = word.split(":");
+			
+			for(int i = 0 ; i < s.length ; i++)
+			{
+				if(s[i].equals(""))
+					continue;
+				
+				if(s[i].contains("><"))
+				{
+					String tmp = s[i].replaceAll("><", ">:<");
+					String[] ss = tmp.split(":");
+					
+					for(int j = 0 ; j < ss.length ; j++)
+					{
+						if(ss[j].equals(""))
+							continue;
+						
+						if(keywords.contains(ss[j]))
+							SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, ss[j].length(), keywordStyle));
+						else if(labelwords.contains(ss[j]))
+						{
+							String []stmp = ss[j].split(":");
+							SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, stmp[0].length(), labelStyle1));
+							if(stmp.length == 2)
+								SwingUtilities.invokeLater(new ColouringTask(this, doc, pos + stmp[0].length(), stmp[1].length() + 1, labelStyle2));
+						}
+						else if(functionwords.contains(ss[j]))
+						{
+							char ctmp = getCharAt(doc,pos+ss[j].length());
+							if(ctmp == '(')
+								SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, ss[j].length(), functionStyle));
+						}
+						else
+							SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, ss[j].length(), normalStyle));
+						
+						pos = pos + ss[j].length();
+					}
+					pos = pos + 1;
+					continue;
+				}
+				
+				if(keywords.contains(s[i]))
+					SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, s[i].length(), keywordStyle));
+				else if(labelwords.contains(s[i]))
+				{
+					String []stmp = s[i].split(":");
+					SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, stmp[0].length(), labelStyle1));
+					if(stmp.length == 2)
+						SwingUtilities.invokeLater(new ColouringTask(this, doc, pos + stmp[0].length(), stmp[1].length() + 1, labelStyle2));
+				}
+				else if(functionwords.contains(s[i]))
+				{
+					char ctmp = getCharAt(doc,pos+s[i].length());
+					if(ctmp == '(')
+						SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, s[i].length(), functionStyle));
+				}
+				else
+					SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, s[i].length(), normalStyle));
+				
+				pos = pos + s[i].length() + 1;
+			}
+			return wordEnd;
+		}
+		else if(word.contains("><"))
+		{
+			word = word.replaceAll("><", ">:<");
+			String[] s = word.split(":");
+			
+			for(int i = 0 ; i < s.length ; i++)
+			{
+				if(s[i].equals(""))
+					continue;
+				
+				if(keywords.contains(s[i]))
+					SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, s[i].length(), keywordStyle));
+				else if(labelwords.contains(s[i]))
+				{
+					String []stmp = s[i].split(":");
+					SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, stmp[0].length(), labelStyle1));
+					if(stmp.length == 2)
+						SwingUtilities.invokeLater(new ColouringTask(this, doc, pos + stmp[0].length(), stmp[1].length() + 1, labelStyle2));
+				}
+				else if(functionwords.contains(s[i]))
+				{
+					char ctmp = getCharAt(doc,pos+s[i].length());
+					if(ctmp == '(')
+						SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, s[i].length(), functionStyle));
+				}
+				else
+					SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, s[i].length(), normalStyle));
+				
+				pos = pos + s[i].length();
+			}
+			return wordEnd;
+		}
 		
 		if(keywords.contains(word))
-			SwingUtilities.invokeLater(new ColouringTask(doc, pos, wordEnd - pos, keywordStyle));
+			SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, wordEnd - pos, keywordStyle));
 		else if(labelwords.contains(word))
 		{
 			String []stmp = word.split(":");
-			SwingUtilities.invokeLater(new ColouringTask(doc, pos, stmp[0].length(), labelStyle1));
+			SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, stmp[0].length(), labelStyle1));
 			if(stmp.length == 2)
-				SwingUtilities.invokeLater(new ColouringTask(doc, pos + stmp[0].length(), stmp[1].length() + 1, labelStyle2));
+				SwingUtilities.invokeLater(new ColouringTask(this, doc, pos + stmp[0].length(), stmp[1].length() + 1, labelStyle2));
 		}
 		else if(functionwords.contains(word))
 		{
 			char ctmp = getCharAt(doc,pos+word.length());
 			if(ctmp == '(')
-				SwingUtilities.invokeLater(new ColouringTask(doc, pos, word.length(), functionStyle));
+				SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, word.length(), functionStyle));
 		}
 		else
-			SwingUtilities.invokeLater(new ColouringTask(doc, pos, wordEnd - pos, normalStyle));
+			SwingUtilities.invokeLater(new ColouringTask(this, doc, pos, wordEnd - pos, normalStyle));
 		
 		return wordEnd;
+	}
+
+	public void undoableEditHappened(UndoableEditEvent e) {
+		u.addEdit(e.getEdit());
+	}
+
+	public UndoManager getU() {
+		return u;
+	}
+
+	public void setU(UndoManager u) {
+		this.u = u;
 	}
 }
 
@@ -360,19 +408,23 @@ class ColouringTask implements Runnable
 	private Style style;
 	private int pos;
 	private int len;
+	private UndoableEditListener unl;
 	
-	public ColouringTask(StyledDocument doc, int pos, int len, Style style)
+	public ColouringTask(UndoableEditListener unl,StyledDocument doc, int pos, int len, Style style)
 	{
 		this.doc = doc;
 		this.pos = pos;
 		this.len = len;
 		this.style = style;
+		this.unl = unl;
 	}
 	
 	public void run()
 	{
 		try{
+			doc.removeUndoableEditListener(unl);
 			doc.setCharacterAttributes(pos, len, style, true);
+			doc.addUndoableEditListener(unl);
 		} catch (Exception e) {}
 	}
 }

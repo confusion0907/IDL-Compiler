@@ -38,6 +38,7 @@ public class EnumType
 {
     public SymbolList enumlist;
     int const_counter = 0;
+    private boolean written = false;
     private boolean parsed = false;
 
     public EnumType(int num)
@@ -236,94 +237,100 @@ public class EnumType
         }
 
         // only write once
-        boolean judge = false;
-    	String className = className();
-    	
-    	int i = 0;
-    	while(i < template.size())
-    	{
-    		if(template.get(i).startsWith("%newfile"))
+
+        if (!written)
+        {
+        	boolean judge = false;
+        	String className = className();
+        	
+        	int i = 0;
+        	while(i < template.size())
         	{
-        		judge = true;
-        		String tmp = template.get(i).replaceAll("<enumName>", name);
-        		PrintWriter _ps;
-        		
-        		try{
-					_ps = openOutput(tmp.substring(9));
-					if(_ps == null)
-						throw new Exception();
-				}catch(Exception e){
-					throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
-				}
-        		
-        		if(ps != null)
+        		if(template.get(i).startsWith("%newfile"))
+            	{
+            		judge = true;
+            		String tmp = template.get(i).replaceAll("<enumName>", name);
+            		PrintWriter _ps;
+            		
+            		try{
+    					_ps = openOutput(tmp.substring(9));
+    					if(_ps == null)
+    						throw new Exception();
+    				}catch(Exception e){
+    					throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+    				}
+            		
+            		if(ps != null)
+            		{
+            			ps.close();
+            			ps = _ps;
+            		}
+            		else
+            			ps = _ps;
+            		
+            		i = i+1;
+            	}
+            	else if(ps == null)
+    				throw new RuntimeException ("模板代码有误,文件已被关闭");
+            	else if(template.get(i).startsWith("%label"))
         		{
-        			ps.close();
-        			ps = _ps;
-        		}
-        		else
-        			ps = _ps;
-        		
-        		i = i+1;
-        	}
-        	else if(ps == null)
-				throw new RuntimeException ("模板代码有误,文件已被关闭");
-        	else if(template.get(i).startsWith("%label"))
-    		{
-    			i = i+1;
-    			Vector<String> _template = new Vector<String>();
-    			while(!template.get(i).equals("%%"))
-    			{
-    				_template.add(template.get(i).replaceAll("<enumName>", className));
-    				i = i+1;
-    			}
-    			int basicNum = 0;
-	            String IncNumSymbol = null;
-	            for(int j = 0 ; j < _template.size() ; j++)
-	            {
-	            	String tmp = _template.get(j);
-	            	if(tmp.contains("IncNum("))
-	            	{
-	            		int begin=-1,end=-1;
-	            		for(int k = 0 ; k < _template.get(j).length() ; k++)
-	            		{
-	            			if(tmp.charAt(k)=='I' && tmp.charAt(k+1)=='n' && tmp.charAt(k+2)=='c' && tmp.charAt(k+3)=='N' && tmp.charAt(k+4)=='u' && tmp.charAt(k+5)=='m' && tmp.charAt(k+6)=='(')
-	                		{
-	                			begin = k;
-	                			break;
-	                		}
-	            		}
-	            		String IncNum = tmp.substring(begin);
-	            		end = IncNum.indexOf(')');
-	            		IncNum = IncNum.substring(0, end+1);
-	            		basicNum = Integer.parseInt(IncNum.substring(7,IncNum.length()-1));
-	            		IncNumSymbol = IncNum;
-	            		break;
-	            	}
-	            }
-	            int index = 0;
-    			for (Enumeration e = enumlist.v.elements(); e.hasMoreElements();)
-    	        {
-    	            String label = (String) e.nextElement();
+        			i = i+1;
+        			Vector<String> _template = new Vector<String>();
+        			while(!template.get(i).equals("%%"))
+        			{
+        				_template.add(template.get(i).replaceAll("<enumName>", className));
+        				i = i+1;
+        			}
+        			int basicNum = 0;
+    	            String IncNumSymbol = null;
     	            for(int j = 0 ; j < _template.size() ; j++)
     	            {
-    	            	String tmp = _template.get(j).replaceAll("<enumLabel>", label);
-    	            	tmp = tmp.replace(IncNumSymbol, Integer.toString(basicNum+index));
-    	            	ps.println(tmp);
+    	            	String tmp = _template.get(j);
+    	            	if(tmp.contains("IncNum("))
+    	            	{
+    	            		int begin=-1,end=-1;
+    	            		for(int k = 0 ; k < _template.get(j).length() ; k++)
+    	            		{
+    	            			if(tmp.charAt(k)=='I' && tmp.charAt(k+1)=='n' && tmp.charAt(k+2)=='c' && tmp.charAt(k+3)=='N' && tmp.charAt(k+4)=='u' && tmp.charAt(k+5)=='m' && tmp.charAt(k+6)=='(')
+    	                		{
+    	                			begin = k;
+    	                			break;
+    	                		}
+    	            		}
+    	            		String IncNum = tmp.substring(begin);
+		            		end = IncNum.indexOf(')');
+		            		IncNum = IncNum.substring(0, end+1);
+		            		basicNum = Integer.parseInt(IncNum.substring(7,IncNum.length()-1));
+		            		IncNumSymbol = IncNum;
+		            		break;
+    	            	}
     	            }
-    	            index = index+1;
-    	        }
-    			i = i+1;
-    		}
-    		else
-    		{
-    			ps.println(template.get(i).replaceAll("<enumName>", className));
-    			i = i+1;
-    		}
-    	}
-    	
-    	if(ps != null && judge)
-        	ps.close();
+    	            int index = 0;
+        			for (Enumeration e = enumlist.v.elements(); e.hasMoreElements();)
+        	        {
+        	            String label = (String) e.nextElement();
+        	            for(int j = 0 ; j < _template.size() ; j++)
+        	            {
+        	            	String tmp = _template.get(j).replaceAll("<enumLabel>", label);
+        	            	tmp = tmp.replace(IncNumSymbol, Integer.toString(basicNum+index));
+        	            	ps.println(tmp);
+        	            }
+        	            index = index+1;
+        	        }
+        			i = i+1;
+        		}
+        		else
+        		{
+        			ps.println(template.get(i).replaceAll("<enumName>", className));
+        			i = i+1;
+        		}
+        	}
+        	
+        	if(ps != null && judge)
+            	ps.close();
+
+        	written = true;
+        }
     }
     
     protected PrintWriter openOutput(String typeName)

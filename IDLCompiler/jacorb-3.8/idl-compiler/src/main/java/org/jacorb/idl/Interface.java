@@ -1436,7 +1436,7 @@ public class Interface
         			String tmp = template.get(i).replaceAll("<interfaceName>", name);
         			tmp = tmp.replaceAll("<scopeList>", scopeList);
 					_template.add(tmp);
-					if(template.get(i).startsWith("%") && !template.get(i).equals("%%") && !template.get(i).contains("%newfile"))
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
 						index = index+1;
 					else if(template.get(i).equals("%%"))
 						index = index-1;
@@ -1456,7 +1456,7 @@ public class Interface
         			String tmp = template.get(i).replaceAll("<interfaceName>", name);
         			tmp = tmp.replaceAll("<scopeList>", scopeList);
 					_template.add(tmp);
-					if(template.get(i).startsWith("%") && !template.get(i).equals("%%") && !template.get(i).contains("%newfile"))
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
 						index = index+1;
 					else if(template.get(i).equals("%%"))
 						index = index-1;
@@ -1489,7 +1489,7 @@ public class Interface
         			String tmp = template.get(i).replaceAll("<interfaceName>", name);
         			tmp = tmp.replaceAll("<scopeList>", scopeList);
 					_template.add(tmp);
-					if(template.get(i).startsWith("%") && !template.get(i).equals("%%") && !template.get(i).contains("%newfile"))
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
 						index = index+1;
 					else if(template.get(i).equals("%%"))
 						index = index-1;
@@ -1508,7 +1508,7 @@ public class Interface
         			String tmp = template.get(i).replaceAll("<interfaceName>", name);
         			tmp = tmp.replaceAll("<scopeList>", scopeList);
 					_template.add(tmp);
-					if(template.get(i).startsWith("%") && !template.get(i).equals("%%") && !template.get(i).contains("%newfile"))
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
 						index = index+1;
 					else if(template.get(i).equals("%%"))
 						index = index-1;
@@ -1527,7 +1527,7 @@ public class Interface
         			String tmp = template.get(i).replaceAll("<interfaceName>", name);
         			tmp = tmp.replaceAll("<scopeList>", scopeList);
 					_template.add(tmp);
-					if(template.get(i).startsWith("%") && !template.get(i).equals("%%") && !template.get(i).contains("%newfile"))
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
 						index = index+1;
 					else if(template.get(i).equals("%%"))
 						index = index-1;
@@ -1546,7 +1546,7 @@ public class Interface
         			String tmp = template.get(i).replaceAll("<interfaceName>", name);
         			tmp = tmp.replaceAll("<scopeList>", scopeList);
 					_template.add(tmp);
-					if(template.get(i).startsWith("%") && !template.get(i).equals("%%") && !template.get(i).contains("%newfile"))
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
 						index = index+1;
 					else if(template.get(i).equals("%%"))
 						index = index-1;
@@ -1563,7 +1563,7 @@ public class Interface
         		{
         			i = i + 1;
 					_template.add(template.get(i).replaceAll("<interfaceName>", name));
-					if(template.get(i).startsWith("%") && !template.get(i).equals("%%") && !template.get(i).contains("%newfile"))
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
 						index = index+1;
 					else if(template.get(i).equals("%%"))
 						index = index-1;
@@ -1598,7 +1598,7 @@ public class Interface
         			i = i + 1;
         			String tmp = template.get(i).replaceAll("<interfaceName>", name);
 					_template.add(tmp);
-					if(template.get(i).startsWith("%") && !template.get(i).equals("%%") && !template.get(i).contains("%newfile"))
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
 						index = index+1;
 					else if(template.get(i).equals("%%"))
 						index = index-1;
@@ -1616,7 +1616,7 @@ public class Interface
         			i = i + 1;
         			String tmp = template.get(i).replaceAll("<interfaceName>", name);
 					_template.add(tmp);
-					if(template.get(i).startsWith("%") && !template.get(i).equals("%%") && !template.get(i).contains("%newfile"))
+					if(template.get(i).startsWith("%") && !template.get(i).equals("%%"))
 						index = index+1;
 					else if(template.get(i).equals("%%"))
 						index = index-1;

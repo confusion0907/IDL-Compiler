@@ -4,18 +4,17 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+
 import javax.swing.JPanel;
-import javax.swing.border.MatteBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
+import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 public class LineNr extends JPanel
 {
 	private static final long serialVersionUID = 1L;
-	public PopupTextPane pane;
-	public LineHighlighterScrollPane scrollPane;
+	PopupTextPane pane;
+	JScrollPane scrollPane;
 
 	public LineNr()
 	{
@@ -31,16 +30,10 @@ public class LineNr extends JPanel
 				LineNr.this.repaint();
 			}
 		};
-		pane.setBorder(new MatteBorder(0, 5, 0, 0, Color.WHITE));
-		scrollPane = new LineHighlighterScrollPane(pane);
-		pane.addCaretListener(new CaretListener(){
-			public void caretUpdate(CaretEvent arg0) {
-				scrollPane.repaint();
-			}
-		});
-		scrollPane.setBorder(new MatteBorder(0, 1, 0, 0, new Color(230,230,230)));
-		this.setBackground(Color.WHITE);
-		this.setBorder(null);
+		pane.setBorder(null);
+		scrollPane = new JScrollPane(pane);
+		scrollPane.setBorder(null);
+		this.setBackground(new Color(230,230,230));
 	}
 	
 	public void paint(Graphics g)
@@ -69,7 +62,5 @@ public class LineNr extends JPanel
 		{
 			g.drawString(Integer.toString(line), 23-6*(Integer.toString(line).length()), y);
 		}
-		
-		scrollPane.repaint();
 	}
 }

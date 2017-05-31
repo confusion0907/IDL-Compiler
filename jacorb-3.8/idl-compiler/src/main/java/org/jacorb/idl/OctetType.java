@@ -57,7 +57,7 @@ public class OctetType
 
     public String toString()
     {
-        return "octet";
+        return typeName();
     }
 
     public boolean basic()

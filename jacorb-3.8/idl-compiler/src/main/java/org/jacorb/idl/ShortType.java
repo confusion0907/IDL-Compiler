@@ -78,10 +78,7 @@ public class ShortType
 
     public String toString()
     {
-    	if(unsigned)
-    		return "ushort";
-    	else
-    		return "short";
+        return typeName();
     }
 
     public String holderName()

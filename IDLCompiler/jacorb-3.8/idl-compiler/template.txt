@@ -1,7 +1,4 @@
 %newfile new<fileName>.idl
-%typeprefix
-string <scopeName> = <prefixString>;
-%%
 %valuetype:box
 <valuetypeType> <valuetypeName>;
 %%

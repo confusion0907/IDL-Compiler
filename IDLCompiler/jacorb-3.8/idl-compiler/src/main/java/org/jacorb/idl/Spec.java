@@ -132,13 +132,16 @@ public class Spec
 				{
 					if(_ps != null)
 						_ps.close();
-					String tmp = str.substring(9);
-					try{
-						_ps = openOutput(tmp);
-						if(_ps == null)
-							throw new Exception();
-					}catch(Exception e){
-						throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+					else
+					{
+						String tmp = str.substring(9);
+						try{
+							_ps = openOutput(tmp);
+							if(_ps == null)
+								throw new Exception();
+						}catch(Exception e){
+							throw new RuntimeException ("文件"+tmp+"已存在,代码生成失败");
+						}
 					}
 				}
 				else if(str.startsWith("%interface"))
@@ -346,28 +349,6 @@ public class Spec
             		Enumeration e = definitions.elements();
             		while( e.hasMoreElements() )
 			            ( (IdlSymbol)e.nextElement() ).print( _ps , template , "valuetype" );
-            	}
-            	else if(str.startsWith("%typeprefix"))
-            	{
-            		int index = 1;
-            		Vector<String> template = new Vector<String>();
-            		while(!(str.equals("%%") && index == 0))
-            		{
-            			str = raf.readLine();
-						ptr = raf.getFilePointer();
-						line = line+1;
-						str = str.replaceAll("<fileName>", parser.file_Name);
-						template.add(str);
-						if(str.startsWith("%") && !str.equals("%%") && !str.contains("%newfile"))
-							index = index+1;
-						else if(str.equals("%%"))
-							index = index-1;
-            		}
-            		template.remove(template.size()-1);
-            		
-            		Enumeration e = definitions.elements();
-            		while( e.hasMoreElements() )
-			            ( (IdlSymbol)e.nextElement() ).print( _ps , template , "typeprefix" );
             	}
             	else if(_ps == null)
 					throw new RuntimeException ("模板代码有误,文件已被关闭 line"+"("+line+")");
